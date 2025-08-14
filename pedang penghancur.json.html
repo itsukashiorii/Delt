@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>wuthering waves shoorekeeper my rgbShiftIntensity]</title>
+  <link rel="icon" href="wuthering waves shoorekeeper.jpg" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg1: url('wuthering waves shoorekeeper1.jpg');
+      --bg2: url('wuthering waves shoorekeeper5.jpg');
+      --bg3: url('wuthering waves shoorekeeper3.jpg');
+      --bg4: url('wuthering waves shoorekeeper4.jpg');
+      --bg5: url('wuthering waves shoorekeeper2.jpg');
+      --accent: #00bcd4;
+      --accent-dark: #008ba3;
+      --text: #eee;
+      --text-light: #fff;
+      --text-muted: #bbb;
+      --bg-overlay: rgba(0, 0, 0, 0.55);
+      --panel-bg: rgba(0, 0, 0, 0.45);
+      --panel-border: rgba(255, 255, 255, 0.15);
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --card-bg-hover: rgba(255, 255, 255, 0.12);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: var(--bg1) center/cover fixed;
+      transition: background-image 1.5s ease-in-out;
+      position: relative;
+    }
+    body::before { content: ""; position: absolute; inset: 0; background: var(--bg-overlay); z-index: -1; }
+    h1 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 3em; margin-bottom: 25px; letter-spacing: 2px;
+      color: var(--text-light);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    }
+    #toast {
+      position: fixed; top: 25px; right: 25px; background: #4caf50; color: #fff;
+      padding: 15px 25px; border-radius: 8px; font-weight: 600;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3); opacity: 0; transform: translateY(-30px);
+      transition: all 0.4s ease; z-index: 9999; display: flex; align-items: center; gap: 10px;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    .panel {
+      background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 12px;
+      padding: 35px 40px; width: 100%; max-width: 1100px; display: grid; grid-template-columns: 1fr 1.8fr; gap: 40px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.3); transition: transform 0.3s;
+    }
+    .panel:hover { transform: translateY(-5px); }
+    .controls { display: flex; flex-direction: column; gap: 25px; }
+    .control-group { display: flex; flex-direction: column; gap: 15px; }
+    .control-group-title { font-size: 1.1em; font-weight: 600; color: var(--text-light); display: flex; align-items: center; gap: 10px; }
+    .control-group-title i { color: var(--accent); }
+    .controls label { font-size: 0.95em; color: var(--text); font-weight: 600; }
+    .controls input[type="file"] {
+      color: var(--text); font-size: 0.9em; width: 100%; padding: 8px;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+    }
+    .controls input[type="range"] { width: 100%; margin-top: 6px; accent-color: var(--accent); }
+    select, button {
+      padding: 12px 18px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1);
+      color: #fff; border-radius: 8px; font-size: 0.95em; transition: 0.3s; width: 100%;
+    }
+    button {
+      cursor: pointer; font-weight: 600; background: rgba(0,188,212,0.2); border-color: var(--accent);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    button:hover { background: rgba(0,188,212,0.4); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .preview-wrapper {
+      position: relative; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; overflow: hidden;
+      background: rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 350px; height: 100%;
+    }
+    #preview { width: 100%; max-height: 480px; object-fit: contain; border-radius: 4px; display: none; }
+    canvas { display: none; }
+    .info-panel { width: 100%; margin-top: 15px; font-family: 'JetBrains Mono', monospace; border-radius: 8px; overflow: hidden; transition: all 0.3s ease; max-height: 500px; }
+    .info-header {
+      background: rgba(0,188,212,0.2); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; border: 1px solid var(--accent); border-radius: 8px;
+    }
+    .info-header:hover { background: rgba(0,188,212,0.3); }
+    .info-header span { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .info-content {
+      background: var(--panel-bg); border: 1px solid var(--panel-border); border-top: none; border-radius: 0 0 8px 8px;
+      padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+    }
+    .info-card { background: var(--card-bg); border-radius: 8px; padding: 12px 15px; border-left: 3px solid var(--accent); transition: 0.3s; }
+    .info-card:hover { background: var(--card-bg-hover); }
+    .info-card span { display: block; font-weight: 700; font-size: 1.05em; color: var(--text-light); }
+    .info-card small { color: var(--text-muted); font-size: 0.9em; }
+    
+    /* Filter controls styling */
+    .filter-controls {
+      display: none;
+      background: rgba(0,0,0,0.2);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    .filter-controls.active {
+      display: block;
+    }
+    .filter-control {
+      margin-bottom: 10px;
+    }
+    .filter-control label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.9em;
+    }
+    
+    @media (max-width: 768px) {
+      .panel { grid-template-columns: 1fr; gap: 25px; padding: 25px 20px; }
+      h1 { font-size: 2.3em; }
+      .info-content { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <h1>ubah gambar jadi 8k/32p 😹</h1>
+
+  <div id="toast"><i class="fas fa-check-circle"></i> Upload berhasil!</div>
+
+  <div class="panel">
+    <div class="controls">
+      <div class="control-group">
+        <label>
+          Upload Gambar
+          <input type="file" id="imageUpload" accept="image/*">
+        </label>
+      </div>
+
+      <div class="control-group">
+        <div class="control-group-title"><i class="fas fa-sliders-h"></i> Pengaturan Efek</div>
+        <label>
+          Mode Output
+          <select id="mode">
+            <option value="resize">Resize Biasa</option>
+            <option value="noise">Noise Glitch</option>
+            <option value="rgb">RGB Shift</option>
+            <option value="vhs">VHS Tracking</option>
+            <option value="invert">Invert Colors</option>
+            <option value="ghost">Ghost Echo</option>
+            <option value="pixelate">Pixelate</option>
+            <option value="sepia">Sepia Rusak</option>
+            <option value="oversat">Over Saturation</option>
+            <option value="graynoise">Grayscale Noise</option>
+            <option value="scanline">Scanline CRT</option>
+            <option value="burned">Burned Contrast</option>
+            <option value="swap">Random Color Swap</option>
+          </select>
+        </label>
+
+        <!-- Filter controls container -->
+        <div id="filterControlsContainer">
+          <!-- Noise Glitch Controls -->
+          <div id="noiseControls" class="filter-controls">
+            <div class="filter-control">
+              <label for="noiseAmount">Jumlah Noise: <span id="noiseAmountValue">40</span></label>
+              <input type="range" id="noiseAmount" min="0" max="100" value="40">
+            </div>
+          </div>
+          
+          <!-- RGB Shift Controls -->
+          <div id="rgbControls" class="filter-controls">
+            <div class="filter-control">
+              <label for="rgbShiftAmount">Jumlah RGB Shift: <span id="rgbShiftAmountValue">15</span></label>
+              <input type="range" id="rgbShiftAmount" min="0" max="50" value="15">
+            </div>
+          </div>
+          
+          <!-- VHS Tracking Controls -->
+          <div id="vhsControls" class="filter-controls">
+            <div class="filter-control">
+              <label for="vhsDistortion">Distorsi VHS: <span id="vhsDistortionValue">10</span></label>
+              <input type="range" id="vhsDistortion" min="0" max="20" value="10">
+            </div>
+          </div>
+          
+          <!-- Ghost Echo Controls -->
+          <div id="ghostControls" class="filter-controls">
+            <div class="filter-control">
+              <label for="ghostCount">Jumlah Echo: <span id="ghostCountValue">2</span></label>
+              <input type="range" id="ghostCount" min="1" max="5" value="2">
+            </div>
+            <div class="filter-control">
+              <label for="ghostOpacity">Opacity Echo: <span id="ghostOpacityValue">25</span>%</label>
+              <input type="range" id="ghostOpacity" min="5" max="50" value="25">
+            </div>
+          </div>
+          
+          <!-- Pixelate Controls -->
+          <div id="pixelateControls" class="filter-controls">
+            <div class="filter-control">
+              <label for="pixelSize">Ukuran Pixel: <span id="pixelSizeValue">8</span>px</label>
+              <input type="range" id="pixelSize" min="2" max="20" value="8">
+            </div>
+          </div>
+          
+          <!-- Over Saturation Controls -->
+          <div id="oversatControls" class="filter-controls">
+            <div class="filter-control">
+              <label for="saturationAmount">Jumlah Saturasi: <span id="saturationAmountValue">1.6</span>x</label>
+              <input type="range" id="saturationAmount" min="1" max="3" step="0.1" value="1.6">
+            </div>
+          </div>
+          
+          <!-- Grayscale Noise Controls -->
+          <div id="graynoiseControls" class="filter-controls">
+            <div class="filter-control">
+              <label for="graynoiseAmount">Jumlah Noise: <span id="graynoiseAmountValue">50</span></label>
+              <input type="range" id="graynoiseAmount" min="0" max="100" value="50">
+            </div>
+          </div>
+          
+          <!-- Scanline CRT Controls -->
+          <div id="scanlineControls" class="filter-controls">
+            <div class="filter-control">
+              <label for="scanlineSize">Ukuran Scanline: <span id="scanlineSizeValue">4</span>px</label>
+              <input type="range" id="scanlineSize" min="1" max="8" value="4">
+            </div>
+            <div class="filter-control">
+              <label for="scanlineOpacity">Opacity Scanline: <span id="scanlineOpacityValue">30</span>%</label>
+              <input type="range" id="scanlineOpacity" min="10" max="70" value="30">
+            </div>
+          </div>
+          
+          <!-- Burned Contrast Controls -->
+          <div id="burnedControls" class="filter-controls">
+            <div class="filter-control">
+              <label for="burnedAmount">Jumlah Kontras: <span id="burnedAmountValue">1.8</span>x</label>
+              <input type="range" id="burnedAmount" min="1" max="3" step="0.1" value="1.8">
+            </div>
+          </div>
+        </div>
+
+        <label>
+          Resolusi Output: <span id="sizeVal">100</span>%
+          <input type="range" id="sizeRange" min="1" max="100" value="100">
+        </label>
+      </div>
+
+      <button id="downloadBtn" disabled><i class="fas fa-download"></i> Download JPG</button>
+
+      <div class="info-panel">
+        <div class="info-header">
+          <span><i class="fas fa-info-circle"></i> Informasi Media</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="info-content">
+          <div class="info-card"><span id="oriDim">-</span><small>Dimensi Asli</small></div>
+          <div class="info-card"><span id="oriSize">-</span><small>Ukuran File Asli</small></div>
+          <div class="info-card"><span id="outDim">-</span><small>Resolusi Output</small></div>
+          <div class="info-card"><span id="outSize">-</span><small>Ukuran File Output</small></div>
+          <div class="info-card"><span id="outMode">-</span><small>Mode Terpilih</small></div>
+          <div class="info-card"><span id="ratio">-</span><small>Perubahan Ukuran</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-wrapper">
+      <img id="preview"/>
+      <canvas id="canvas"></canvas>
+    </div>
+  </div>
+
+  <script>
+  /* ===== Background Rotator ===== */
+  const bgArr = ['wuthering waves shoorekeeper5.jpg','wuthering waves shoorekeeper3.jpg','wuthering waves shoorekeeper4.jpg','wuthering waves shoorekeeper2.jpg','wuthering waves shoorekeeper1.jpg'];
+  let bgIdx = 0;
+  setInterval(() => {
+    bgIdx = (bgIdx + 1) % bgArr.length;
+    document.body.style.backgroundImage = `url('${bgArr[bgIdx]}')`;
+  }, 3000);
+
+  /* ===== DOM Elements ===== */
+  const imageUpload = document.getElementById('imageUpload');
+  const preview = document.getElementById('preview');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const sizeVal = document.getElementById('sizeVal');
+  const sizeRange = document.getElementById('sizeRange');
+  const modeSel = document.getElementById('mode');
+  const dlBtn = document.getElementById('downloadBtn');
+  
+  // Filter controls
+  const filterControlsContainer = document.getElementById('filterControlsContainer');
+  const noiseAmount = document.getElementById('noiseAmount');
+  const noiseAmountValue = document.getElementById('noiseAmountValue');
+  const rgbShiftAmount = document.getElementById('rgbShiftAmount');
+  const rgbShiftAmountValue = document.getElementById('rgbShiftAmountValue');
+  const vhsDistortion = document.getElementById('vhsDistortion');
+  const vhsDistortionValue = document.getElementById('vhsDistortionValue');
+  const ghostCount = document.getElementById('ghostCount');
+  const ghostCountValue = document.getElementById('ghostCountValue');
+  const ghostOpacity = document.getElementById('ghostOpacity');
+  const ghostOpacityValue = document.getElementById('ghostOpacityValue');
+  const pixelSize = document.getElementById('pixelSize');
+  const pixelSizeValue = document.getElementById('pixelSizeValue');
+  const saturationAmount = document.getElementById('saturationAmount');
+  const saturationAmountValue = document.getElementById('saturationAmountValue');
+  const graynoiseAmount = document.getElementById('graynoiseAmount');
+  const graynoiseAmountValue = document.getElementById('graynoiseAmountValue');
+  const scanlineSize = document.getElementById('scanlineSize');
+  const scanlineSizeValue = document.getElementById('scanlineSizeValue');
+  const scanlineOpacity = document.getElementById('scanlineOpacity');
+  const scanlineOpacityValue = document.getElementById('scanlineOpacityValue');
+  const burnedAmount = document.getElementById('burnedAmount');
+  const burnedAmountValue = document.getElementById('burnedAmountValue');
+
+  // Info panel elements
+  const toast = document.getElementById('toast');
+  const oriDimEl = document.getElementById('oriDim');
+  const oriSizeEl = document.getElementById('oriSize');
+  const outDimEl = document.getElementById('outDim');
+  const outSizeEl = document.getElementById('outSize');
+  const outModeEl = document.getElementById('outMode');
+  const ratioEl = document.getElementById('ratio');
+  const infoHeader = document.querySelector('.info-header');
+  const infoContent = document.querySelector('.info-content');
+
+  // State
+  let img = null;
+  let originalBytes = 0;
+
+  /* ===== Utils ===== */
+  function bytesTo(bytes, unit = 'MB', dec = 2) {
+    const map = { B: 1, KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3 };
+    return (bytes / map[unit]).toFixed(dec) + ' ' + unit;
+  }
+  
+  function showToast(message = 'Upload berhasil!') {
+    toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+  
+  function toggleInfoPanel() {
+    const isOpen = infoContent.style.maxHeight !== '0px';
+    infoContent.style.maxHeight = isOpen ? '0px' : '500px';
+    infoContent.style.padding = isOpen ? '0 15px' : '15px';
+    infoContent.style.border = isOpen ? 'none' : '1px solid var(--panel-border)';
+    infoHeader.querySelector('i').className = isOpen ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+  }
+  
+  function updateFilterControls() {
+    // Hide all filter controls first
+    const allControls = document.querySelectorAll('.filter-controls');
+    allControls.forEach(control => control.classList.remove('active'));
+    
+    // Show controls for selected filter
+    const selectedFilter = modeSel.value;
+    if (selectedFilter !== 'resize' && selectedFilter !== 'invert' && selectedFilter !== 'swap') {
+      document.getElementById(`${selectedFilter}Controls`).classList.add('active');
+    }
+  }
+
+  /* ===== Info Display ===== */
+  function updateInfo() {
+    if (!img) return;
+    const scale = sizeRange.value / 100;
+    const mode = modeSel.value;
+
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+
+    oriDimEl.textContent = `${img.width} × ${img.height}`;
+    oriSizeEl.textContent = bytesTo(originalBytes);
+    outDimEl.textContent = `${w} × ${h} (${Math.round(scale * 100)}%)`;
+    outModeEl.textContent = mode.toUpperCase();
+
+    canvas.toBlob(blob => {
+      if (!blob) return;
+      const newBytes = blob.size;
+      outSizeEl.textContent = bytesTo(newBytes);
+      ratioEl.textContent = `${((newBytes / originalBytes) * 100).toFixed(1)}%`;
+    }, 'image/jpeg', scale < 1 ? 0.3 : 0.92);
+  }
+
+  /* ===== Image Processing ===== */
+  function handleImageFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    originalBytes = file.size;
+    const reader = new FileReader();
+
+    reader.onload = function(ev) {
+      const pic = new Image();
+      pic.onload = function() {
+        img = pic;
+        showToast();
+        processImage();
+        preview.style.display = 'block';
+        dlBtn.disabled = false;
+      };
+      pic.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function processImage() {
+    if (!img) return;
+
+    const scale = sizeRange.value / 100;
+    sizeVal.textContent = sizeRange.value;
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+
+    // Resize dasar
+    canvas.width = w;
+    canvas.height = h;
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(img, 0, 0, w, h);
+
+    const mode = modeSel.value;
+
+    // ===== Tambahan efek burik ala "resolusi rendah YouTube" =====
+    if (scale < 1) {
+      // Noise ringan + blur halus untuk melembutkan blok kompresi
+      let imageData = ctx.getImageData(0, 0, w, h);
+      let d = imageData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const n = (Math.random() - 0.5) * 15; // noise ringan
+        d[i] += n; d[i + 1] += n; d[i + 2] += n;
+      }
+      ctx.putImageData(imageData, 0, 0);
+      ctx.filter = 'blur(0.6px)';
+      ctx.drawImage(canvas, 0, 0);
+      ctx.filter = 'none';
+    }
+
+    // ===== Efek tambahan dari dropdown (opsional) =====
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const d2 = imgData.data;
+    
+    switch (mode) {
+      case 'resize': 
+        break;
+        
+      case 'noise':
+        const noiseIntensity = noiseAmount.value / 100 * 80;
+        noiseAmountValue.textContent = noiseAmount.value;
+        for (let i = 0; i < d2.length; i += 4) {
+          const n = (Math.random() - 0.5) * noiseIntensity;
+          d2[i] += n; d2[i + 1] += n; d2[i + 2] += n;
+        }
+        ctx.putImageData(imgData, 0, 0);
+        break;
+        
+      case 'rgb':
+        const rgbShiftIntensity = parseInt(rgbShiftAmount.value);
+        rgbShiftAmountValue.textContent = rgbShiftAmount.value;
+        for (let i = 0; i < d2.length; i += 4) {
+          const o = Math.floor(Math.random() * rgbShiftIntensity);
+          d2[i] = d2[i + o] || d2[i];
+          d2[i + 1] = d2[i + 1 + o] || d2[i + 1];
+          d2[i + 2] = d2[i + 2 - o] || d2[i + 2];
+        }
+        ctx.putImageData(imgData, 0, 0);
+        break;
+        
+      case 'vhs':
+        const vhsIntensity = parseInt(vhsDistortion.value);
+        vhsDistortionValue.textContent = vhsDistortion.value;
+        for (let y = 0; y < h; y++) {
+          const o = Math.sin(y * 0.2) * vhsIntensity;
+          for (let x = 0; x < w; x++) {
+            const sx = Math.max(0, Math.min(w - 1, x + o));
+            const si = (y * w + sx) * 4;
+            const di = (y * w + x) * 4;
+            for (let c = 0; c < 3; c++) d2[di + c] = d2[si + c];
+          }
+        }
+        ctx.putImageData(imgData, 0, 0);
+        break;
+        
+      case 'invert':
+        for (let i = 0; i < d2.length; i += 4) {
+          d2[i] = 255 - d2[i];
+          d2[i + 1] = 255 - d2[i + 1];
+          d2[i + 2] = 255 - d2[i + 2];
+        }
+        ctx.putImageData(imgData, 0, 0);
+        break;
+        
+      case 'ghost':
+        ghostCountValue.textContent = ghostCount.value;
+        ghostOpacityValue.textContent = ghostOpacity.value;
+        const ghostOpacityLevel = ghostOpacity.value / 100;
+        const ghostCountNum = parseInt(ghostCount.value);
+        
+        for (let i = 1; i <= ghostCountNum; i++) {
+          const offset = i * 5;
+          ctx.globalAlpha = ghostOpacityLevel / i;
+          ctx.drawImage(canvas, offset, offset);
+          ctx.drawImage(canvas, -offset, -offset);
+        }
+        ctx.globalAlpha = 1;
+        break;
+        
+      case 'pixelate':
+        pixelSizeValue.textContent = pixelSize.value;
+        const blockSize = parseInt(pixelSize.value);
+        for (let y = 0; y < h; y += blockSize) {
+          for (let x = 0; x < w; x += blockSize) {
+            const i = (y * w + x) * 4;
+            const r = d2[i], g = d2[i+1], b = d2[i+2];
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.fillRect(x, y, blockSize, blockSize);
+          }
+        }
+        break;
+        
+      case 'sepia':
+        for (let i = 0; i < d2.length; i += 4) {
+          let r = d2[i], g = d2[i+1], b = d2[i+2];
+          d2[i]   = (r * .393) + (g *.769) + (b * .189);
+          d2[i+1] = (r * .349) + (g *.686) + (b * .168);
+          d2[i+2] = (r * .272) + (g *.534) + (b * .131);
+        }
+        ctx.putImageData(imgData, 0, 0);
+        break;
+        
+      case 'oversat':
+        saturationAmountValue.textContent = saturationAmount.value;
+        const satAmount = parseFloat(saturationAmount.value);
+        for (let i = 0; i < d2.length; i += 4) {
+          d2[i] = Math.min(255, d2[i] * satAmount);
+          d2[i+1] = Math.min(255, d2[i+1] * satAmount);
+          d2[i+2] = Math.min(255, d2[i+2] * satAmount);
+        }
+        ctx.putImageData(imgData, 0, 0);
+        break;
+        
+      case 'graynoise':
+        graynoiseAmountValue.textContent = graynoiseAmount.value;
+        const grayNoiseIntensity = graynoiseAmount.value / 100 * 50;
+        for (let i = 0; i < d2.length; i += 4) {
+          let avg = (d2[i] + d2[i+1] + d2[i+2]) / 3;
+          let noise = (Math.random() - 0.5) * grayNoiseIntensity;
+          d2[i] = d2[i+1] = d2[i+2] = avg + noise;
+        }
+        ctx.putImageData(imgData, 0, 0);
+        break;
+        
+      case 'scanline':
+        scanlineSizeValue.textContent = scanlineSize.value;
+        scanlineOpacityValue.textContent = scanlineOpacity.value;
+        const scanSize = parseInt(scanlineSize.value);
+        const scanOpacity = scanlineOpacity.value / 100;
+        
+        for (let y = 0; y < h; y++) {
+          if (y % scanSize === 0) {
+            for (let x = 0; x < w; x++) {
+              let idx = (y * w + x) * 4;
+              d2[idx] *= scanOpacity;
+              d2[idx+1] *= scanOpacity;
+              d2[idx+2] *= scanOpacity;
+            }
+          }
+        }
+        ctx.putImageData(imgData, 0, 0);
+        break;
+        
+      case 'burned':
+        burnedAmountValue.textContent = burnedAmount.value;
+        const burnAmount = parseFloat(burnedAmount.value);
+        for (let i = 0; i < d2.length; i += 4) {
+          d2[i] = Math.min(255, d2[i] * burnAmount);
+          d2[i+1] = Math.min(255, d2[i+1] * burnAmount);
+          d2[i+2] = Math.min(255, d2[i+2] * burnAmount);
+        }
+        ctx.putImageData(imgData, 0, 0);
+        break;
+        
+      case 'swap':
+        for (let i = 0; i < d2.length; i += 4) {
+          [d2[i], d2[i+1], d2[i+2]] = [d2[i+1], d2[i+2], d2[i]];
+        }
+        ctx.putImageData(imgData, 0, 0);
+        break;
+    }
+
+    // Preview: JPEG dengan kualitas beda untuk HD vs burik
+    if (scale < 1) {
+      preview.src = canvas.toDataURL('image/jpeg', 0.3);   // burik (30%)
+    } else {
+      preview.src = canvas.toDataURL('image/jpeg', 0.92);  // HD
+    }
+
+    updateInfo();
+  }
+
+  /* ===== Events ===== */
+  imageUpload.addEventListener('change', handleImageFile);
+  sizeRange.addEventListener('input', processImage);
+  modeSel.addEventListener('change', () => {
+    updateFilterControls();
+    processImage();
+  });
+  
+  // Add event listeners for all filter controls
+  noiseAmount.addEventListener('input', () => {
+    noiseAmountValue.textContent = noiseAmount.value;
+    processImage();
+  });
+  
+  rgbShiftAmount.addEventListener('input', () => {
+    rgbShiftAmountValue.textContent = rgbShiftAmount.value;
+    processImage();
+  });
+  
+  vhsDistortion.addEventListener('input', () => {
+    vhsDistortionValue.textContent = vhsDistortion.value;
+    processImage();
+  });
+  
+  ghostCount.addEventListener('input', () => {
+    ghostCountValue.textContent = ghostCount.value;
+    processImage();
+  });
+  
+  ghostOpacity.addEventListener('input', () => {
+    ghostOpacityValue.textContent = ghostOpacity.value;
+    processImage();
+  });
+  
+  pixelSize.addEventListener('input', () => {
+    pixelSizeValue.textContent = pixelSize.value;
+    processImage();
+  });
+  
+  saturationAmount.addEventListener('input', () => {
+    saturationAmountValue.textContent = saturationAmount.value;
+    processImage();
+  });
+  
+  graynoiseAmount.addEventListener('input', () => {
+    graynoiseAmountValue.textContent = graynoiseAmount.value;
+    processImage();
+  });
+  
+  scanlineSize.addEventListener('input', () => {
+    scanlineSizeValue.textContent = scanlineSize.value;
+    processImage();
+  });
+  
+  scanlineOpacity.addEventListener('input', () => {
+    scanlineOpacityValue.textContent = scanlineOpacity.value;
+    processImage();
+  });
+  
+  burnedAmount.addEventListener('input', () => {
+    burnedAmountValue.textContent = burnedAmount.value;
+    processImage();
+  });
+
+  dlBtn.addEventListener('click', () => {
+    if (!img) return;
+    const scale = sizeRange.value / 100;
+    canvas.toBlob(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = scale < 1 ? 'corrupt-burik.jpg' : 'corrupt-hd.jpg';
+      a.click();
+    }, 'image/jpeg', scale < 1 ? 0.3 : 0.92);
+  });
+
+  infoHeader.addEventListener('click', toggleInfoPanel);
+
+  // Init
+  infoContent.style.maxHeight = '0px';
+  infoContent.style.padding = '0 15px';
+  infoContent.style.border = 'none';
+  updateFilterControls();
+  </script>
+</body>
+</html>
