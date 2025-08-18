@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ultimate Image Editor</title>
+  <link rel="icon" href="wuthering waves shoorekeeper.jpg" type="image/png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+  --bg1: url('wuthering waves shoorekeeper1.jpg');
+  --bg2: url('wuthering waves shoorekeeper2.jpg');
+  --bg3: url('wuthering waves shoorekeeper3.jpg');
+  --bg4: url('wuthering waves shoorekeeper4.jpg');
+  --bg5: url('wuthering waves shoorekeeper5.jpg');
+  --bg6: url('wuthering waves shoorekeeper6.jpg');
+  --bg7: url('wuthering waves shoorekeeper7.jpg');
+  --bg8: url('wuthering waves shoorekeeper8.jpg');
+  --bg9: url('wuthering waves shoorekeeper9.jpg');
+  --bg10: url('wuthering waves shoorekeeper10.jpg');
+      --accent: #00bcd4;
+      --accent-dark: #008ba3;
+      --text: #eee;
+      --text-light: #fff;
+      --text-muted: #bbb;
+      --bg-overlay: rgba(0, 0, 0, 0.65);
+      --panel-bg: rgba(49,255,75,0);
+      --panel-border: rgba(255, 255, 255, 0.2);
+      --card-bg: rgba(87,255,108,0);
+      --card-bg-hover: rgba(255, 255, 255, 0.15);
+      --glow: 0 0 15px rgba(0, 188, 212, 0.4);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: var(--bg1) center/cover fixed;
+      transition: background-image 1.5s ease-in-out;
+      position: relative;
+    }
+    body::before { 
+      content: ""; 
+      position: absolute; 
+      inset: 0; 
+      background: var(--bg-overlay); 
+      z-index: -1; 
+    }
+
+    h1 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.8em; 
+      margin-bottom: 25px; 
+      letter-spacing: 2px;
+      color: var(--text-light);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+      background: linear-gradient(90deg, #00bcd4, #00ffaa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      padding: 0 15px;
+    }
+
+    #toast {
+      position: fixed; 
+      top: 25px; 
+      right: 25px; 
+      background: #4caf50; 
+      color: #fff;
+      padding: 15px 25px; 
+      border-radius: 8px; 
+      font-weight: 600;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3); 
+      opacity: 0; 
+      transform: translateY(-30px);
+      transition: all 0.4s ease; 
+      z-index: 9999; 
+      display: flex; 
+      align-items: center; 
+      gap: 10px;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.error { background: #f44336; }
+
+    .panel {
+      background: var(--panel-bg); 
+      border: 1px solid var(--panel-border); 
+      border-radius: 16px;
+      padding: 35px 40px; 
+      width: 100%; 
+      max-width: 1200px; 
+      display: grid; 
+      grid-template-columns: 1fr 2fr; 
+      gap: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+      transition: all 0.3s;
+      backdrop-filter: blur(0px);
+    }
+    .panel:hover { 
+      transform: translateY(-5px); 
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    }
+
+    .controls { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 25px; 
+    }
+    .control-group { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 15px; 
+    }
+    .control-group-title { 
+      font-size: 1.1em; 
+      font-weight: 600; 
+      color: var(--text-light); 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      padding-bottom: 5px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .control-group-title i { 
+      color: var(--accent); 
+      font-size: 1.2em;
+    }
+    .controls label { 
+      font-size: 0.95em; 
+      color: var(--text); 
+      font-weight: 600; 
+      display: block;
+      margin-bottom: 5px;
+    }
+    .controls input[type="file"] {
+      color: var(--text); 
+      font-size: 0.9em; 
+      width: 100%; 
+      padding: 10px;
+      background: rgba(240,0,0,0); 
+      border: 1px dashed rgba(255,255,255,0.3); 
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    .controls input[type="file"]:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: var(--accent);
+    }
+    .controls input[type="range"] { 
+      width: 100%; 
+      margin-top: 6px; 
+      height: 6px;
+      accent-color: var(--accent); 
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+    }
+    select, button {
+      padding: 12px 18px; 
+      border: 1px solid rgba(255,255,255,0.2); 
+      background: hsla(0,100%,51.2%,0);
+      color: #fff; 
+      border-radius: 8px; 
+      font-size: 0.95em; 
+      transition: all 0.3s; 
+      width: 100%;
+    }
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 15px;
+    }
+    select:focus, button:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+    }
+    button {
+      cursor: pointer; 
+      font-weight: 600; 
+      background: linear-gradient(135deg, rgba(0,188,212,0.3), rgba(0,150,200,0.4));
+      border-color: var(--accent);
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 8px;
+    }
+    button:hover { 
+      background: linear-gradient(135deg, rgba(0,188,212,0.5), rgba(0,150,200,0.6));
+      transform: translateY(-2px);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    button:disabled { 
+      opacity: 0.5; 
+      cursor: not-allowed; 
+      transform: none !important;
+    }
+
+    .preview-wrapper {
+      position: relative; 
+      border: 1px solid rgba(255,255,255,0.2); 
+      border-radius: 12px; 
+      overflow: hidden;
+      background: rgba(0,0,0,0.1); 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center;
+      min-height: 400px; 
+      height: 100%;
+      transition: all 0.3s;
+    }
+    .preview-wrapper:hover {
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+    }
+    #preview { 
+      width: 100%; 
+      max-height: 500px; 
+      object-fit: contain; 
+      border-radius: 4px; 
+      display: none; 
+    }
+    canvas { display: none; }
+    .placeholder-text {
+      color: var(--text-muted);
+      font-size: 1.1em;
+      text-align: center;
+      padding: 0 20px;
+    }
+    .placeholder-text i {
+      font-size: 2em;
+      margin-bottom: 15px;
+      color: var(--accent);
+      opacity: 0.7;
+    }
+
+    .info-panel { 
+      width: 100%; 
+      margin-top: 15px; 
+      font-family: 'JetBrains Mono', monospace; 
+      border-radius: 12px; 
+      overflow: hidden; 
+      transition: all 0.3s ease; 
+      max-height: 500px; 
+    }
+    .info-header {
+      background: rgba(0,188,212,0.2); 
+      padding: 12px 15px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      cursor: pointer; 
+      border: 1px solid var(--accent); 
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    .info-header:hover { 
+      background: rgba(0,188,212,0.3); 
+      box-shadow: var(--glow);
+    }
+    .info-header span { 
+      font-weight: 600; 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+    }
+    .info-content {
+      background: var(--panel-bg); 
+      border: 1px solid var(--panel-border); 
+      border-top: none; 
+      border-radius: 0 0 8px 8px;
+      padding: 15px; 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 15px;
+    }
+    .info-card { 
+      background: var(--card-bg); 
+      border-radius: 8px; 
+      padding: 12px 15px; 
+      border-left: 3px solid var(--accent); 
+      transition: all 0.3s; 
+    }
+    .info-card:hover { 
+      background: var(--card-bg-hover); 
+      transform: translateY(-3px);
+    }
+    .info-card span { 
+      display: block; 
+      font-weight: 700; 
+      font-size: 1.05em; 
+      color: var(--text-light); 
+    }
+    .info-card small { 
+      color: var(--text-muted); 
+      font-size: 0.85em; 
+    }
+
+    /* Filter controls styling */
+    .filter-controls {
+      display: none;
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .filter-controls.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    .filter-control {
+      margin-bottom: 15px;
+    }
+    .filter-control:last-child {
+      margin-bottom: 0;
+    }
+    .filter-control label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.9em;
+    }
+    .filter-control-value {
+      float: right;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* Tabs */
+    .tab-container {
+      display: flex;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 15px;
+    }
+    .tab {
+      padding: 8px 15px;
+      cursor: pointer;
+      font-size: 0.9em;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    .tab.active {
+      border-bottom-color: var(--accent);
+      color: var(--accent);
+    }
+    .tab:hover:not(.active) {
+      border-bottom-color: rgba(255,255,255,0.3);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== Season Effects Overlay ===== */
+    .season-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+    }
+
+    .season-overlay.active {
+      opacity: 1;
+    }
+
+    /* Spring - Sakura Petals */
+    .season-overlay.spring {
+      background: linear-gradient(
+        135deg,
+        rgba(255, 182, 193, 0.3) 0%,
+        rgba(255, 192, 203, 0.2) 30%,
+        rgba(255, 240, 245, 0.1) 70%,
+        transparent 100%
+      );
+    }
+
+    .petal {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: linear-gradient(45deg, #FFB6C1, #FFC0CB);
+      border-radius: 150% 0 150% 0;
+      animation: fall 10s infinite linear;
+      box-shadow: 0 0 10px rgba(255, 182, 193, 0.8);
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Summer - Fireflies & Warm Glow */
+    .season-overlay.summer {
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 215, 0, 0.1) 0%,
+        rgba(255, 140, 0, 0.1) 30%,
+        transparent 70%
+      );
+    }
+
+    .firefly {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #FFFF00;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #FFFF00, 0 0 20px #FFD700;
+      animation: float 8s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+      }
+      25% {
+        transform: translateY(-50px) translateX(30px);
+      }
+      50% {
+        transform: translateY(-20px) translateX(-20px);
+      }
+      75% {
+        transform: translateY(-80px) translateX(10px);
+      }
+    }
+
+    /* Autumn - Falling Leaves */
+    .season-overlay.autumn {
+      background: linear-gradient(
+        45deg,
+        rgba(255, 140, 0, 0.2) 0%,
+        rgba(139, 69, 19, 0.15) 40%,
+        rgba(205, 133, 63, 0.1) 80%,
+        transparent 100%
+      );
+    }
+
+    .leaf {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      animation: fall 12s infinite linear;
+    }
+
+    .leaf::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #FF8C00, #CD853F);
+      clip-path: polygon(50% 0%, 0% 100%, 50% 80%, 100% 100%);
+      transform: rotate(45deg);
+    }
+
+    /* Winter - Snow & Frost */
+    .season-overlay.winter {
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(240, 248, 255, 0.05) 50%,
+        rgba(230, 230, 250, 0.05) 100%
+      );
+    }
+
+    .snowflake {
+      position: absolute;
+      color: white;
+      font-size: 1em;
+      animation: snowfall 8s infinite linear;
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+    }
+
+    @keyframes snowfall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Season Indicator */
+    .season-indicator {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 15px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .season-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .season-dot.active {
+      transform: scale(1.3);
+      border-color: white;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .season-dot.spring { background: #FFB6C1; }
+    .season-dot.summer { background: #FFD700; }
+    .season-dot.autumn { background: #FF8C00; }
+    .season-dot.winter { background: #87CEEB; }
+
+    /* Season Info Tooltip */
+    .season-info {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,150,200,0.4);
+      backdrop-filter: blur(5px);
+      color: white;
+      padding: 5px 20px;
+      border-radius: 2px;
+      font-size: 0.9em;
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .season-indicator {
+        top: auto;
+        bottom: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        flex-direction: row;
+        padding: 10px 15px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .panel { 
+        grid-template-columns: 1fr; 
+        gap: 25px; 
+        padding: 25px 20px; 
+      }
+      h1 { 
+        font-size: 2em; 
+        text-align: center;
+      }
+      .info-content { 
+        grid-template-columns: 1fr; 
+      }
+      .preview-wrapper {
+        min-height: 300px;
+      }
+    }
+    
+    /* Mini Social Bar */
+.social-mini {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 5px;
+  z-index: 1000;
+}
+
+.social-mini-icon {
+  width: 25px;
+  height: 25px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-decoration: none;
+  font-size: 10px;
+  transition: all 0.2s ease;
+}
+
+.social-mini-icon:hover {
+  background: var(--accent);
+  transform: scale(1.1);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .social-mini {
+    bottom: 5px;
+    right: 5px;
+    gap: 3px;
+  }
+  
+  .social-mini-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 8px;
+  }
+}
+  </style>
+</head>
+<body>
+  <!-- Season Overlays -->
+  <div class="season-overlay" id="seasonOverlay"></div>
+  
+  <!-- Season Indicator -->
+  <div class="season-indicator">
+    <div class="season-dot spring active" data-season="spring" title="Spring - Sakura"></div>
+    <div class="season-dot summer" data-season="summer" title="Summer - Fireflies"></div>
+    <div class="season-dot autumn" data-season="autumn" title="Autumn - Momiji"></div>
+    <div class="season-dot winter" data-season="winter" title="Winter - Snow"></div>
+  </div>
+
+  <!-- Season Info Original -->
+<div class="season-info" id="seasonInfo">Loading...</div>
+
+  <h1>ubah gambar jadi 8k/32p <h2>😹</h2></h1>
+
+  <div id="toast"><i class="fas fa-check-circle"></i> Upload berhasil!</div>
+
+  <div class="panel">
+    <div class="controls">
+      <div class="control-group">
+        <label>
+          <i class="fas fa-cloud-upload-alt"></i> Upload Gambar
+          <input type="file" id="imageUpload" accept="image/*">
+        </label>
+      </div>
+
+      <div class="control-group">
+        <div class="control-group-title"><i class="fas fa-sliders-h"></i> Pengaturan Dasar</div>
+        <label>
+          Resolusi Output: <span id="sizeVal">100</span>%
+          <input type="range" id="sizeRange" min="1" max="200" value="100">
+        </label>
+        
+        <label>
+          Kualitas Output: <span id="qualityVal">92</span>%
+          <input type="range" id="qualityRange" min="10" max="100" value="92">
+        </label>
+      </div>
+
+      <div class="control-group">
+        <div class="control-group-title"><i class="fas fa-magic"></i> Filter & Efek</div>
+        
+        <div class="tab-container">
+          <div class="tab active" data-tab="basic">Basic</div>
+          <div class="tab" data-tab="artistic">Artistic</div>
+          <div class="tab" data-tab="distortion">Distortion</div>
+          <div class="tab" data-tab="color">Color</div>
+        </div>
+        
+        <div class="tab-content active" id="basic-tab">
+          <select id="mode">
+            <option value="resize">Resize Biasa</option>
+            <option value="noise">Noise Glitch</option>
+            <option value="rgb">RGB Shift</option>
+            <option value="vhs">VHS Tracking</option>
+            <option value="invert">Invert Colors</option>
+            <option value="ghost">Ghost Echo</option>
+            <option value="pixelate">Pixelate</option>
+            <option value="sepia">Sepia Rusak</option>
+            <option value="oversat">Over Saturation</option>
+            <option value="graynoise">Grayscale Noise</option>
+            <option value="scanline">Scanline CRT</option>
+            <option value="burned">Burned Contrast</option>
+            <option value="swap">Random Color Swap</option>
+          </select>
+        </div>
+        
+        <div class="tab-content" id="artistic-tab">
+          <select id="artisticMode">
+            <option value="none">Pilih Efek Artistik</option>
+            <option value="watercolor">Watercolor</option>
+            <option value="oilpainting">Oil Painting</option>
+            <option value="sketch">Pencil Sketch</option>
+            <option value="pointillism">Pointillism</option>
+            <option value="halftone">Halftone Dots</option>
+            <option value="crosshatch">Cross Hatch</option>
+            <option value="mosaic">Mosaic Tiles</option>
+            <option value="stainedglass">Stained Glass</option>
+          </select>
+        </div>
+        
+        <div class="tab-content" id="distortion-tab">
+          <select id="distortionMode">
+            <option value="none">Pilih Distorsi</option>
+            <option value="ripple">Ripple Effect</option>
+            <option value="bulge">Bulge Effect</option>
+            <option value="pinch">Pinch Effect</option>
+            <option value="swirl">Swirl Effect</option>
+            <option value="fisheye">Fisheye Lens</option>
+            <option value="kaleidoscope">Kaleidoscope</option>
+            <option value="mirror">Mirror Effect</option>
+            <option value="tunnel">Tunnel Vision</option>
+          </select>
+        </div>
+        
+        <div class="tab-content" id="color-tab">
+          <select id="colorMode">
+            <option value="none">Pilih Efek Warna</option>
+            <option value="duotone">Duotone</option>
+            <option value="posterize">Posterize</option>
+            <option value="solarize">Solarize</option>
+            <option value="edgeglow">Edge Glow</option>
+            <option value="chromatic">Chromatic Aberration</option>
+            <option value="thermal">Thermal Vision</option>
+            <option value="xray">X-Ray</option>
+            <option value="infrared">Infrared</option>
+          </select>
+        </div>
+
+        <!-- Filter controls container -->
+        <div id="filterControlsContainer">
+          <!-- Noise Glitch Controls -->
+          <div id="noiseControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Jumlah Noise: <span class="filter-control-value" id="noiseAmountValue">40</span></label>
+              <input type="range" id="noiseAmount" min="0" max="100" value="40">
+            </div>
+          </div>
+          
+          <!-- RGB Shift Controls -->
+          <div id="rgbControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Jumlah RGB Shift: <span class="filter-control-value" id="rgbShiftAmountValue">15</span></label>
+              <input type="range" id="rgbShiftAmount" min="0" max="50" value="15">
+            </div>
+          </div>
+          
+          <!-- VHS Tracking Controls -->
+          <div id="vhsControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Distorsi VHS: <span class="filter-control-value" id="vhsDistortionValue">10</span></label>
+              <input type="range" id="vhsDistortion" min="0" max="20" value="10">
+            </div>
+          </div>
+          
+          <!-- Ghost Echo Controls -->
+          <div id="ghostControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Jumlah Echo: <span class="filter-control-value" id="ghostCountValue">2</span></label>
+              <input type="range" id="ghostCount" min="1" max="5" value="2">
+            </div>
+            <div class="filter-control">
+              <label>Opacity Echo: <span class="filter-control-value" id="ghostOpacityValue">25</span>%</label>
+              <input type="range" id="ghostOpacity" min="5" max="50" value="25">
+            </div>
+          </div>
+          
+          <!-- Pixelate Controls -->
+          <div id="pixelateControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Ukuran Pixel: <span class="filter-control-value" id="pixelSizeValue">8</span>px</label>
+              <input type="range" id="pixelSize" min="2" max="20" value="8">
+            </div>
+          </div>
+          
+          <!-- Over Saturation Controls -->
+          <div id="oversatControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Jumlah Saturasi: <span class="filter-control-value" id="saturationAmountValue">1.6</span>x</label>
+              <input type="range" id="saturationAmount" min="1" max="3" step="0.1" value="1.6">
+            </div>
+          </div>
+          
+          <!-- Grayscale Noise Controls -->
+          <div id="graynoiseControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Jumlah Noise: <span class="filter-control-value" id="graynoiseAmountValue">50</span></label>
+              <input type="range" id="graynoiseAmount" min="0" max="100" value="50">
+            </div>
+          </div>
+          
+          <!-- Scanline CRT Controls -->
+          <div id="scanlineControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Ukuran Scanline: <span class="filter-control-value" id="scanlineSizeValue">4</span>px</label>
+              <input type="range" id="scanlineSize" min="1" max="8" value="4">
+            </div>
+            <div class="filter-control">
+              <label>Opacity Scanline: <span class="filter-control-value" id="scanlineOpacityValue">30</span>%</label>
+              <input type="range" id="scanlineOpacity" min="10" max="70" value="30">
+            </div>
+          </div>
+          
+          <!-- Burned Contrast Controls -->
+          <div id="burnedControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Jumlah Kontras: <span class="filter-control-value" id="burnedAmountValue">1.8</span>x</label>
+              <input type="range" id="burnedAmount" min="1" max="3" step="0.1" value="1.8">
+            </div>
+          </div>
+          
+          <!-- Watercolor Controls -->
+          <div id="watercolorControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Brush Size: <span class="filter-control-value" id="watercolorBrushValue">8</span></label>
+              <input type="range" id="watercolorBrush" min="3" max="15" value="8">
+            </div>
+            <div class="filter-control">
+              <label>Intensity: <span class="filter-control-value" id="watercolorIntensityValue">70</span>%</label>
+              <input type="range" id="watercolorIntensity" min="20" max="100" value="70">
+            </div>
+          </div>
+          
+          <!-- Oil Painting Controls -->
+          <div id="oilpaintingControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Brush Size: <span class="filter-control-value" id="oilBrushValue">5</span></label>
+              <input type="range" id="oilBrush" min="1" max="10" value="5">
+            </div>
+            <div class="filter-control">
+              <label>Intensity: <span class="filter-control-value" id="oilIntensityValue">60</span>%</label>
+              <input type="range" id="oilIntensity" min="10" max="100" value="60">
+            </div>
+          </div>
+          
+          <!-- Sketch Controls -->
+          <div id="sketchControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Pencil Size: <span class="filter-control-value" id="sketchPencilValue">1</span></label>
+              <input type="range" id="sketchPencil" min="1" max="5" step="0.5" value="1">
+            </div>
+            <div class="filter-control">
+              <label>Darkness: <span class="filter-control-value" id="sketchDarknessValue">70</span>%</label>
+              <input type="range" id="sketchDarkness" min="30" max="100" value="70">
+            </div>
+          </div>
+          
+          <!-- Ripple Controls -->
+          <div id="rippleControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Wave Size: <span class="filter-control-value" id="rippleSizeValue">20</span></label>
+              <input type="range" id="rippleSize" min="5" max="50" value="20">
+            </div>
+            <div class="filter-control">
+              <label>Frequency: <span class="filter-control-value" id="rippleFreqValue">0.05</span></label>
+              <input type="range" id="rippleFreq" min="0.01" max="0.1" step="0.01" value="0.05">
+            </div>
+          </div>
+          
+          <!-- Duotone Controls -->
+          <div id="duotoneControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Dark Color</label>
+              <input type="color" id="duotoneDark" value="#0000ff">
+            </div>
+            <div class="filter-control">
+              <label>Light Color</label>
+              <input type="color" id="duotoneLight" value="#ffff00">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <button id="downloadBtn" disabled><i class="fas fa-download"></i> Download Image</button>
+        <button id="resetBtn"><i class="fas fa-undo"></i> Reset All</button>
+      </div>
+
+      <div class="info-panel">
+        <div class="info-header">
+          <span><i class="fas fa-info-circle"></i> Informasi Media</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="info-content">
+          <div class="info-card"><span id="oriDim">-</span><small>Dimensi Asli</small></div>
+          <div class="info-card"><span id="oriSize">-</span><small>Ukuran File Asli</small></div>
+          <div class="info-card"><span id="outDim">-</span><small>Resolusi Output</small></div>
+          <div class="info-card"><span id="outSize">-</span><small>Ukuran File Output</small></div>
+          <div class="info-card"><span id="outMode">-</span><small>Mode Terpilih</small></div>
+          <div class="info-card"><span id="ratio">-</span><small>Perubahan Ukuran</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-wrapper">
+      <img id="preview"/>
+      <canvas id="canvas"></canvas>
+      <div class="placeholder-text" id="placeholder">
+        <i class="fas fa-image"></i>
+        <p>Upload gambar untuk memulai editing</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Compact Social Bar -->
+<div class="social-mini">
+  <a href="https://facebook.com" target="_blank" class="social-mini-icon" title="Facebook">
+    <i class="fab fa-facebook-f"></i>
+  </a>
+  <a href="https://twitter.com" target="_blank" class="social-mini-icon" title="Twitter">
+    <i class="fab fa-twitter"></i>
+  </a>
+  <a href="https://instagram.com" target="_blank" class="social-mini-icon" title="Instagram">
+    <i class="fab fa-instagram"></i>
+  </a>
+  <a href="https://pinterest.com" target="_blank" class="social-mini-icon" title="Pinterest">
+    <i class="fab fa-pinterest-p"></i>
+  </a>
+  <a href="https://site1.com" target="_blank" class="social-mini-icon" title="Website 1">
+    <i class="fas fa-link"></i>
+  </a>
+  <a href="https://site2.com" target="_blank" class="social-mini-icon" title="Website 2">
+    <i class="fas fa-link"></i>
+  </a>
+</div>
+
+  <script>
+    /* ===== Season System ===== */
+    /* ===== Fungsi Musim Jepang ===== */
+function getCurrentSeasonInJapan() {
+  const now = new Date();
+  const month = now.getMonth() + 1; // 1 = Januari, 12 = Desember
+
+  if ([12, 1, 2].includes(month)) {
+    return "winter";
+  } else if ([3, 4, 5].includes(month)) {
+    return "spring";
+  } else if ([6, 7, 8].includes(month)) {
+    return "summer";
+  } else {
+    return "autumn";
+  }
+}
+    class SeasonManager {
+      constructor() {
+        this.currentSeason = 'spring';
+        this.seasons = ['spring', 'summer', 'autumn', 'winter'];
+        this.seasonNames = {
+          spring: 'Spring - Cherry Blossoms',
+          summer: 'Summer - Fireflies',
+          autumn: 'Autumn - Momiji',
+          winter: 'Winter - Snow'
+        };
+        this.seasonBackgrounds = {
+  spring: ['wuthering waves shoorekeeper1.jpg', 'wuthering waves shoorekeeper2.jpg', 'wuthering waves shoorekeeper3.jpg'],
+  summer: ['wuthering waves shoorekeeper4.jpg', 'wuthering waves shoorekeeper5.jpg', 'wuthering waves shoorekeeper6.jpg'],
+  autumn: ['wuthering waves shoorekeeper7.jpg', 'wuthering waves shoorekeeper8.jpg', 'wuthering waves shoorekeeper9.jpg'],
+  winter: ['wuthering waves shoorekeeper10.jpg', 'wuthering waves shoorekeeper1.jpg', 'wuthering waves shoorekeeper2.jpg']
+};
+        
+        this.init();
+      }
+
+      init() {
+        this.createSeasonElements();
+        this.bindEvents();
+        this.autoCycle();
+        this.setSeason(getCurrentSeasonInJapan());
+      }
+
+      createSeasonElements() {
+        const overlay = document.getElementById('seasonOverlay');
+        
+        // Create season-specific elements
+        this.createSpringElements(overlay);
+        this.createSummerElements(overlay);
+        this.createAutumnElements(overlay);
+        this.createWinterElements(overlay);
+      }
+
+      createSpringElements(overlay) {
+        for (let i = 0; i < 20; i++) {
+          const petal = document.createElement('div');
+          petal.className = 'petal spring';
+          petal.style.left = Math.random() * 100 + '%';
+          petal.style.animationDelay = Math.random() * 10 + 's';
+          petal.style.animationDuration = (8 + Math.random() * 4) + 's';
+          overlay.appendChild(petal);
+        }
+      }
+
+      createSummerElements(overlay) {
+        for (let i = 0; i < 15; i++) {
+          const firefly = document.createElement('div');
+          firefly.className = 'firefly summer';
+          firefly.style.left = Math.random() * 100 + '%';
+          firefly.style.top = Math.random() * 100 + '%';
+          firefly.style.animationDelay = Math.random() * 8 + 's';
+          firefly.style.animationDuration = (6 + Math.random() * 4) + 's';
+          overlay.appendChild(firefly);
+        }
+      }
+
+      createAutumnElements(overlay) {
+        for (let i = 0; i < 15; i++) {
+          const leaf = document.createElement('div');
+          leaf.className = 'leaf autumn';
+          leaf.style.left = Math.random() * 100 + '%';
+          leaf.style.animationDelay = Math.random() * 12 + 's';
+          leaf.style.animationDuration = (10 + Math.random() * 4) + 's';
+          overlay.appendChild(leaf);
+        }
+      }
+
+      createWinterElements(overlay) {
+        const snowflakes = ['❄', '❅', '❆'];
+        for (let i = 0; i < 30; i++) {
+          const snowflake = document.createElement('div');
+          snowflake.className = 'snowflake winter';
+          snowflake.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+          snowflake.style.left = Math.random() * 100 + '%';
+          snowflake.style.animationDelay = Math.random() * 8 + 's';
+          snowflake.style.animationDuration = (6 + Math.random() * 4) + 's';
+          snowflake.style.fontSize = (0.5 + Math.random() * 1) + 'em';
+          overlay.appendChild(snowflake);
+        }
+      }
+
+      setSeason(season) {
+        this.currentSeason = season;
+        
+        // Update overlay
+        const overlay = document.getElementById('seasonOverlay');
+        overlay.className = 'season-overlay active ' + season;
+        
+        // Update dots
+        document.querySelectorAll('.season-dot').forEach(dot => {
+          dot.classList.toggle('active', dot.dataset.season === season);
+        });
+        
+        // Update text
+        document.getElementById('seasonText').textContent = this.seasonNames[season];
+        
+        // Update background rotation with season-specific images
+        window.bgArr = this.seasonBackgrounds[season];
+        window.bgIdx = 0;
+        document.body.style.backgroundImage = `url('${window.bgArr[0]}')`;
+        
+        // Show season change notification
+        showToast(`Berubah ke: ${this.seasonNames[season]}`);
+      }
+
+      nextSeason() {
+        const currentIndex = this.seasons.indexOf(this.currentSeason);
+        const nextIndex = (currentIndex + 1) % this.seasons.length;
+        this.setSeason(this.seasons[nextIndex]);
+      }
+
+      autoCycle() {
+        // Auto cycle seasons every 30 seconds
+        setInterval(() => {
+          this.nextSeason();
+        }, 30000);
+      }
+
+      bindEvents() {
+        // Manual season selection
+        document.querySelectorAll('.season-dot').forEach(dot => {
+          dot.addEventListener('click', () => {
+            this.setSeason(dot.dataset.season);
+          });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+          if (e.altKey) {
+            switch(e.key) {
+              case '1': this.setSeason('spring'); break;
+              case '2': this.setSeason('summer'); break;
+              case '3': this.setSeason('autumn'); break;
+              case '4': this.setSeason('winter'); break;
+            }
+          }
+        });
+      }
+    }
+
+    /* ===== Background Rotation ===== */
+    let bgArr = [
+  'wuthering waves shoorekeeper1.jpg',
+  'wuthering waves shoorekeeper2.jpg',
+  'wuthering waves shoorekeeper3.jpg',
+  'wuthering waves shoorekeeper4.jpg',
+  'wuthering waves shoorekeeper5.jpg',
+  'wuthering waves shoorekeeper6.jpg',
+  'wuthering waves shoorekeeper7.jpg',
+  'wuthering waves shoorekeeper8.jpg',
+  'wuthering waves shoorekeeper9.jpg',
+  'wuthering waves shoorekeeper10.jpg'
+];
+    let bgIdx = 0;
+    
+    setInterval(() => {
+      bgIdx = (bgIdx + 1) % bgArr.length;
+      document.body.style.backgroundImage = `url('${bgArr[bgIdx]}')`;
+    }, 3000);
+
+    /* ===== DOM Elements ===== */
+    const imageUpload = document.getElementById('imageUpload');
+    const preview = document.getElementById('preview');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const placeholder = document.getElementById('placeholder');
+    const sizeVal = document.getElementById('sizeVal');
+    const sizeRange = document.getElementById('sizeRange');
+    const qualityVal = document.getElementById('qualityVal');
+    const qualityRange = document.getElementById('qualityRange');
+    const modeSel = document.getElementById('mode');
+    const artisticModeSel = document.getElementById('artisticMode');
+    const distortionModeSel = document.getElementById('distortionMode');
+    const colorModeSel = document.getElementById('colorMode');
+    const dlBtn = document.getElementById('downloadBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    
+    // Filter controls
+    const filterControlsContainer = document.getElementById('filterControlsContainer');
+    const noiseAmount = document.getElementById('noiseAmount');
+    const noiseAmountValue = document.getElementById('noiseAmountValue');
+    const rgbShiftAmount = document.getElementById('rgbShiftAmount');
+    const rgbShiftAmountValue = document.getElementById('rgbShiftAmountValue');
+    const vhsDistortion = document.getElementById('vhsDistortion');
+    const vhsDistortionValue = document.getElementById('vhsDistortionValue');
+    const ghostCount = document.getElementById('ghostCount');
+    const ghostCountValue = document.getElementById('ghostCountValue');
+    const ghostOpacity = document.getElementById('ghostOpacity');
+    const ghostOpacityValue = document.getElementById('ghostOpacityValue');
+    const pixelSize = document.getElementById('pixelSize');
+    const pixelSizeValue = document.getElementById('pixelSizeValue');
+    const saturationAmount = document.getElementById('saturationAmount');
+    const saturationAmountValue = document.getElementById('saturationAmountValue');
+    const graynoiseAmount = document.getElementById('graynoiseAmount');
+    const graynoiseAmountValue = document.getElementById('graynoiseAmountValue');
+    const scanlineSize = document.getElementById('scanlineSize');
+    const scanlineSizeValue = document.getElementById('scanlineSizeValue');
+    const scanlineOpacity = document.getElementById('scanlineOpacity');
+    const scanlineOpacityValue = document.getElementById('scanlineOpacityValue');
+    const burnedAmount = document.getElementById('burnedAmount');
+    const burnedAmountValue = document.getElementById('burnedAmountValue');
+    const watercolorBrush = document.getElementById('watercolorBrush');
+    const watercolorBrushValue = document.getElementById('watercolorBrushValue');
+    const watercolorIntensity = document.getElementById('watercolorIntensity');
+    const watercolorIntensityValue = document.getElementById('watercolorIntensityValue');
+    const oilBrush = document.getElementById('oilBrush');
+    const oilBrushValue = document.getElementById('oilBrushValue');
+    const oilIntensity = document.getElementById('oilIntensity');
+    const oilIntensityValue = document.getElementById('oilIntensityValue');
+    const sketchPencil = document.getElementById('sketchPencil');
+    const sketchPencilValue = document.getElementById('sketchPencilValue');
+    const sketchDarkness = document.getElementById('sketchDarkness');
+    const sketchDarknessValue = document.getElementById('sketchDarknessValue');
+    const rippleSize = document.getElementById('rippleSize');
+    const rippleSizeValue = document.getElementById('rippleSizeValue');
+    const rippleFreq = document.getElementById('rippleFreq');
+    const rippleFreqValue = document.getElementById('rippleFreqValue');
+    const duotoneDark = document.getElementById('duotoneDark');
+    const duotoneLight = document.getElementById('duotoneLight');
+
+    // Info panel elements
+    const toast = document.getElementById('toast');
+    const oriDimEl = document.getElementById('oriDim');
+    const oriSizeEl = document.getElementById('oriSize');
+    const outDimEl = document.getElementById('outDim');
+    const outSizeEl = document.getElementById('outSize');
+    const outModeEl = document.getElementById('outMode');
+    const ratioEl = document.getElementById('ratio');
+    const infoHeader = document.querySelector('.info-header');
+    const infoContent = document.querySelector('.info-content');
+
+    // Tab elements
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // State
+    let img = null;
+    let originalBytes = 0;
+    let activeMode = 'basic';
+    let activeEffect = 'resize';
+
+    /* ===== Utils ===== */
+    function bytesTo(bytes, unit = 'MB', dec = 2) {
+      const map = { B: 1, KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3 };
+      return (bytes / map[unit]).toFixed(dec) + ' ' + unit;
+    }
+    
+    function showToast(message = 'Upload berhasil!', isError = false) {
+      toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+      toast.classList.add('show');
+      if (isError) toast.classList.add('error');
+      setTimeout(() => {
+        toast.classList.remove('show');
+        if (isError) toast.classList.remove('error');
+      }, 3000);
+    }
+    
+    function toggleInfoPanel() {
+      const isOpen = infoContent.style.maxHeight !== '0px';
+      infoContent.style.maxHeight = isOpen ? '0px' : '500px';
+      infoContent.style.padding = isOpen ? '0 15px' : '15px';
+      infoContent.style.border = isOpen ? 'none' : '1px solid var(--panel-border)';
+      infoHeader.querySelector('i').className = isOpen ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+    }
+    
+    function updateFilterControls() {
+      // Hide all filter controls first
+      const allControls = document.querySelectorAll('.filter-controls');
+      allControls.forEach(control => control.classList.remove('active'));
+      
+      // Show controls for selected filter
+      if (activeMode === 'basic') {
+        if (activeEffect !== 'resize' && activeEffect !== 'invert' && activeEffect !== 'swap') {
+          document.getElementById(`${activeEffect}Controls`).classList.add('active');
+        }
+      } else if (activeMode === 'artistic' && activeEffect !== 'none') {
+        document.getElementById(`${activeEffect}Controls`).classList.add('active');
+      } else if (activeMode === 'distortion' && activeEffect !== 'none') {
+        document.getElementById(`${activeEffect}Controls`).classList.add('active');
+      } else if (activeMode === 'color' && activeEffect !== 'none') {
+        document.getElementById(`${activeEffect}Controls`).classList.add('active');
+      }
+    }
+
+    function hexToRgb(hex) {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return [r, g, b];
+    }
+
+    /* ===== Info Display ===== */
+    function updateInfo() {
+      if (!img) return;
+      const scale = sizeRange.value / 100;
+      const quality = qualityRange.value / 100;
+      const mode = activeEffect === 'none' ? 'resize' : activeEffect;
+
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+
+      oriDimEl.textContent = `${img.width} × ${img.height}`;
+      oriSizeEl.textContent = bytesTo(originalBytes);
+      outDimEl.textContent = `${w} × ${h} (${Math.round(scale * 100)}%)`;
+      outModeEl.textContent = mode.toUpperCase();
+
+      canvas.toBlob(blob => {
+        if (!blob) return;
+        const newBytes = blob.size;
+        outSizeEl.textContent = bytesTo(newBytes);
+        ratioEl.textContent = `${((newBytes / originalBytes) * 100).toFixed(1)}%`;
+      }, 'image/jpeg', quality);
+    }
+
+    /* ===== Image Processing ===== */
+    function handleImageFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        showToast('File terlalu besar (maks 10MB)', true);
+        return;
+      }
+
+      originalBytes = file.size;
+      const reader = new FileReader();
+
+      reader.onload = function(ev) {
+        const pic = new Image();
+        pic.onload = function() {
+          img = pic;
+          showToast();
+          processImage();
+          preview.style.display = 'block';
+          placeholder.style.display = 'none';
+          dlBtn.disabled = false;
+        };
+        pic.onerror = function() {
+          showToast('Gagal memuat gambar', true);
+        };
+        pic.src = ev.target.result;
+      };
+      reader.onerror = function() {
+        showToast('Gagal membaca file', true);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function applyBasicEffects(imgData, w, h) {
+      const d = imgData.data;
+      
+      switch (activeEffect) {
+        case 'resize': 
+          break;
+          
+        case 'noise':
+          const noiseIntensity = noiseAmount.value / 100 * 80;
+          noiseAmountValue.textContent = noiseAmount.value;
+          for (let i = 0; i < d.length; i += 4) {
+            const n = (Math.random() - 0.5) * noiseIntensity;
+            d[i] += n; d[i + 1] += n; d[i + 2] += n;
+          }
+          break;
+          
+        case 'rgb':
+          const rgbShiftIntensity = parseInt(rgbShiftAmount.value);
+          rgbShiftAmountValue.textContent = rgbShiftAmount.value;
+          for (let i = 0; i < d.length; i += 4) {
+            const o = Math.floor(Math.random() * rgbShiftIntensity);
+            d[i] = d[i + o] || d[i];
+            d[i + 1] = d[i + 1 + o] || d[i + 1];
+            d[i + 2] = d[i + 2 - o] || d[i + 2];
+          }
+          break;
+          
+        case 'vhs':
+          const vhsIntensity = parseInt(vhsDistortion.value);
+          vhsDistortionValue.textContent = vhsDistortion.value;
+          for (let y = 0; y < h; y++) {
+            const o = Math.sin(y * 0.2) * vhsIntensity;
+            for (let x = 0; x < w; x++) {
+              const sx = Math.max(0, Math.min(w - 1, x + o));
+              const si = (y * w + sx) * 4;
+              const di = (y * w + x) * 4;
+              for (let c = 0; c < 3; c++) d[di + c] = d[si + c];
+            }
+          }
+          break;
+          
+        case 'invert':
+          for (let i = 0; i < d.length; i += 4) {
+            d[i] = 255 - d[i];
+            d[i + 1] = 255 - d[i + 1];
+            d[i + 2] = 255 - d[i + 2];
+          }
+          break;
+          
+        case 'ghost':
+          ghostCountValue.textContent = ghostCount.value;
+          ghostOpacityValue.textContent = ghostOpacity.value;
+          const ghostOpacityLevel = ghostOpacity.value / 100;
+          const ghostCountNum = parseInt(ghostCount.value);
+          
+          for (let i = 1; i <= ghostCountNum; i++) {
+            const offset = i * 5;
+            ctx.globalAlpha = ghostOpacityLevel / i;
+            ctx.drawImage(canvas, offset, offset);
+            ctx.drawImage(canvas, -offset, -offset);
+          }
+          ctx.globalAlpha = 1;
+          break;
+          
+        case 'pixelate':
+          pixelSizeValue.textContent = pixelSize.value;
+          const blockSize = parseInt(pixelSize.value);
+          for (let y = 0; y < h; y += blockSize) {
+            for (let x = 0; x < w; x += blockSize) {
+              const i = (y * w + x) * 4;
+              const r = d[i], g = d[i+1], b = d[i+2];
+              ctx.fillStyle = `rgb(${r},${g},${b})`;
+              ctx.fillRect(x, y, blockSize, blockSize);
+            }
+          }
+          break;
+          
+        case 'sepia':
+          for (let i = 0; i < d.length; i += 4) {
+            let r = d[i], g = d[i+1], b = d[i+2];
+            d[i]   = (r * .393) + (g *.769) + (b * .189);
+            d[i+1] = (r * .349) + (g *.686) + (b * .168);
+            d[i+2] = (r * .272) + (g *.534) + (b * .131);
+          }
+          break;
+          
+        case 'oversat':
+          saturationAmountValue.textContent = saturationAmount.value;
+          const satAmount = parseFloat(saturationAmount.value);
+          for (let i = 0; i < d.length; i += 4) {
+            d[i] = Math.min(255, d[i] * satAmount);
+            d[i+1] = Math.min(255, d[i+1] * satAmount);
+            d[i+2] = Math.min(255, d[i+2] * satAmount);
+          }
+          break;
+          
+        case 'graynoise':
+          graynoiseAmountValue.textContent = graynoiseAmount.value;
+          const grayNoiseIntensity = graynoiseAmount.value / 100 * 50;
+          for (let i = 0; i < d.length; i += 4) {
+            let avg = (d[i] + d[i+1] + d[i+2]) / 3;
+            let noise = (Math.random() - 0.5) * grayNoiseIntensity;
+            d[i] = d[i+1] = d[i+2] = avg + noise;
+          }
+          break;
+          
+        case 'scanline':
+          scanlineSizeValue.textContent = scanlineSize.value;
+          scanlineOpacityValue.textContent = scanlineOpacity.value;
+          const scanSize = parseInt(scanlineSize.value);
+          const scanOpacity = scanlineOpacity.value / 100;
+          
+          for (let y = 0; y < h; y++) {
+            if (y % scanSize === 0) {
+              for (let x = 0; x < w; x++) {
+                let idx = (y * w + x) * 4;
+                d[idx] *= scanOpacity;
+                d[idx+1] *= scanOpacity;
+                d[idx+2] *= scanOpacity;
+              }
+            }
+          }
+          break;
+          
+        case 'burned':
+          burnedAmountValue.textContent = burnedAmount.value;
+          const burnAmount = parseFloat(burnedAmount.value);
+          for (let i = 0; i < d.length; i += 4) {
+            d[i] = Math.min(255, d[i] * burnAmount);
+            d[i+1] = Math.min(255, d[i+1] * burnAmount);
+            d[i+2] = Math.min(255, d[i+2] * burnAmount);
+          }
+          break;
+          
+        case 'swap':
+          for (let i = 0; i < d.length; i += 4) {
+            [d[i], d[i+1], d[i+2]] = [d[i+1], d[i+2], d[i]];
+          }
+          break;
+      }
+      
+      return imgData;
+    }
+
+    function processImage() {
+      if (!img) return;
+
+      const scale = sizeRange.value / 100;
+      const quality = qualityRange.value / 100;
+      sizeVal.textContent = sizeRange.value;
+      qualityVal.textContent = qualityRange.value;
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+
+      // Resize dasar
+      canvas.width = w;
+      canvas.height = h;
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+
+      // Apply effects
+      let imgData = ctx.getImageData(0, 0, w, h);
+      imgData = applyBasicEffects(imgData, w, h);
+      ctx.putImageData(imgData, 0, 0);
+
+      // Preview with quality setting
+      preview.src = canvas.toDataURL('image/jpeg', quality);
+
+      updateInfo();
+    }
+
+    function resetAll() {
+      imageUpload.value = '';
+      sizeRange.value = 100;
+      qualityRange.value = 92;
+      modeSel.value = 'resize';
+      artisticModeSel.value = 'none';
+      distortionModeSel.value = 'none';
+      colorModeSel.value = 'none';
+      
+      // Reset all filter controls to defaults
+      noiseAmount.value = 40;
+      rgbShiftAmount.value = 15;
+      vhsDistortion.value = 10;
+      ghostCount.value = 2;
+      ghostOpacity.value = 25;
+      pixelSize.value = 8;
+      saturationAmount.value = 1.6;
+      graynoiseAmount.value = 50;
+      scanlineSize.value = 4;
+      scanlineOpacity.value = 30;
+      burnedAmount.value = 1.8;
+      watercolorBrush.value = 8;
+      watercolorIntensity.value = 70;
+      oilBrush.value = 5;
+      oilIntensity.value = 60;
+      sketchPencil.value = 1;
+      sketchDarkness.value = 70;
+      rippleSize.value = 20;
+      rippleFreq.value = 0.05;
+      duotoneDark.value = '#0000ff';
+      duotoneLight.value = '#ffff00';
+      
+      // Update displayed values
+      sizeVal.textContent = sizeRange.value;
+      qualityVal.textContent = qualityRange.value;
+      noiseAmountValue.textContent = noiseAmount.value;
+      rgbShiftAmountValue.textContent = rgbShiftAmount.value;
+      vhsDistortionValue.textContent = vhsDistortion.value;
+      ghostCountValue.textContent = ghostCount.value;
+      ghostOpacityValue.textContent = ghostOpacity.value;
+      pixelSizeValue.textContent = pixelSize.value;
+      saturationAmountValue.textContent = saturationAmount.value;
+      graynoiseAmountValue.textContent = graynoiseAmount.value;
+      scanlineSizeValue.textContent = scanlineSize.value;
+      scanlineOpacityValue.textContent = scanlineOpacity.value;
+      burnedAmountValue.textContent = burnedAmount.value;
+      watercolorBrushValue.textContent = watercolorBrush.value;
+      watercolorIntensityValue.textContent = watercolorIntensity.value;
+      oilBrushValue.textContent = oilBrush.value;
+      oilIntensityValue.textContent = oilIntensity.value;
+      sketchPencilValue.textContent = sketchPencil.value;
+      sketchDarknessValue.textContent = sketchDarkness.value;
+      rippleSizeValue.textContent = rippleSize.value;
+      rippleFreqValue.textContent = rippleFreq.value;
+      
+      // Reset image
+      img = null;
+      originalBytes = 0;
+      preview.style.display = 'none';
+      placeholder.style.display = 'flex';
+      dlBtn.disabled = true;
+      
+      // Clear info
+      oriDimEl.textContent = '-';
+      oriSizeEl.textContent = '-';
+      outDimEl.textContent = '-';
+      outSizeEl.textContent = '-';
+      outModeEl.textContent = '-';
+      ratioEl.textContent = '-';
+      
+      // Hide all filter controls
+      const allControls = document.querySelectorAll('.filter-controls');
+      allControls.forEach(control => control.classList.remove('active'));
+      
+      // Reset to basic tab
+      tabs[0].click();
+    }
+
+    /* ===== Events ===== */
+    imageUpload.addEventListener('change', handleImageFile);
+    sizeRange.addEventListener('input', processImage);
+    qualityRange.addEventListener('input', processImage);
+    modeSel.addEventListener('change', () => {
+      activeMode = 'basic';
+      activeEffect = modeSel.value;
+      updateFilterControls();
+      processImage();
+    });
+
+    // Tab switching
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        tab.classList.add('active');
+        const tabId = tab.getAttribute('data-tab');
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+        
+        activeMode = tabId;
+        if (activeMode === 'basic') {
+          activeEffect = modeSel.value;
+        } else if (activeMode === 'artistic') {
+          activeEffect = artisticModeSel.value;
+        } else if (activeMode === 'distortion') {
+          activeEffect = distortionModeSel.value;
+        } else if (activeMode === 'color') {
+          activeEffect = colorModeSel.value;
+        }
+        
+        updateFilterControls();
+      });
+    });
+
+    // Add event listeners for all filter controls
+    [noiseAmount, rgbShiftAmount, vhsDistortion, ghostCount, ghostOpacity, 
+     pixelSize, saturationAmount, graynoiseAmount, scanlineSize, scanlineOpacity,
+     burnedAmount, watercolorBrush, watercolorIntensity, oilBrush, oilIntensity,
+     sketchPencil, sketchDarkness, rippleSize, rippleFreq, duotoneDark, duotoneLight]
+    .forEach(control => {
+      if (control) {
+        control.addEventListener('input', processImage);
+      }
+    });
+
+    dlBtn.addEventListener('click', () => {
+      if (!img) return;
+      const scale = sizeRange.value / 100;
+      const quality = qualityRange.value / 100;
+      
+      let filename = 'image-editor-';
+      if (activeEffect !== 'none' && activeEffect !== 'resize') {
+        filename += activeEffect + '-';
+      }
+      filename += new Date().getTime() + '.jpg';
+      
+      canvas.toBlob(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        showToast('Gambar berhasil diunduh!');
+      }, 'image/jpeg', quality);
+    });
+
+    resetBtn.addEventListener('click', resetAll);
+    infoHeader.addEventListener('click', toggleInfoPanel);
+
+    // Init
+    infoContent.style.maxHeight = '0px';
+    infoContent.style.padding = '0 15px';
+    infoContent.style.border = 'none';
+    updateFilterControls();
+    tabs[0].classList.add('active');
+    document.getElementById('basic-tab').classList.add('active');
+    activeMode = 'basic';
+    activeEffect = 'resize';
+
+/* ===== Update Season Info secara otomatis ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  const currentSeason = getCurrentSeasonInJapan();
+  const seasonNames = {
+    spring: 'Spring - Cherry Blossoms',
+    summer: 'Summer - Fireflies',
+    autumn: 'Autumn - Momiji',
+    winter: 'Winter - Snow'
+  };
+  document.getElementById('seasonInfo').textContent = seasonNames[currentSeason];
+});
+    /* ===== Initialize Season System ===== */
+    const seasonManager = new SeasonManager();
+  </script>
+</body>
+</html>
