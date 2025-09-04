@@ -344,7 +344,7 @@
       flex-direction: column;
       gap: 15px;
     }
-    
+
     .tab-container {
       display: flex;
       flex-direction: column;
@@ -449,7 +449,7 @@
     .frame-option:hover {
       background: rgba(0,188,212,0.3);
     }
-
+    
     .frame-option.active {
       background: rgba(0,188,212,0.5);
       border: 1px solid var(--accent);
@@ -835,6 +835,8 @@
 <body>
   <!-- Season Overlays -->
   <div class="season-overlay" id="seasonOverlay"></div>
+    <!-- Season Overlays -->
+  <div class="season-overlay" id="seasonOverlay"></div>
   
   <!-- Season Indicator -->
   <div class="season-indicator">
@@ -845,7 +847,8 @@
   </div>
 
   <!-- Season Info Original -->
-  <div class="season-info" id="seasonInfo">Loading...</div>
+<div class="season-info" id="seasonInfo">Loading...</div>
+
 
   <h1>ubah gambar jadi 8k/32p <h2>😹</h2></h1>
 
@@ -889,6 +892,7 @@
             <div class="tab" data-tab="stickers">Stickers</div>
             <div class="tab" data-tab="advanced">Advanced</div>
           </div>
+          
           <div class="tab-content-container">
             <!-- Tab Basic -->
             <div class="tab-content active" id="basic-tab">
@@ -953,7 +957,7 @@
                 <option value="infrared">Infrared</option>
               </select>
             </div>
-            
+
             <!-- Tab Cyber Funk -->
             <div class="tab-content" id="cyberfunk-tab">
               <select id="cyberfunkMode">
@@ -1139,7 +1143,7 @@
               <input type="range" id="noiseAmount" min="0" max="100" value="40">
             </div>
           </div>
-          
+
           <!-- RGB Shift Controls -->
           <div id="rgbControls" class="filter-controls">
             <div class="filter-control">
@@ -1316,7 +1320,7 @@
               <input type="range" id="colorShift" min="0" max="50" value="15">
             </div>
           </div>
-          
+
           <div id="synthwaveControls" class="filter-controls">
             <div class="filter-control">
               <label>Sun Color</label>
@@ -1406,31 +1410,22 @@
   </div>
 
   <script>
-    /* ===== Season System ===== */
+    /* ===== Season System ===== */    /* ===== Season System ===== */
     /* ===== Fungsi Musim Jepang ===== */
-    function getCurrentSeasonInJapan() {
-      const now = new Date();
-      const month = now.getMonth() + 1; // 1 = Januari, 12 = Desember
-      const day = now.getDate();
+function getCurrentSeasonInJapan() {
+  const now = new Date();
+  const month = now.getMonth() + 1; // 1 = Januari, 12 = Desember
 
-      // Musim semi (Spring): 21 Maret - 20 Juni
-      if ((month === 3 && day >= 21) || (month === 4 || month === 5) || (month === 6 && day < 21)) {
-        return "spring";
-      }
-      // Musim panas (Summer): 21 Juni - 22 September
-      else if ((month === 6 && day >= 21) || (month === 7 || month === 8) || (month === 9 && day < 23)) {
-        return "summer";
-      }
-      // Musim gugur (Autumn): 23 September - 20 Desember
-      else if ((month === 9 && day >= 23) || (month === 10 || month === 11) || (month === 12 && day < 21)) {
-        return "autumn";
-      }
-      // Musim dingin (Winter): 21 Desember - 20 Maret
-      else {
-        return "winter";
-      }
-    }
-    
+  if ([12, 1, 2].includes(month)) {
+    return "winter";
+  } else if ([3, 4, 5].includes(month)) {
+    return "spring";
+  } else if ([6, 7, 8].includes(month)) {
+    return "summer";
+  } else {
+    return "autumn";
+  }
+}
     class SeasonManager {
       constructor() {
         this.currentSeason = 'spring';
@@ -1442,11 +1437,11 @@
           winter: 'Winter - Snow'
         };
         this.seasonBackgrounds = {
-          spring: ['wuthering waves shoorekeeper1.jpg', 'wuthering waves shoorekeeper2.jpg', 'wuthering waves shoorekeeper3.jpg'],
-          summer: ['wuthering waves shoorekeeper4.jpg', 'wuthering waves shoorekeeper5.jpg', 'wuthering waves shoorekeeper6.jpg'],
-          autumn: ['wuthering waves shoorekeeper7.jpg', 'wuthering waves shoorekeeper8.jpg', 'wuthering waves shoorekeeper9.jpg'],
-          winter: ['wuthering waves shoorekeeper10.jpg', 'wuthering waves shoorekeeper1.jpg', 'wuthering waves shoorekeeper2.jpg']
-        };
+  spring: ['wuthering waves shoorekeeper1.jpg', 'wuthering waves shoorekeeper2.jpg', 'wuthering waves shoorekeeper3.jpg'],
+  summer: ['wuthering waves shoorekeeper4.jpg', 'wuthering waves shoorekeeper5.jpg', 'wuthering waves shoorekeeper6.jpg'],
+  autumn: ['wuthering waves shoorekeeper7.jpg', 'wuthering waves shoorekeeper8.jpg', 'wuthering waves shoorekeeper9.jpg'],
+  winter: ['wuthering waves shoorekeeper10.jpg', 'wuthering waves shoorekeeper1.jpg', 'wuthering waves shoorekeeper2.jpg']
+};
         
         this.init();
       }
@@ -1454,7 +1449,7 @@
       init() {
         this.createSeasonElements();
         this.bindEvents();
-        // Set season based on actual Japanese calendar
+        this.autoCycle();
         this.setSeason(getCurrentSeasonInJapan());
       }
 
@@ -1522,14 +1517,14 @@
         // Update overlay
         const overlay = document.getElementById('seasonOverlay');
         overlay.className = 'season-overlay active ' + season;
-        
+
         // Update dots
         document.querySelectorAll('.season-dot').forEach(dot => {
           dot.classList.toggle('active', dot.dataset.season === season);
         });
         
         // Update text
-        document.getElementById('seasonInfo').textContent = this.seasonNames[season];
+        document.getElementById('seasonText').textContent = this.seasonNames[season];
         
         // Update background rotation with season-specific images
         window.bgArr = this.seasonBackgrounds[season];
@@ -1537,7 +1532,20 @@
         document.body.style.backgroundImage = `url('${window.bgArr[0]}')`;
         
         // Show season change notification
-        showToast(`Musim saat ini: ${this.seasonNames[season]}`);
+        showToast(`Berubah ke: ${this.seasonNames[season]}`);
+      }
+
+      nextSeason() {
+        const currentIndex = this.seasons.indexOf(this.currentSeason);
+        const nextIndex = (currentIndex + 1) % this.seasons.length;
+        this.setSeason(this.seasons[nextIndex]);
+      }
+
+      autoCycle() {
+        // Auto cycle seasons every 30 seconds
+        setInterval(() => {
+          this.nextSeason();
+        }, 30000);
       }
 
       bindEvents() {
@@ -1738,7 +1746,7 @@
         if (isError) toast.classList.remove('error');
       }, 3000);
     }
-    
+
     function toggleInfoPanel() {
       const isOpen = infoContent.style.maxHeight !== '0px';
       infoContent.style.maxHeight = isOpen ? '0px' : '500px';
@@ -1886,7 +1894,7 @@
           ghostOpacityValue.textContent = ghostOpacity.value;
           const ghostOpacityLevel = ghostOpacity.value / 100;
           const ghostCountNum = parseInt(ghostCount.value);
-          
+
           for (let i = 1; i <= ghostCountNum; i++) {
             const offset = i * 5;
             ctx.globalAlpha = ghostOpacityLevel / i;
@@ -2014,7 +2022,7 @@
             d[i + 2] = Math.floor(d[i + 2] / 32) * 32 * oilIntensityVal + d[i + 2] * (1 - oilIntensityVal);
           }
           break;
-
+          
         case 'sketch':
           sketchPencilValue.textContent = sketchPencil.value;
           sketchDarknessValue.textContent = sketchDarkness.value;
@@ -2122,7 +2130,7 @@
             }
           }
           break;
-          
+
         case 'bulge':
           const centerX = w / 2;
           const centerY = h / 2;
@@ -2541,7 +2549,7 @@
             }
           }
           break;
-
+          
         case 'cyberpunk':
           darknessValue.textContent = darkness.value;
           const accentRgb = hexToRgb(accentColor.value);
@@ -3351,6 +3359,20 @@
       infoContent.style.padding = '0 15px';
       infoContent.style.border = 'none';
     });
+    
+    /* ===== Update Season Info secara otomatis ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  const currentSeason = getCurrentSeasonInJapan();
+  const seasonNames = {
+    spring: 'Spring - Cherry Blossoms',
+    summer: 'Summer - Fireflies',
+    autumn: 'Autumn - Momiji',
+    winter: 'Winter - Snow'
+  };
+  document.getElementById('seasonInfo').textContent = seasonNames[currentSeason];
+});
+    /* ===== Initialize Season System ===== */
+    const seasonManager = new SeasonManager();
   </script>
 </body>
 </html>
