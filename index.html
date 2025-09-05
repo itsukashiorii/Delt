@@ -730,6 +730,39 @@
       transition: opacity 0.3s ease;
     }
 
+    /* Compare Button */
+    .compare-btn {
+      position: fixed;
+      bottom: 70px;
+      right: 20px;
+      background: rgba(0, 188, 212, 0.7);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .compare-btn:hover {
+      background: rgba(0, 188, 212, 0.9);
+      transform: scale(1.1);
+    }
+
+    .compare-btn.active {
+      background: rgba(244, 67, 54, 0.7);
+    }
+
+    .compare-btn.active:hover {
+      background: rgba(244, 67, 54, 0.9);
+    }
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .season-indicator {
@@ -765,6 +798,13 @@
       .tab.active {
         border-left: none;
         border-bottom-color: var(--accent);
+      }
+      
+      .compare-btn {
+        bottom: 80px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
       }
     }
 
@@ -830,12 +870,28 @@
         font-size: 8px;
       }
     }
+    
+    .emoji {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  color: gold; /* bebas atur warna */
+}
+
+.info-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+  display: grid; /* biar layout tetap grid */
+}
+.info-content.active {
+  max-height: 500px; /* cukup besar untuk isi panel */
+  opacity: 1;
+}
   </style>
 </head>
 <body>
   <!-- Season Overlays -->
-  <div class="season-overlay" id="seasonOverlay"></div>
-    <!-- Season Overlays -->
   <div class="season-overlay" id="seasonOverlay"></div>
   
   <!-- Season Indicator -->
@@ -847,10 +903,12 @@
   </div>
 
   <!-- Season Info Original -->
-<div class="season-info" id="seasonInfo">Loading...</div>
+  <div class="season-info" id="seasonInfo">Loading...</div>
 
-
-  <h1>ubah gambar jadi 8k/32p <h2>😹</h2></h1>
+  <h1>
+  ubah gambar jadi 8k/32p 
+  <span class="emoji">😹</span>
+</h1>
 
   <div id="toast"><i class="fas fa-check-circle"></i> Upload berhasil!</div>
 
@@ -1004,7 +1062,7 @@
                 <input type="range" id="temperature" min="-100" max="100" value="0">
               </div>
             </div>
-            
+
             <!-- Tab Frames -->
             <div class="tab-content" id="frames-tab">
               <div class="feature-control">
@@ -1387,6 +1445,11 @@
     </div>
   </div>
   
+  <!-- Compare Button -->
+  <button class="compare-btn" id="compareBtn" title="Compare Original vs Edited">
+    <i class="fas fa-exchange-alt"></i>
+  </button>
+  
   <!-- Compact Social Bar -->
   <div class="social-mini">
     <a href="https://facebook.com" target="_blank" class="social-mini-icon" title="Facebook">
@@ -1398,1981 +1461,2588 @@
     <a href="https://instagram.com" target="_blank" class="social-mini-icon" title="Instagram">
       <i class="fab fa-instagram"></i>
     </a>
-    <a href="https://pinterest.com" target="_blank" class="social-mini-icon" title="Pinterest">
-      <i class="fab fa-pinterest-p"></i>
-    </a>
-    <a href="https://aelta-liart.vercel.app/" target="_blank" class="social-mini-icon" title="Website 1">
-      <i class="fas fa-link"></i>
-    </a>
-    <a href="https://delt-a.vercel.app/" target="_blank" class="social-mini-icon" title="Website 2">
-      <i class="fas fa-link"></i>
-    </a>
   </div>
 
   <script>
-    /* ===== Season System ===== */    /* ===== Season System ===== */
-    /* ===== Fungsi Musim Jepang ===== */
-function getCurrentSeasonInJapan() {
-  const now = new Date();
-  const month = now.getMonth() + 1; // 1 = Januari, 12 = Desember
-
-  if ([12, 1, 2].includes(month)) {
-    return "winter";
-  } else if ([3, 4, 5].includes(month)) {
-    return "spring";
-  } else if ([6, 7, 8].includes(month)) {
-    return "summer";
-  } else {
-    return "autumn";
-  }
-}
-    class SeasonManager {
-      constructor() {
-        this.currentSeason = 'spring';
-        this.seasons = ['spring', 'summer', 'autumn', 'winter'];
-        this.seasonNames = {
-          spring: 'Spring - Cherry Blossoms',
-          summer: 'Summer - Fireflies',
-          autumn: 'Autumn - Momiji',
-          winter: 'Winter - Snow'
-        };
-        this.seasonBackgrounds = {
-  spring: ['wuthering waves shoorekeeper1.jpg', 'wuthering waves shoorekeeper2.jpg', 'wuthering waves shoorekeeper3.jpg'],
-  summer: ['wuthering waves shoorekeeper4.jpg', 'wuthering waves shoorekeeper5.jpg', 'wuthering waves shoorekeeper6.jpg'],
-  autumn: ['wuthering waves shoorekeeper7.jpg', 'wuthering waves shoorekeeper8.jpg', 'wuthering waves shoorekeeper9.jpg'],
-  winter: ['wuthering waves shoorekeeper10.jpg', 'wuthering waves shoorekeeper1.jpg', 'wuthering waves shoorekeeper2.jpg']
-};
-        
-        this.init();
-      }
-
-      init() {
-        this.createSeasonElements();
-        this.bindEvents();
-        this.autoCycle();
-        this.setSeason(getCurrentSeasonInJapan());
-      }
-
-      createSeasonElements() {
-        const overlay = document.getElementById('seasonOverlay');
-        
-        // Create season-specific elements
-        this.createSpringElements(overlay);
-        this.createSummerElements(overlay);
-        this.createAutumnElements(overlay);
-        this.createWinterElements(overlay);
-      }
-
-      createSpringElements(overlay) {
-        for (let i = 0; i < 20; i++) {
-          const petal = document.createElement('div');
-          petal.className = 'petal spring';
-          petal.style.left = Math.random() * 100 + '%';
-          petal.style.animationDelay = Math.random() * 10 + 's';
-          petal.style.animationDuration = (8 + Math.random() * 4) + 's';
-          overlay.appendChild(petal);
-        }
-      }
-
-      createSummerElements(overlay) {
-        for (let i = 0; i < 15; i++) {
-          const firefly = document.createElement('div');
-          firefly.className = 'firefly summer';
-          firefly.style.left = Math.random() * 100 + '%';
-          firefly.style.top = Math.random() * 100 + '%';
-          firefly.style.animationDelay = Math.random() * 8 + 's';
-          firefly.style.animationDuration = (6 + Math.random() * 4) + 's';
-          overlay.appendChild(firefly);
-        }
-      }
-
-      createAutumnElements(overlay) {
-        for (let i = 0; i < 15; i++) {
-          const leaf = document.createElement('div');
-          leaf.className = 'leaf autumn';
-          leaf.style.left = Math.random() * 100 + '%';
-          leaf.style.animationDelay = Math.random() * 12 + 's';
-          leaf.style.animationDuration = (10 + Math.random() * 4) + 's';
-          overlay.appendChild(leaf);
-        }
-      }
-
-      createWinterElements(overlay) {
-        const snowflakes = ['❄', '❅', '❆'];
-        for (let i = 0; i < 30; i++) {
-          const snowflake = document.createElement('div');
-          snowflake.className = 'snowflake winter';
-          snowflake.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
-          snowflake.style.left = Math.random() * 100 + '%';
-          snowflake.style.animationDelay = Math.random() * 8 + 's';
-          snowflake.style.animationDuration = (6 + Math.random() * 4) + 's';
-          snowflake.style.fontSize = (0.5 + Math.random() * 1) + 'em';
-          overlay.appendChild(snowflake);
-        }
-      }
-
-      setSeason(season) {
-        this.currentSeason = season;
-        
-        // Update overlay
-        const overlay = document.getElementById('seasonOverlay');
-        overlay.className = 'season-overlay active ' + season;
-
-        // Update dots
-        document.querySelectorAll('.season-dot').forEach(dot => {
-          dot.classList.toggle('active', dot.dataset.season === season);
-        });
-        
-        // Update text
-        document.getElementById('seasonText').textContent = this.seasonNames[season];
-        
-        // Update background rotation with season-specific images
-        window.bgArr = this.seasonBackgrounds[season];
-        window.bgIdx = 0;
-        document.body.style.backgroundImage = `url('${window.bgArr[0]}')`;
-        
-        // Show season change notification
-        showToast(`Berubah ke: ${this.seasonNames[season]}`);
-      }
-
-      nextSeason() {
-        const currentIndex = this.seasons.indexOf(this.currentSeason);
-        const nextIndex = (currentIndex + 1) % this.seasons.length;
-        this.setSeason(this.seasons[nextIndex]);
-      }
-
-      autoCycle() {
-        // Auto cycle seasons every 30 seconds
-        setInterval(() => {
-          this.nextSeason();
-        }, 30000);
-      }
-
-      bindEvents() {
-        // Manual season selection
-        document.querySelectorAll('.season-dot').forEach(dot => {
-          dot.addEventListener('click', () => {
-            this.setSeason(dot.dataset.season);
-          });
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-          if (e.altKey) {
-            switch(e.key) {
-              case '1': this.setSeason('spring'); break;
-              case '2': this.setSeason('summer'); break;
-              case '3': this.setSeason('autumn'); break;
-              case '4': this.setSeason('winter'); break;
-            }
-          }
-        });
-      }
-    }
-
-    /* ===== Background Rotation ===== */
-    let bgArr = [
-      'wuthering waves shoorekeeper1.jpg',
-      'wuthering waves shoorekeeper2.jpg',
-      'wuthering waves shoorekeeper3.jpg',
-      'wuthering waves shoorekeeper4.jpg',
-      'wuthering waves shoorekeeper5.jpg',
-      'wuthering waves shoorekeeper6.jpg',
-      'wuthering waves shoorekeeper7.jpg',
-      'wuthering waves shoorekeeper8.jpg',
-      'wuthering waves shoorekeeper9.jpg',
-      'wuthering waves shoorekeeper10.jpg'
-    ];
-    let bgIdx = 0;
-    
-    setInterval(() => {
-      bgIdx = (bgIdx + 1) % bgArr.length;
-      document.body.style.backgroundImage = `url('${bgArr[bgIdx]}')`;
-    }, 3000);
-
-    /* ===== DOM Elements ===== */
-    const imageUpload = document.getElementById('imageUpload');
-    const preview = document.getElementById('preview');
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const placeholder = document.getElementById('placeholder');
-    const sizeVal = document.getElementById('sizeVal');
-    const sizeRange = document.getElementById('sizeRange');
-    const qualityVal = document.getElementById('qualityVal');
-    const qualityRange = document.getElementById('qualityRange');
-    const modeSel = document.getElementById('mode');
-    const artisticModeSel = document.getElementById('artisticMode');
-    const distortionModeSel = document.getElementById('distortionMode');
-    const colorModeSel = document.getElementById('colorMode');
-    const cyberfunkModeSel = document.getElementById('cyberfunkMode');
-    const dlBtn = document.getElementById('downloadBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    
-    // Filter controls
-    const filterControlsContainer = document.getElementById('filterControlsContainer');
-    const noiseAmount = document.getElementById('noiseAmount');
-    const noiseAmountValue = document.getElementById('noiseAmountValue');
-    const rgbShiftAmount = document.getElementById('rgbShiftAmount');
-    const rgbShiftAmountValue = document.getElementById('rgbShiftAmountValue');
-    const vhsDistortion = document.getElementById('vhsDistortion');
-    const vhsDistortionValue = document.getElementById('vhsDistortionValue');
-    const ghostCount = document.getElementById('ghostCount');
-    const ghostCountValue = document.getElementById('ghostCountValue');
-    const ghostOpacity = document.getElementById('ghostOpacity');
-    const ghostOpacityValue = document.getElementById('ghostOpacityValue');
-    const pixelSize = document.getElementById('pixelSize');
-    const pixelSizeValue = document.getElementById('pixelSizeValue');
-    const saturationAmount = document.getElementById('saturationAmount');
-    const saturationAmountValue = document.getElementById('saturationAmountValue');
-    const graynoiseAmount = document.getElementById('graynoiseAmount');
-    const graynoiseAmountValue = document.getElementById('graynoiseAmountValue');
-    const scanlineSize = document.getElementById('scanlineSize');
-    const scanlineSizeValue = document.getElementById('scanlineSizeValue');
-    const scanlineOpacity = document.getElementById('scanlineOpacity');
-    const scanlineOpacityValue = document.getElementById('scanlineOpacityValue');
-    const burnedAmount = document.getElementById('burnedAmount');
-    const burnedAmountValue = document.getElementById('burnedAmountValue');
-    const watercolorBrush = document.getElementById('watercolorBrush');
-    const watercolorBrushValue = document.getElementById('watercolorBrushValue');
-    const watercolorIntensity = document.getElementById('watercolorIntensity');
-    const watercolorIntensityValue = document.getElementById('watercolorIntensityValue');
-    const oilBrush = document.getElementById('oilBrush');
-    const oilBrushValue = document.getElementById('oilBrushValue');
-    const oilIntensity = document.getElementById('oilIntensity');
-    const oilIntensityValue = document.getElementById('oilIntensityValue');
-    const sketchPencil = document.getElementById('sketchPencil');
-    const sketchPencilValue = document.getElementById('sketchPencilValue');
-    const sketchDarkness = document.getElementById('sketchDarkness');
-    const sketchDarknessValue = document.getElementById('sketchDarknessValue');
-    const rippleSize = document.getElementById('rippleSize');
-    const rippleSizeValue = document.getElementById('rippleSizeValue');
-    const rippleFreq = document.getElementById('rippleFreq');
-    const rippleFreqValue = document.getElementById('rippleFreqValue');
-    const duotoneDark = document.getElementById('duotoneDark');
-    const duotoneLight = document.getElementById('duotoneLight');
-
-    // Cyber Funk controls
-    const neonColor = document.getElementById('neonColor');
-    const glowIntensity = document.getElementById('glowIntensity');
-    const glowIntensityValue = document.getElementById('glowIntensityValue');
-    const gridSize = document.getElementById('gridSize');
-    const gridSizeValue = document.getElementById('gridSizeValue');
-    const gridColor = document.getElementById('gridColor');
-    const interference = document.getElementById('interference');
-    const interferenceValue = document.getElementById('interferenceValue');
-    const transparency = document.getElementById('transparency');
-    const transparencyValue = document.getElementById('transparencyValue');
-    const glitchAmount = document.getElementById('glitchAmount');
-    const glitchAmountValue = document.getElementById('glitchAmountValue');
-    const colorShift = document.getElementById('colorShift');
-    const colorShiftValue = document.getElementById('colorShiftValue');
-    const sunColor = document.getElementById('sunColor');
-    const horizonHeight = document.getElementById('horizonHeight');
-    const horizonHeightValue = document.getElementById('horizonHeightValue');
-    const accentColor = document.getElementById('accentColor');
-    const darkness = document.getElementById('darkness');
-    const darknessValue = document.getElementById('darknessValue');
-    const rainDensity = document.getElementById('rainDensity');
-    const rainDensityValue = document.getElementById('rainDensityValue');
-    const rainColor = document.getElementById('rainColor');
-
-    // New feature controls
-    const brightness = document.getElementById('brightness');
-    const brightnessValue = document.getElementById('brightnessValue');
-    const contrast = document.getElementById('contrast');
-    const contrastValue = document.getElementById('contrastValue');
-    const saturation = document.getElementById('saturation');
-    const saturationValue = document.getElementById('saturationValue');
-    const exposure = document.getElementById('exposure');
-    const exposureValue = document.getElementById('exposureValue');
-    const temperature = document.getElementById('temperature');
-    const temperatureValue = document.getElementById('temperatureValue');
-    const frameSize = document.getElementById('frameSize');
-    const frameSizeValue = document.getElementById('frameSizeValue');
-    const frameColor = document.getElementById('frameColor');
-    const textContent = document.getElementById('textContent');
-    const fontSize = document.getElementById('fontSize');
-    const fontSizeValue = document.getElementById('fontSizeValue');
-    const textColor = document.getElementById('textColor');
-    const textPosition = document.getElementById('textPosition');
-    const stickerSize = document.getElementById('stickerSize');
-    const stickerSizeValue = document.getElementById('stickerSizeValue');
-    const blur = document.getElementById('blur');
-    const blurValue = document.getElementById('blurValue');
-    const sharpen = document.getElementById('sharpen');
-    const sharpenValue = document.getElementById('sharpenValue');
-    const noiseReduction = document.getElementById('noiseReduction');
-    const noiseReductionValue = document.getElementById('noiseReductionValue');
-    const cropTool = document.getElementById('cropTool');
-    const perspectiveH = document.getElementById('perspectiveH');
-    const perspectiveHValue = document.getElementById('perspectiveHValue');
-    const perspectiveV = document.getElementById('perspectiveV');
-    const perspectiveVValue = document.getElementById('perspectiveVValue');
-
-    // Info panel elements
-    const toast = document.getElementById('toast');
-    const oriDimEl = document.getElementById('oriDim');
-    const oriSizeEl = document.getElementById('oriSize');
-    const outDimEl = document.getElementById('outDim');
-    const outSizeEl = document.getElementById('outSize');
-    const outModeEl = document.getElementById('outMode');
-    const ratioEl = document.getElementById('ratio');
-    const infoHeader = document.querySelector('.info-header');
-    const infoContent = document.querySelector('.info-content');
-
-    // Tab elements
-    const tabs = document.querySelectorAll('.tab');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    // State
-    let img = null;
-    let originalBytes = 0;
-    let activeMode = 'basic';
-    let activeEffect = 'resize';
+    // Variabel global
+    let originalImage = null;
+    let currentImage = null;
+    let isComparing = false;
+    let compareInterval = null;
+    let activeTab = 'basic';
+    let activeMode = 'resize';
     let selectedSticker = null;
-
-    /* ===== Utils ===== */
-    function bytesTo(bytes, unit = 'MB', dec = 2) {
-      const map = { B: 1, KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3 };
-      return (bytes / map[unit]).toFixed(dec) + ' ' + unit;
-    }
+    let stickerPosition = { x: 0, y: 0 };
     
-    function showToast(message = 'Upload berhasil!', isError = false) {
-      toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
-      toast.classList.add('show');
-      if (isError) toast.classList.add('error');
-      setTimeout(() => {
-        toast.classList.remove('show');
-        if (isError) toast.classList.remove('error');
-      }, 3000);
-    }
-
-    function toggleInfoPanel() {
-      const isOpen = infoContent.style.maxHeight !== '0px';
-      infoContent.style.maxHeight = isOpen ? '0px' : '500px';
-      infoContent.style.padding = isOpen ? '0 15px' : '15px';
-      infoContent.style.border = isOpen ? 'none' : '1px solid var(--panel-border)';
-      infoHeader.querySelector('i').className = isOpen ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
-    }
-    
-    function updateFilterControls() {
-      // Hide all filter controls first
-      const allControls = document.querySelectorAll('.filter-controls');
-      allControls.forEach(control => control.classList.remove('active'));
-      
-      // Show controls for selected filter
-      if (activeMode === 'basic') {
-        if (activeEffect !== 'resize' && activeEffect !== 'invert' && activeEffect !== 'swap') {
-          document.getElementById(`${activeEffect}Controls`).classList.add('active');
-        }
-      } else if (activeMode === 'artistic' && activeEffect !== 'none') {
-        document.getElementById(`${activeEffect}Controls`).classList.add('active');
-      } else if (activeMode === 'distortion' && activeEffect !== 'none') {
-        document.getElementById(`${activeEffect}Controls`).classList.add('active');
-      } else if (activeMode === 'color' && activeEffect !== 'none') {
-        document.getElementById(`${activeEffect}Controls`).classList.add('active');
-      } else if (activeMode === 'cyberfunk' && activeEffect !== 'none') {
-        document.getElementById(`${activeEffect}Controls`).classList.add('active');
-      }
-    }
-
-    function hexToRgb(hex) {
-      const r = parseInt(hex.slice(1, 3), 16);
-      const g = parseInt(hex.slice(3, 5), 16);
-      const b = parseInt(hex.slice(5, 7), 16);
-      return [r, g, b];
-    }
-
-    /* ===== Info Display ===== */
-    function updateInfo() {
-      if (!img) return;
-      const scale = sizeRange.value / 100;
-      const quality = qualityRange.value / 100;
-      const mode = activeEffect === 'none' ? 'resize' : activeEffect;
-
-      const w = Math.round(img.width * scale);
-      const h = Math.round(img.height * scale);
-
-      oriDimEl.textContent = `${img.width} × ${img.height}`;
-      oriSizeEl.textContent = bytesTo(originalBytes);
-      outDimEl.textContent = `${w} × ${h} (${Math.round(scale * 100)}%)`;
-      outModeEl.textContent = mode.toUpperCase();
-
-      canvas.toBlob(blob => {
-        if (!blob) return;
-        const newBytes = blob.size;
-        outSizeEl.textContent = bytesTo(newBytes);
-        ratioEl.textContent = `${((newBytes / originalBytes) * 100).toFixed(1)}%`;
-      }, 'image/jpeg', quality);
-    }
-
-    /* ===== Image Processing ===== */
-    function handleImageFile(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        showToast('File terlalu besar (maks 10MB)', true);
-        return;
-      }
-
-      originalBytes = file.size;
-      const reader = new FileReader();
-
-      reader.onload = function(ev) {
-        const pic = new Image();
-        pic.onload = function() {
-          img = pic;
-          showToast();
-          processImage();
-          preview.style.display = 'block';
-          placeholder.style.display = 'none';
-          dlBtn.disabled = false;
-        };
-        pic.onerror = function() {
-          showToast('Gagal memuat gambar', true);
-        };
-        pic.src = ev.target.result;
-      };
-      reader.onerror = function() {
-        showToast('Gagal membaca file', true);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function applyBasicEffects(imgData, w, h) {
-      const d = imgData.data;
-      
-      switch (activeEffect) {
-        case 'resize': 
-          break;
-          
-        case 'noise':
-          const noiseIntensity = noiseAmount.value / 100 * 80;
-          noiseAmountValue.textContent = noiseAmount.value;
-          for (let i = 0; i < d.length; i += 4) {
-            const n = (Math.random() - 0.5) * noiseIntensity;
-            d[i] += n; d[i + 1] += n; d[i + 2] += n;
-          }
-          break;
-          
-        case 'rgb':
-          const rgbShiftIntensity = parseInt(rgbShiftAmount.value);
-          rgbShiftAmountValue.textContent = rgbShiftAmount.value;
-          for (let i = 0; i < d.length; i += 4) {
-            const o = Math.floor(Math.random() * rgbShiftIntensity);
-            d[i] = d[i + o] || d[i];
-            d[i + 1] = d[i + 1 + o] || d[i + 1];
-            d[i + 2] = d[i + 2 - o] || d[i + 2];
-          }
-          break;
-          
-        case 'vhs':
-          const vhsIntensity = parseInt(vhsDistortion.value);
-          vhsDistortionValue.textContent = vhsDistortion.value;
-          for (let y = 0; y < h; y++) {
-            const o = Math.sin(y * 0.2) * vhsIntensity;
-            for (let x = 0; x < w; x++) {
-              const sx = Math.max(0, Math.min(w - 1, x + o));
-              const si = (y * w + sx) * 4;
-              const di = (y * w + x) * 4;
-              for (let c = 0; c < 3; c++) d[di + c] = d[si + c];
-            }
-          }
-          break;
-          
-        case 'invert':
-          for (let i = 0; i < d.length; i += 4) {
-            d[i] = 255 - d[i];
-            d[i + 1] = 255 - d[i + 1];
-            d[i + 2] = 255 - d[i + 2];
-          }
-          break;
-          
-        case 'ghost':
-          ghostCountValue.textContent = ghostCount.value;
-          ghostOpacityValue.textContent = ghostOpacity.value;
-          const ghostOpacityLevel = ghostOpacity.value / 100;
-          const ghostCountNum = parseInt(ghostCount.value);
-
-          for (let i = 1; i <= ghostCountNum; i++) {
-            const offset = i * 5;
-            ctx.globalAlpha = ghostOpacityLevel / i;
-            ctx.drawImage(canvas, offset, offset);
-            ctx.drawImage(canvas, -offset, -offset);
-          }
-          ctx.globalAlpha = 1;
-          break;
-          
-        case 'pixelate':
-          pixelSizeValue.textContent = pixelSize.value;
-          const blockSize = parseInt(pixelSize.value);
-          for (let y = 0; y < h; y += blockSize) {
-            for (let x = 0; x < w; x += blockSize) {
-              const i = (y * w + x) * 4;
-              const r = d[i], g = d[i + 1], b = d[i + 2];
-              for (let dy = 0; dy < blockSize && y + dy < h; dy++) {
-                for (let dx = 0; dx < blockSize && x + dx < w; dx++) {
-                  const ni = ((y + dy) * w + (x + dx)) * 4;
-                  d[ni] = r; d[ni + 1] = g; d[ni + 2] = b;
-                }
-              }
-            }
-          }
-          break;
-          
-        case 'sepia':
-          for (let i = 0; i < d.length; i += 4) {
-            const r = d[i], g = d[i + 1], b = d[i + 2];
-            d[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
-            d[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
-            d[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
-          }
-          break;
-          
-        case 'oversat':
-          saturationAmountValue.textContent = saturationAmount.value;
-          const satFactor = parseFloat(saturationAmount.value);
-          for (let i = 0; i < d.length; i += 4) {
-            const r = d[i], g = d[i + 1], b = d[i + 2];
-            const gray = 0.2989 * r + 0.5870 * g + 0.1140 * b;
-            d[i] = gray + satFactor * (r - gray);
-            d[i + 1] = gray + satFactor * (g - gray);
-            d[i + 2] = gray + satFactor * (b - gray);
-          }
-          break;
-          
-        case 'graynoise':
-          graynoiseAmountValue.textContent = graynoiseAmount.value;
-          const grayNoiseIntensity = graynoiseAmount.value / 100 * 80;
-          for (let i = 0; i < d.length; i += 4) {
-            const gray = 0.2989 * d[i] + 0.5870 * d[i + 1] + 0.1140 * d[i + 2];
-            const noise = (Math.random() - 0.5) * grayNoiseIntensity;
-            d[i] = gray + noise;
-            d[i + 1] = gray + noise;
-            d[i + 2] = gray + noise;
-          }
-          break;
-          
-        case 'scanline':
-          scanlineSizeValue.textContent = scanlineSize.value;
-          scanlineOpacityValue.textContent = scanlineOpacity.value;
-          const scanlineSizeVal = parseInt(scanlineSize.value);
-          const scanlineOpacityVal = scanlineOpacity.value / 100;
-          
-          for (let y = 0; y < h; y += scanlineSizeVal * 2) {
-            for (let x = 0; x < w; x++) {
-              for (let dy = 0; dy < scanlineSizeVal && y + dy < h; dy++) {
-                const i = ((y + dy) * w + x) * 4;
-                d[i] *= (1 - scanlineOpacityVal);
-                d[i + 1] *= (1 - scanlineOpacityVal);
-                d[i + 2] *= (1 - scanlineOpacityVal);
-              }
-            }
-          }
-          break;
-          
-        case 'burned':
-          burnedAmountValue.textContent = burnedAmount.value;
-          const burnedFactor = parseFloat(burnedAmount.value);
-          for (let i = 0; i < d.length; i += 4) {
-            d[i] = Math.pow(d[i] / 255, burnedFactor) * 255;
-            d[i + 1] = Math.pow(d[i + 1] / 255, burnedFactor) * 255;
-            d[i + 2] = Math.pow(d[i + 2] / 255, burnedFactor) * 255;
-          }
-          break;
-          
-        case 'swap':
-          for (let i = 0; i < d.length; i += 4) {
-            const r = d[i], g = d[i + 1], b = d[i + 2];
-            d[i] = b; d[i + 1] = r; d[i + 2] = g;
-          }
-          break;
-      }
-    }
-
-    function applyArtisticEffects(imgData, w, h) {
-      const d = imgData.data;
-      
-      switch (activeEffect) {
-        case 'watercolor':
-          watercolorBrushValue.textContent = watercolorBrush.value;
-          watercolorIntensityValue.textContent = watercolorIntensity.value;
-          const brushSize = parseInt(watercolorBrush.value);
-          const intensity = watercolorIntensity.value / 100;
-          
-          // Simplified watercolor effect
-          for (let i = 0; i < d.length; i += 4) {
-            d[i] = d[i] * (1 - intensity) + 255 * intensity;
-            d[i + 1] = d[i + 1] * (1 - intensity) + 200 * intensity;
-            d[i + 2] = d[i + 2] * (1 - intensity) + 150 * intensity;
-          }
-          break;
-          
-        case 'oilpainting':
-          oilBrushValue.textContent = oilBrush.value;
-          oilIntensityValue.textContent = oilIntensity.value;
-          const oilBrushSize = parseInt(oilBrush.value);
-          const oilIntensityVal = oilIntensity.value / 100;
-          
-          // Simplified oil painting effect
-          for (let i = 0; i < d.length; i += 4) {
-            d[i] = Math.floor(d[i] / 32) * 32 * oilIntensityVal + d[i] * (1 - oilIntensityVal);
-            d[i + 1] = Math.floor(d[i + 1] / 32) * 32 * oilIntensityVal + d[i + 1] * (1 - oilIntensityVal);
-            d[i + 2] = Math.floor(d[i + 2] / 32) * 32 * oilIntensityVal + d[i + 2] * (1 - oilIntensityVal);
-          }
-          break;
-          
-        case 'sketch':
-          sketchPencilValue.textContent = sketchPencil.value;
-          sketchDarknessValue.textContent = sketchDarkness.value;
-          const pencilSize = parseFloat(sketchPencil.value);
-          const darkness = sketchDarkness.value / 100;
-          
-          // Convert to grayscale and apply sketch effect
-          for (let i = 0; i < d.length; i += 4) {
-            const gray = 0.2989 * d[i] + 0.5870 * d[i + 1] + 0.1140 * d[i + 2];
-            const sketchVal = gray > 128 ? 255 : 0;
-            d[i] = sketchVal * darkness + gray * (1 - darkness);
-            d[i + 1] = sketchVal * darkness + gray * (1 - darkness);
-            d[i + 2] = sketchVal * darkness + gray * (1 - darkness);
-          }
-          break;
-          
-        case 'pointillism':
-          // Simplified pointillism effect
-          for (let i = 0; i < d.length; i += 4) {
-            const dotSize = Math.random() * 5;
-            d[i] = Math.min(255, d[i] + dotSize * 10);
-            d[i + 1] = Math.min(255, d[i + 1] + dotSize * 10);
-            d[i + 2] = Math.min(255, d[i + 2] + dotSize * 10);
-          }
-          break;
-          
-        case 'halftone':
-          // Simplified halftone effect
-          for (let i = 0; i < d.length; i += 4) {
-            const gray = 0.2989 * d[i] + 0.5870 * d[i + 1] + 0.1140 * d[i + 2];
-            const halftone = gray > 128 ? 255 : 0;
-            d[i] = halftone;
-            d[i + 1] = halftone;
-            d[i + 2] = halftone;
-          }
-          break;
-          
-        case 'crosshatch':
-          // Simplified crosshatch effect
-          for (let y = 0; y < h; y += 2) {
-            for (let x = 0; x < w; x += 2) {
-              const i = (y * w + x) * 4;
-              d[i] = 0;
-              d[i + 1] = 0;
-              d[i + 2] = 0;
-            }
-          }
-          break;
-          
-        case 'mosaic':
-          // Simplified mosaic effect
-          const tileSize = 10;
-          for (let y = 0; y < h; y += tileSize) {
-            for (let x = 0; x < w; x += tileSize) {
-              const i = (y * w + x) * 4;
-              const r = d[i], g = d[i + 1], b = d[i + 2];
-              for (let dy = 0; dy < tileSize && y + dy < h; dy++) {
-                for (let dx = 0; dx < tileSize && x + dx < w; dx++) {
-                  const ni = ((y + dy) * w + (x + dx)) * 4;
-                  d[ni] = r;
-                  d[ni + 1] = g;
-                  d[ni + 2] = b;
-                }
-              }
-            }
-          }
-          break;
-          
-        case 'stainedglass':
-          // Simplified stained glass effect
-          for (let i = 0; i < d.length; i += 4) {
-            d[i] = Math.min(255, d[i] * 1.2);
-            d[i + 1] = Math.min(255, d[i + 1] * 0.8);
-            d[i + 2] = Math.min(255, d[i + 2] * 1.5);
-          }
-          break;
-      }
-    }
-
-    function applyDistortionEffects(imgData, w, h) {
-      const d = imgData.data;
-      const tempData = new Uint8ClampedArray(d);
-      
-      switch (activeEffect) {
-        case 'ripple':
-          rippleSizeValue.textContent = rippleSize.value;
-          rippleFreqValue.textContent = rippleFreq.value;
-          const waveSize = parseInt(rippleSize.value);
-          const frequency = parseFloat(rippleFreq.value);
-          
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const offsetX = Math.sin(y * frequency) * waveSize;
-              const offsetY = Math.cos(x * frequency) * waveSize;
-              
-              const srcX = Math.max(0, Math.min(w - 1, x + offsetX));
-              const srcY = Math.max(0, Math.min(h - 1, y + offsetY));
-              
-              const srcI = (srcY * w + srcX) * 4;
-              const dstI = (y * w + x) * 4;
-              
-              d[dstI] = tempData[srcI];
-              d[dstI + 1] = tempData[srcI + 1];
-              d[dstI + 2] = tempData[srcI + 2];
-            }
-          }
-          break;
-
-        case 'bulge':
-          const centerX = w / 2;
-          const centerY = h / 2;
-          const radius = Math.min(w, h) / 2;
-          
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const dx = x - centerX;
-              const dy = y - centerY;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              
-              if (distance < radius) {
-                const r = distance / radius;
-                const amount = r * r * 0.5;
-                const srcX = Math.floor(centerX + dx * (1 - amount));
-                const srcY = Math.floor(centerY + dy * (1 - amount));
-                
-                const srcI = (srcY * w + srcX) * 4;
-                const dstI = (y * w + x) * 4;
-                
-                d[dstI] = tempData[srcI];
-                d[dstI + 1] = tempData[srcI + 1];
-                d[dstI + 2] = tempData[srcI + 2];
-              }
-            }
-          }
-          break;
-          
-        case 'pinch':
-          const pCenterX = w / 2;
-          const pCenterY = h / 2;
-          const pRadius = Math.min(w, h) / 2;
-          
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const dx = x - pCenterX;
-              const dy = y - pCenterY;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              
-              if (distance < pRadius) {
-                const r = distance / pRadius;
-                const amount = r * r * 0.5;
-                const srcX = Math.floor(pCenterX + dx * (1 + amount));
-                const srcY = Math.floor(pCenterY + dy * (1 + amount));
-                
-                const srcI = (srcY * w + srcX) * 4;
-                const dstI = (y * w + x) * 4;
-                
-                d[dstI] = tempData[srcI];
-                d[dstI + 1] = tempData[srcI + 1];
-                d[dstI + 2] = tempData[srcI + 2];
-              }
-            }
-          }
-          break;
-          
-        case 'swirl':
-          const sCenterX = w / 2;
-          const sCenterY = h / 2;
-          const sRadius = Math.min(w, h) / 2;
-          
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const dx = x - sCenterX;
-              const dy = y - sCenterY;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              
-              if (distance < sRadius) {
-                const angle = Math.atan2(dy, dx);
-                const amount = (1 - distance / sRadius) * 0.5;
-                const srcAngle = angle + amount;
-                
-                const srcX = Math.floor(sCenterX + Math.cos(srcAngle) * distance);
-                const srcY = Math.floor(sCenterY + Math.sin(srcAngle) * distance);
-                
-                const srcI = (srcY * w + srcX) * 4;
-                const dstI = (y * w + x) * 4;
-                
-                d[dstI] = tempData[srcI];
-                d[dstI + 1] = tempData[srcI + 1];
-                d[dstI + 2] = tempData[srcI + 2];
-              }
-            }
-          }
-          break;
-          
-        case 'fisheye':
-          const fCenterX = w / 2;
-          const fCenterY = h / 2;
-          const fRadius = Math.min(w, h) / 2;
-          
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const dx = x - fCenterX;
-              const dy = y - fCenterY;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              
-              if (distance < fRadius) {
-                const r = distance / fRadius;
-                const amount = Math.sqrt(r) * 0.5;
-                const srcX = Math.floor(fCenterX + dx * amount);
-                const srcY = Math.floor(fCenterY + dy * amount);
-                
-                const srcI = (srcY * w + srcX) * 4;
-                const dstI = (y * w + x) * 4;
-                
-                d[dstI] = tempData[srcI];
-                d[dstI + 1] = tempData[srcI + 1];
-                d[dstI + 2] = tempData[srcI + 2];
-              }
-            }
-          }
-          break;
-          
-        case 'kaleidoscope':
-          const kCenterX = w / 2;
-          const kCenterY = h / 2;
-          const segments = 6;
-          
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const dx = x - kCenterX;
-              const dy = y - kCenterY;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              const angle = Math.atan2(dy, dx);
-              
-              const segmentAngle = (angle % (2 * Math.PI / segments));
-              const segmentIndex = Math.floor(angle / (2 * Math.PI / segments));
-              
-              const srcAngle = segmentIndex % 2 === 0 ? segmentAngle : -segmentAngle;
-              const srcX = Math.floor(kCenterX + Math.cos(srcAngle) * distance);
-              const srcY = Math.floor(kCenterY + Math.sin(srcAngle) * distance);
-              
-              if (srcX >= 0 && srcX < w && srcY >= 0 && srcY < h) {
-                const srcI = (srcY * w + srcX) * 4;
-                const dstI = (y * w + x) * 4;
-                
-                d[dstI] = tempData[srcI];
-                d[dstI + 1] = tempData[srcI + 1];
-                d[dstI + 2] = tempData[srcI + 2];
-              }
-            }
-          }
-          break;
-          
-        case 'mirror':
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w / 2; x++) {
-              const srcI = (y * w + x) * 4;
-              const dstI = (y * w + (w - 1 - x)) * 4;
-              
-              d[dstI] = tempData[srcI];
-              d[dstI + 1] = tempData[srcI + 1];
-              d[dstI + 2] = tempData[srcI + 2];
-            }
-          }
-          break;
-          
-        case 'tunnel':
-          const tCenterX = w / 2;
-          const tCenterY = h / 2;
-          const maxRadius = Math.min(w, h) / 2;
-          
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const dx = x - tCenterX;
-              const dy = y - tCenterY;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              
-              if (distance < maxRadius) {
-                const r = distance / maxRadius;
-                const srcRadius = r * r * maxRadius;
-                const angle = Math.atan2(dy, dx);
-                
-                const srcX = Math.floor(tCenterX + Math.cos(angle) * srcRadius);
-                const srcY = Math.floor(tCenterY + Math.sin(angle) * srcRadius);
-                
-                if (srcX >= 0 && srcX < w && srcY >= 0 && srcY < h) {
-                  const srcI = (srcY * w + srcX) * 4;
-                  const dstI = (y * w + x) * 4;
-                  
-                  d[dstI] = tempData[srcI];
-                  d[dstI + 1] = tempData[srcI + 1];
-                  d[dstI + 2] = tempData[srcI + 2];
-                }
-              }
-            }
-          }
-          break;
-      }
-    }
-
-    function applyColorEffects(imgData, w, h) {
-      const d = imgData.data;
-      
-      switch (activeEffect) {
-        case 'duotone':
-          const darkRgb = hexToRgb(duotoneDark.value);
-          const lightRgb = hexToRgb(duotoneLight.value);
-          
-          for (let i = 0; i < d.length; i += 4) {
-            const gray = 0.2989 * d[i] + 0.5870 * d[i + 1] + 0.1140 * d[i + 2];
-            const t = gray / 255;
-            
-            d[i] = darkRgb[0] + (lightRgb[0] - darkRgb[0]) * t;
-            d[i + 1] = darkRgb[1] + (lightRgb[1] - darkRgb[1]) * t;
-            d[i + 2] = darkRgb[2] + (lightRgb[2] - darkRgb[2]) * t;
-          }
-          break;
-          
-        case 'posterize':
-          const levels = 4;
-          const step = 255 / levels;
-          
-          for (let i = 0; i < d.length; i += 4) {
-            d[i] = Math.floor(d[i] / step) * step;
-            d[i + 1] = Math.floor(d[i + 1] / step) * step;
-            d[i + 2] = Math.floor(d[i + 2] / step) * step;
-          }
-          break;
-          
-        case 'solarize':
-          for (let i = 0; i < d.length; i += 4) {
-            d[i] = d[i] > 128 ? 255 - d[i] : d[i];
-            d[i + 1] = d[i + 1] > 128 ? 255 - d[i + 1] : d[i + 1];
-            d[i + 2] = d[i + 2] > 128 ? 255 - d[i + 2] : d[i + 2];
-          }
-          break;
-          
-        case 'edgeglow':
-          // Simplified edge glow effect
-          for (let i = 0; i < d.length; i += 4) {
-            const gray = 0.2989 * d[i] + 0.5870 * d[i + 1] + 0.1140 * d[i + 2];
-            const edge = gray > 100 ? 255 : 0;
-            
-            d[i] = Math.min(255, d[i] + edge * 0.5);
-            d[i + 1] = Math.min(255, d[i + 1] + edge * 0.3);
-            d[i + 2] = Math.min(255, d[i + 2] + edge * 0.8);
-          }
-          break;
-          
-        case 'chromatic':
-          const shiftAmount = 5;
-          
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const i = (y * w + x) * 4;
-              
-              // Shift red channel
-              if (x + shiftAmount < w) {
-                const redI = (y * w + x + shiftAmount) * 4;
-                d[i] = tempData[redI];
-              }
-              
-              // Shift blue channel
-              if (x - shiftAmount >= 0) {
-                const blueI = (y * w + x - shiftAmount) * 4;
-                d[i + 2] = tempData[blueI + 2];
-              }
-            }
-          }
-          break;
-          
-        case 'thermal':
-          for (let i = 0; i < d.length; i += 4) {
-            const gray = 0.2989 * d[i] + 0.5870 * d[i + 1] + 0.1140 * d[i + 2];
-            
-            if (gray < 85) {
-              d[i] = 0;
-              d[i + 1] = 0;
-              d[i + 2] = gray * 3;
-            } else if (gray < 170) {
-              d[i] = (gray - 85) * 3;
-              d[i + 1] = 0;
-              d[i + 2] = 255 - (gray - 85) * 3;
-            } else {
-              d[i] = 255;
-              d[i + 1] = (gray - 170) * 3;
-              d[i + 2] = 0;
-            }
-          }
-          break;
-          
-        case 'xray':
-          for (let i = 0; i < d.length; i += 4) {
-            const gray = 0.2989 * d[i] + 0.5870 * d[i + 1] + 0.1140 * d[i + 2];
-            const xray = 255 - gray;
-            
-            d[i] = xray;
-            d[i + 1] = xray;
-            d[i + 2] = xray;
-          }
-          break;
-          
-        case 'infrared':
-          for (let i = 0; i < d.length; i += 4) {
-            const gray = 0.2989 * d[i] + 0.5870 * d[i + 1] + 0.1140 * d[i + 2];
-            
-            d[i] = gray;
-            d[i + 1] = gray * 0.5;
-            d[i + 2] = gray * 0.2;
-          }
-          break;
-      }
-    }
-
-    function applyCyberFunkEffects(imgData, w, h) {
-      const d = imgData.data;
-      
-      switch (activeEffect) {
-        case 'neonglow':
-          glowIntensityValue.textContent = glowIntensity.value;
-          const neonRgb = hexToRgb(neonColor.value);
-          const glowIntensityVal = glowIntensity.value / 100;
-          
-          // Apply neon glow effect
-          for (let i = 0; i < d.length; i += 4) {
-            const brightness = (d[i] + d[i + 1] + d[i + 2]) / 3;
-            
-            if (brightness > 100) {
-              d[i] = Math.min(255, d[i] + neonRgb[0] * glowIntensityVal);
-              d[i + 1] = Math.min(255, d[i + 1] + neonRgb[1] * glowIntensityVal);
-              d[i + 2] = Math.min(255, d[i + 2] + neonRgb[2] * glowIntensityVal);
-            }
-          }
-          break;
-          
-        case 'cybergrid':
-          gridSizeValue.textContent = gridSize.value;
-          const gridSizeVal = parseInt(gridSize.value);
-          const gridRgb = hexToRgb(gridColor.value);
-          
-          // Apply cyber grid effect
-          for (let y = 0; y < h; y += gridSizeVal) {
-            for (let x = 0; x < w; x++) {
-              const i = (y * w + x) * 4;
-              d[i] = gridRgb[0];
-              d[i + 1] = gridRgb[1];
-              d[i + 2] = gridRgb[2];
-            }
-          }
-          
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x += gridSizeVal) {
-              const i = (y * w + x) * 4;
-              d[i] = gridRgb[0];
-              d[i + 1] = gridRgb[1];
-              d[i + 2] = gridRgb[2];
-            }
-          }
-          break;
-          
-        case 'hologram':
-          interferenceValue.textContent = interference.value;
-          transparencyValue.textContent = transparency.value;
-          const interferenceVal = interference.value / 100;
-          const transparencyVal = transparency.value / 100;
-          
-          // Apply hologram effect
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const i = (y * w + x) * 4;
-              const noise = Math.sin(x * 0.1 + y * 0.1) * interferenceVal * 50;
-              
-              d[i] = Math.min(255, Math.max(0, d[i] + noise));
-              d[i + 1] = Math.min(255, Math.max(0, d[i + 1] + noise));
-              d[i + 2] = Math.min(255, Math.max(0, d[i + 2] + noise));
-              d[i + 3] = 255 * transparencyVal;
-            }
-          }
-          break;
-          
-        case 'digitalglitch':
-          glitchAmountValue.textContent = glitchAmount.value;
-          colorShiftValue.textContent = colorShift.value;
-          const glitchAmountVal = glitchAmount.value / 100;
-          const colorShiftVal = parseInt(colorShift.value);
-          
-          // Apply digital glitch effect
-          for (let i = 0; i < d.length; i += 4) {
-            if (Math.random() < glitchAmountVal) {
-              const shift = Math.floor(Math.random() * colorShiftVal);
-              
-              if (i + shift * 4 < d.length) {
-                d[i] = d[i + shift * 4];
-                d[i + 1] = d[i + 1 + shift * 4];
-                d[i + 2] = d[i + 2 + shift * 4];
-              }
-            }
-          }
-          break;
-          
-        case 'synthwave':
-          horizonHeightValue.textContent = horizonHeight.value;
-          const sunRgb = hexToRgb(sunColor.value);
-          const horizonHeightVal = horizonHeight.value / 100;
-          const horizonY = h * horizonHeightVal;
-          
-          // Apply synthwave effect
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const i = (y * w + x) * 4;
-              
-              if (y > horizonY) {
-                // Below horizon - dark
-                d[i] *= 0.2;
-                d[i + 1] *= 0.1;
-                d[i + 2] *= 0.3;
-              } else {
-                // Above horizon - add sun color
-                const distance = Math.abs(y - horizonY) / horizonY;
-                d[i] = Math.min(255, d[i] + sunRgb[0] * (1 - distance));
-                d[i + 1] = Math.min(255, d[i + 1] + sunRgb[1] * (1 - distance));
-                d[i + 2] = Math.min(255, d[i + 2] + sunRgb[2] * (1 - distance));
-              }
-            }
-          }
-          break;
-          
-        case 'cyberpunk':
-          darknessValue.textContent = darkness.value;
-          const accentRgb = hexToRgb(accentColor.value);
-          const darknessVal = darkness.value / 100;
-          
-          // Apply cyberpunk effect
-          for (let i = 0; i < d.length; i += 4) {
-            const brightness = (d[i] + d[i + 1] + d[i + 2]) / 3;
-            
-            if (brightness > 150) {
-              // Bright areas - add accent color
-              d[i] = Math.min(255, d[i] + accentRgb[0] * 0.5);
-              d[i + 1] = Math.min(255, d[i + 1] + accentRgb[1] * 0.5);
-              d[i + 2] = Math.min(255, d[i + 2] + accentRgb[2] * 0.5);
-            } else {
-              // Dark areas - make darker
-              d[i] *= darknessVal;
-              d[i + 1] *= darknessVal;
-              d[i + 2] *= darknessVal;
-            }
-          }
-          break;
-          
-        case 'neonrain':
-          rainDensityValue.textContent = rainDensity.value;
-          const rainRgb = hexToRgb(rainColor.value);
-          const rainDensityVal = rainDensity.value / 100;
-          
-          // Apply neon rain effect
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const i = (y * w + x) * 4;
-              
-              if (Math.random() < rainDensityVal * 0.01) {
-                // Create rain drops
-                for (let dy = 0; dy < 10 && y + dy < h; dy++) {
-                  const dropI = ((y + dy) * w + x) * 4;
-                  d[dropI] = rainRgb[0];
-                  d[dropI + 1] = rainRgb[1];
-                  d[dropI + 2] = rainRgb[2];
-                }
-              }
-            }
-          }
-          break;
-      }
-    }
-
-    function applyAdjustments(imgData) {
-      const data = imgData.data;
-      const brightnessVal = parseInt(brightness.value);
-      const contrastVal = parseInt(contrast.value);
-      const saturationVal = parseInt(saturation.value);
-      const exposureVal = parseInt(exposure.value);
-      const temperatureVal = parseInt(temperature.value);
-      
-      // Apply brightness
-      for (let i = 0; i < data.length; i += 4) {
-        data[i] += brightnessVal;
-        data[i + 1] += brightnessVal;
-        data[i + 2] += brightnessVal;
-      }
-      
-      // Apply contrast
-      const contrastFactor = (259 * (contrastVal + 255)) / (255 * (259 - contrastVal));
-      for (let i = 0; i < data.length; i += 4) {
-        data[i] = contrastFactor * (data[i] - 128) + 128;
-        data[i + 1] = contrastFactor * (data[i + 1] - 128) + 128;
-        data[i + 2] = contrastFactor * (data[i + 2] - 128) + 128;
-      }
-      
-      // Apply saturation
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        const gray = 0.2989 * r + 0.5870 * g + 0.1140 * b;
-        const satFactor = saturationVal / 100 + 1;
-        data[i] = gray + satFactor * (r - gray);
-        data[i + 1] = gray + satFactor * (g - gray);
-        data[i + 2] = gray + satFactor * (b - gray);
-      }
-      
-      // Apply exposure
-      for (let i = 0; i < data.length; i += 4) {
-        data[i] *= Math.pow(2, exposureVal / 100);
-        data[i + 1] *= Math.pow(2, exposureVal / 100);
-        data[i + 2] *= Math.pow(2, exposureVal / 100);
-      }
-      
-      // Apply temperature
-      for (let i = 0; i < data.length; i += 4) {
-        data[i] += temperatureVal;
-        data[i + 2] -= temperatureVal;
-      }
-    }
-
-    function applyFrames() {
-      const activeFrame = document.querySelector('.frame-option.active').dataset.frame;
-      if (activeFrame === 'none') return;
-      
-      const frameSizeVal = parseInt(frameSize.value);
-      const frameColorVal = frameColor.value;
-      
-      ctx.strokeStyle = frameColorVal;
-      ctx.lineWidth = frameSizeVal;
-      
-      if (activeFrame === 'simple') {
-        ctx.strokeRect(0, 0, canvas.width, canvas.height);
-      } else if (activeFrame === 'vintage') {
-        // Draw vintage frame with inner border
-        ctx.strokeRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = '#d4af37';
-        ctx.lineWidth = frameSizeVal / 2;
-        ctx.strokeRect(frameSizeVal, frameSizeVal, canvas.width - frameSizeVal * 2, canvas.height - frameSizeVal * 2);
-      } else if (activeFrame === 'modern') {
-        // Draw modern frame with corners
-        const cornerLength = frameSizeVal * 3;
-        ctx.beginPath();
-        // Top left
-        ctx.moveTo(0, cornerLength);
-        ctx.lineTo(0, 0);
-        ctx.lineTo(cornerLength, 0);
-        // Top right
-        ctx.moveTo(canvas.width - cornerLength, 0);
-        ctx.lineTo(canvas.width, 0);
-        ctx.lineTo(canvas.width, cornerLength);
-        // Bottom right
-        ctx.moveTo(canvas.width, canvas.height - cornerLength);
-        ctx.lineTo(canvas.width, canvas.height);
-        ctx.lineTo(canvas.width - cornerLength, canvas.height);
-        // Bottom left
-        ctx.moveTo(cornerLength, canvas.height);
-        ctx.lineTo(0, canvas.height);
-        ctx.lineTo(0, canvas.height - cornerLength);
-        ctx.stroke();
-      } else if (activeFrame === 'polaroid') {
-        // Draw polaroid frame
-        ctx.fillStyle = '#ffffff';
-        const frameHeight = canvas.height * 0.15;
-        ctx.fillRect(0, canvas.height - frameHeight, canvas.width, frameHeight);
-        ctx.strokeRect(0, 0, canvas.width, canvas.height);
-      } else if (activeFrame === 'film') {
-        // Draw film strip frame
-        ctx.fillStyle = '#000000';
-        const holeSize = frameSizeVal * 2;
-        const holeSpacing = frameSizeVal * 4;
-        
-        // Top strip
-        ctx.fillRect(0, 0, canvas.width, frameSizeVal);
-        for (let x = holeSpacing; x < canvas.width; x += holeSpacing * 2) {
-          ctx.clearRect(x, 0, holeSize, frameSizeVal);
-        }
-        
-        // Bottom strip
-        ctx.fillRect(0, canvas.height - frameSizeVal, canvas.width, frameSizeVal);
-        for (let x = holeSpacing; x < canvas.width; x += holeSpacing * 2) {
-          ctx.clearRect(x, canvas.height - frameSizeVal, holeSize, frameSizeVal);
-        }
-      }
-    }
-
-    function applyText() {
-      const text = textContent.value;
-      if (!text) return;
-      
-      const activeStyle = document.querySelector('.text-style-option.active').dataset.style;
-      const fontSizeVal = fontSize.value;
-      const textColorVal = textColor.value;
-      const positionVal = textPosition.value;
-      
-      ctx.font = `${fontSizeVal}px Poppins`;
-      ctx.fillStyle = textColorVal;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      
-      // Apply text style
-      if (activeStyle === 'bold') {
-        ctx.font = `bold ${fontSizeVal}px Poppins`;
-      } else if (activeStyle === 'italic') {
-        ctx.font = `italic ${fontSizeVal}px Poppins`;
-      } else if (activeStyle === 'outline') {
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 2;
-      }
-      
-      // Calculate position
-      let x, y;
-      switch (positionVal) {
-        case 'top-left':
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'top';
-          x = fontSizeVal;
-          y = fontSizeVal;
-          break;
-        case 'top-center':
-          x = canvas.width / 2;
-          y = fontSizeVal;
-          break;
-        case 'top-right':
-          ctx.textAlign = 'right';
-          ctx.textBaseline = 'top';
-          x = canvas.width - fontSizeVal;
-          y = fontSizeVal;
-          break;
-        case 'center':
-          x = canvas.width / 2;
-          y = canvas.height / 2;
-          break;
-        case 'bottom-left':
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'bottom';
-          x = fontSizeVal;
-          y = canvas.height - fontSizeVal;
-          break;
-        case 'bottom-center':
-          x = canvas.width / 2;
-          y = canvas.height - fontSizeVal;
-          break;
-        case 'bottom-right':
-          ctx.textAlign = 'right';
-          ctx.textBaseline = 'bottom';
-          x = canvas.width - fontSizeVal;
-          y = canvas.height - fontSizeVal;
-          break;
-      }
-      
-      // Draw text
-      if (activeStyle === 'outline') {
-        ctx.strokeText(text, x, y);
-        ctx.fillText(text, x, y);
-      } else {
-        ctx.fillText(text, x, y);
-      }
-    }
-
-    function applyAdvancedEffects(imgData) {
-      const data = imgData.data;
-      const blurVal = parseInt(blur.value);
-      const sharpenVal = parseInt(sharpen.value);
-      const noiseReductionVal = parseInt(noiseReduction.value);
-      const perspectiveHVal = parseInt(perspectiveH.value);
-      const perspectiveVVal = parseInt(perspectiveV.value);
-      
-      // Apply blur
-      if (blurVal > 0) {
-        // Simplified blur implementation
-        const tempData = new Uint8ClampedArray(data);
-        const width = imgData.width;
-        const height = imgData.height;
-        
-        for (let y = 1; y < height - 1; y++) {
-          for (let x = 1; x < width - 1; x++) {
-            for (let c = 0; c < 3; c++) {
-              let sum = 0;
-              for (let ky = -1; ky <= 1; ky++) {
-                for (let kx = -1; kx <= 1; kx++) {
-                  const idx = ((y + ky) * width + (x + kx)) * 4 + c;
-                  sum += tempData[idx];
-                }
-              }
-              data[(y * width + x) * 4 + c] = sum / 9;
-            }
-          }
-        }
-      }
-      
-      // Apply sharpen (simplified)
-      if (sharpenVal > 0) {
-        const tempData = new Uint8ClampedArray(data);
-        const width = imgData.width;
-        const height = imgData.height;
-        const factor = sharpenVal / 50;
-        
-        for (let y = 1; y < height - 1; y++) {
-          for (let x = 1; x < width - 1; x++) {
-            for (let c = 0; c < 3; c++) {
-              const idx = (y * width + x) * 4 + c;
-              const sum = 
-                5 * tempData[idx] -
-                tempData[idx - 4] -
-                tempData[idx + 4] -
-                tempData[idx - width * 4] -
-                tempData[idx + width * 4];
-              
-              data[idx] = Math.min(255, Math.max(0, tempData[idx] + factor * (sum - tempData[idx])));
-            }
-          }
-        }
-      }
-      
-      // Apply noise reduction (simplified)
-      if (noiseReductionVal > 0) {
-        const tempData = new Uint8ClampedArray(data);
-        const width = imgData.width;
-        const height = imgData.height;
-        const threshold = noiseReductionVal / 2;
-        
-        for (let y = 1; y < height - 1; y++) {
-          for (let x = 1; x < width - 1; x++) {
-            for (let c = 0; c < 3; c++) {
-              const idx = (y * width + x) * 4 + c;
-              const avg = (
-                tempData[idx] +
-                tempData[idx - 4] +
-                tempData[idx + 4] +
-                tempData[idx - width * 4] +
-                tempData[idx + width * 4]
-              ) / 5;
-              
-              if (Math.abs(tempData[idx] - avg) > threshold) {
-                data[idx] = avg;
-              }
-            }
-          }
-        }
-      }
-      
-      // Apply perspective correction (simplified)
-      if (perspectiveHVal !== 0 || perspectiveVVal !== 0) {
-        // This would require a more complex implementation
-        // For now, we'll just apply a simple skew transformation
-        const tempCanvas = document.createElement('canvas');
-        const tempCtx = tempCanvas.getContext('2d');
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-        tempCtx.putImageData(imgData, 0, 0);
-        
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.save();
-        ctx.transform(
-          1, 
-          perspectiveVVal / 100, 
-          perspectiveHVal / 100, 
-          1, 
-          0, 
-          0
-        );
-        ctx.drawImage(tempCanvas, 0, 0);
-        ctx.restore();
-      }
-    }
-
-    function processImage() {
-      if (!img) return;
-      
-      const scale = sizeRange.value / 100;
-      const quality = qualityRange.value / 100;
-      
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
-      
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      
-      // Get image data for processing
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      
-      // Apply existing effects based on active mode and effect
-      if (activeMode === 'basic') {
-        applyBasicEffects(imageData, canvas.width, canvas.height);
-      } else if (activeMode === 'artistic') {
-        applyArtisticEffects(imageData, canvas.width, canvas.height);
-      } else if (activeMode === 'distortion') {
-        applyDistortionEffects(imageData, canvas.width, canvas.height);
-      } else if (activeMode === 'color') {
-        applyColorEffects(imageData, canvas.width, canvas.height);
-      } else if (activeMode === 'cyberfunk') {
-        applyCyberFunkEffects(imageData, canvas.width, canvas.height);
-      }
-      
-      // Apply adjustments
-      applyAdjustments(imageData);
-      
-      // Put the processed image data back
-      ctx.putImageData(imageData, 0, 0);
-      
-      // Apply frames (after image data to avoid affecting the image data)
-      applyFrames();
-      
-      // Apply text (after frames to appear on top)
-      applyText();
-      
-      // Apply advanced effects
-      const advancedImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      applyAdvancedEffects(advancedImageData);
-      ctx.putImageData(advancedImageData, 0, 0);
-      
-      // Update preview and info
-      preview.src = canvas.toDataURL('image/jpeg', quality);
-      updateInfo();
-    }
-
-    function downloadImage() {
-      if (!img) return;
-      
-      const quality = qualityRange.value / 100;
-      canvas.toBlob(blob => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'edited-image.jpg';
-        a.click();
-        URL.revokeObjectURL(url);
-        showToast('Gambar berhasil diunduh!');
-      }, 'image/jpeg', quality);
-    }
-
-    function resetAll() {
-      if (!img) return;
-      
-      // Reset all controls
-      sizeRange.value = 100;
-      sizeVal.textContent = 100;
-      qualityRange.value = 92;
-      qualityVal.textContent = 92;
-      modeSel.value = 'resize';
-      artisticModeSel.value = 'none';
-      distortionModeSel.value = 'none';
-      colorModeSel.value = 'none';
-      cyberfunkModeSel.value = 'none';
-      
-      // Reset new feature controls
-      brightness.value = 0;
-      brightnessValue.textContent = 0;
-      contrast.value = 0;
-      contrastValue.textContent = 0;
-      saturation.value = 0;
-      saturationValue.textContent = 0;
-      exposure.value = 0;
-      exposureValue.textContent = 0;
-      temperature.value = 0;
-      temperatureValue.textContent = 0;
-      
-      // Reset frame controls
-      document.querySelectorAll('.frame-option').forEach(opt => opt.classList.remove('active'));
-      document.querySelector('.frame-option[data-frame="none"]').classList.add('active');
-      frameSize.value = 10;
-      frameSizeValue.textContent = 10;
-      frameColor.value = '#ffffff';
-      
-      // Reset text controls
-      textContent.value = '';
-      document.querySelectorAll('.text-style-option').forEach(opt => opt.classList.remove('active'));
-      document.querySelector('.text-style-option[data-style="normal"]').classList.add('active');
-      fontSize.value = 24;
-      fontSizeValue.textContent = 24;
-      textColor.value = '#ffffff';
-      textPosition.value = 'center';
-      
-      // Reset sticker controls
-      stickerSize.value = 50;
-      stickerSizeValue.textContent = 50;
-      
-      // Reset advanced controls
-      blur.value = 0;
-      blurValue.textContent = 0;
-      sharpen.value = 0;
-      sharpenValue.textContent = 0;
-      noiseReduction.value = 0;
-      noiseReductionValue.textContent = 0;
-      perspectiveH.value = 0;
-      perspectiveHValue.textContent = 0;
-      perspectiveV.value = 0;
-      perspectiveVValue.textContent = 0;
-      
-      // Reset filter controls
-      document.querySelectorAll('.filter-controls').forEach(control => {
-        control.classList.remove('active');
-      });
-      
-      // Reset active mode and effect
-      activeMode = 'basic';
-      activeEffect = 'resize';
-      
-      // Process image with reset values
-      processImage();
-      showToast('Semua pengaturan di-reset!');
-    }
-
-    /* ===== Event Listeners ===== */
-    imageUpload.addEventListener('change', handleImageFile);
-    
-    sizeRange.addEventListener('input', function() {
-      sizeVal.textContent = this.value;
-      processImage();
-    });
-    
-    qualityRange.addEventListener('input', function() {
-      qualityVal.textContent = this.value;
-      processImage();
-    });
-    
-    modeSel.addEventListener('change', function() {
-      activeEffect = this.value;
-      updateFilterControls();
-      processImage();
-    });
-    
-    artisticModeSel.addEventListener('change', function() {
-      activeEffect = this.value;
-      updateFilterControls();
-      processImage();
-    });
-    
-    distortionModeSel.addEventListener('change', function() {
-      activeEffect = this.value;
-      updateFilterControls();
-      processImage();
-    });
-    
-    colorModeSel.addEventListener('change', function() {
-      activeEffect = this.value;
-      updateFilterControls();
-      processImage();
-    });
-    
-    cyberfunkModeSel.addEventListener('change', function() {
-      activeEffect = this.value;
-      updateFilterControls();
-      processImage();
-    });
-    
-    dlBtn.addEventListener('click', downloadImage);
-    resetBtn.addEventListener('click', resetAll);
-    infoHeader.addEventListener('click', toggleInfoPanel);
-    
-    // Event listeners for filter controls
-    noiseAmount.addEventListener('input', function() {
-      noiseAmountValue.textContent = this.value;
-      processImage();
-    });
-    
-    rgbShiftAmount.addEventListener('input', function() {
-      rgbShiftAmountValue.textContent = this.value;
-      processImage();
-    });
-    
-    vhsDistortion.addEventListener('input', function() {
-      vhsDistortionValue.textContent = this.value;
-      processImage();
-    });
-    
-    ghostCount.addEventListener('input', function() {
-      ghostCountValue.textContent = this.value;
-      processImage();
-    });
-    
-    ghostOpacity.addEventListener('input', function() {
-      ghostOpacityValue.textContent = this.value;
-      processImage();
-    });
-    
-    pixelSize.addEventListener('input', function() {
-      pixelSizeValue.textContent = this.value;
-      processImage();
-    });
-    
-    saturationAmount.addEventListener('input', function() {
-      saturationAmountValue.textContent = this.value;
-      processImage();
-    });
-    
-    graynoiseAmount.addEventListener('input', function() {
-      graynoiseAmountValue.textContent = this.value;
-      processImage();
-    });
-    
-    scanlineSize.addEventListener('input', function() {
-      scanlineSizeValue.textContent = this.value;
-      processImage();
-    });
-    
-    scanlineOpacity.addEventListener('input', function() {
-      scanlineOpacityValue.textContent = this.value;
-      processImage();
-    });
-    
-    burnedAmount.addEventListener('input', function() {
-      burnedAmountValue.textContent = this.value;
-      processImage();
-    });
-    
-    watercolorBrush.addEventListener('input', function() {
-      watercolorBrushValue.textContent = this.value;
-      processImage();
-    });
-    
-    watercolorIntensity.addEventListener('input', function() {
-      watercolorIntensityValue.textContent = this.value;
-      processImage();
-    });
-    
-    oilBrush.addEventListener('input', function() {
-      oilBrushValue.textContent = this.value;
-      processImage();
-    });
-    
-    oilIntensity.addEventListener('input', function() {
-      oilIntensityValue.textContent = this.value;
-      processImage();
-    });
-    
-    sketchPencil.addEventListener('input', function() {
-      sketchPencilValue.textContent = this.value;
-      processImage();
-    });
-    
-    sketchDarkness.addEventListener('input', function() {
-      sketchDarknessValue.textContent = this.value;
-      processImage();
-    });
-    
-    rippleSize.addEventListener('input', function() {
-      rippleSizeValue.textContent = this.value;
-      processImage();
-    });
-    
-    rippleFreq.addEventListener('input', function() {
-      rippleFreqValue.textContent = this.value;
-      processImage();
-    });
-    
-    duotoneDark.addEventListener('input', processImage);
-    duotoneLight.addEventListener('input', processImage);
-    
-    // Cyber Funk controls
-    glowIntensity.addEventListener('input', function() {
-      glowIntensityValue.textContent = this.value;
-      processImage();
-    });
-    
-    gridSize.addEventListener('input', function() {
-      gridSizeValue.textContent = this.value;
-      processImage();
-    });
-    
-    interference.addEventListener('input', function() {
-      interferenceValue.textContent = this.value;
-      processImage();
-    });
-    
-    transparency.addEventListener('input', function() {
-      transparencyValue.textContent = this.value;
-      processImage();
-    });
-    
-    glitchAmount.addEventListener('input', function() {
-      glitchAmountValue.textContent = this.value;
-      processImage();
-    });
-    
-    colorShift.addEventListener('input', function() {
-      colorShiftValue.textContent = this.value;
-      processImage();
-    });
-    
-    horizonHeight.addEventListener('input', function() {
-      horizonHeightValue.textContent = this.value;
-      processImage();
-    });
-    
-    darkness.addEventListener('input', function() {
-      darknessValue.textContent = this.value;
-      processImage();
-    });
-    
-    rainDensity.addEventListener('input', function() {
-      rainDensityValue.textContent = this.value;
-      processImage();
-    });
-    
-    // Event listeners for new features
-    brightness.addEventListener('input', function() {
-      brightnessValue.textContent = this.value;
-      processImage();
-    });
-    
-    contrast.addEventListener('input', function() {
-      contrastValue.textContent = this.value;
-      processImage();
-    });
-    
-    saturation.addEventListener('input', function() {
-      saturationValue.textContent = this.value;
-      processImage();
-    });
-    
-    exposure.addEventListener('input', function() {
-      exposureValue.textContent = this.value;
-      processImage();
-    });
-    
-    temperature.addEventListener('input', function() {
-      temperatureValue.textContent = this.value;
-      processImage();
-    });
-    
-    // Frame controls
-    document.querySelectorAll('.frame-option').forEach(option => {
-      option.addEventListener('click', () => {
-        document.querySelectorAll('.frame-option').forEach(o => o.classList.remove('active'));
-        option.classList.add('active');
-        processImage();
-      });
-    });
-    
-    frameSize.addEventListener('input', function() {
-      frameSizeValue.textContent = this.value;
-      processImage();
-    });
-    
-    frameColor.addEventListener('input', processImage);
-    
-    // Text controls
-    textContent.addEventListener('input', processImage);
-    
-    document.querySelectorAll('.text-style-option').forEach(option => {
-      option.addEventListener('click', () => {
-        document.querySelectorAll('.text-style-option').forEach(o => o.classList.remove('active'));
-        option.classList.add('active');
-        processImage();
-      });
-    });
-    
-    fontSize.addEventListener('input', function() {
-      fontSizeValue.textContent = this.value;
-      processImage();
-    });
-    
-    textColor.addEventListener('input', processImage);
-    
-    textPosition.addEventListener('change', processImage);
-    
-    // Sticker controls
-    document.querySelectorAll('.sticker-item').forEach(item => {
-      item.addEventListener('click', () => {
-        selectedSticker = item.dataset.sticker;
-        showToast(`Sticker dipilih: ${selectedSticker}`);
-        processImage();
-      });
-    });
-    
-    stickerSize.addEventListener('input', function() {
-      stickerSizeValue.textContent = this.value;
-      processImage();
-    });
-    
-    // Advanced controls
-    blur.addEventListener('input', function() {
-      blurValue.textContent = this.value;
-      processImage();
-    });
-    
-    sharpen.addEventListener('input', function() {
-      sharpenValue.textContent = this.value;
-      processImage();
-    });
-    
-    noiseReduction.addEventListener('input', function() {
-      noiseReductionValue.textContent = this.value;
-      processImage();
-    });
-    
-    cropTool.addEventListener('click', () => {
-      showToast('Fitur crop akan segera hadir!');
-    });
-    
-    perspectiveH.addEventListener('input', function() {
-      perspectiveHValue.textContent = this.value;
-      processImage();
-    });
-    
-    perspectiveV.addEventListener('input', function() {
-      perspectiveVValue.textContent = this.value;
-      processImage();
-    });
-    
-    // Tab switching
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        tabContents.forEach(c => c.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
-        activeMode = tab.dataset.tab;
-        
-        // Update active effect based on tab
-        if (['basic', 'artistic', 'distortion', 'color', 'cyberfunk'].includes(activeMode)) {
-          const select = document.querySelector(`#${activeMode}Mode`);
-          activeEffect = select ? select.value : 'none';
-        } else {
-          activeEffect = 'none';
-        }
-        
-        updateFilterControls();
-      });
-    });
-
-    /* ===== Initialize ===== */
+        // Inisialisasi saat DOM dimuat
     document.addEventListener('DOMContentLoaded', function() {
-      // Initialize season manager
-      new SeasonManager();
+      // Fungsi untuk mendapatkan musim berdasarkan bulan di Jepang
+      function getJapanSeason() {
+        const now = new Date();
+        const month = now.getMonth() + 1; // getMonth() mengembalikan 0-11
+        
+        if (month >= 3 && month <= 5) {
+          return 'spring'; // Maret-Mei: Musim Semi (Sakura)
+        } else if (month >= 6 && month <= 8) {
+          return 'summer'; // Juni-Agustus: Musim Panas
+        } else if (month >= 9 && month <= 11) {
+          return 'autumn'; // September-November: Musim Gugur (Momiji)
+        } else {
+          return 'winter'; // Desember-Februari: Musim Dingin
+        }
+      }
       
-      // Set initial info panel state
-      infoContent.style.maxHeight = '0px';
-      infoContent.style.padding = '0 15px';
-      infoContent.style.border = 'none';
+      // Mengatur musim aktif berdasarkan musim di Jepang
+      function setJapanSeason() {
+        const currentSeason = getJapanSeason();
+        
+        // Hapus kelas aktif dari semua indikator musim
+        document.querySelectorAll('.season-dot').forEach(dot => {
+          dot.classList.remove('active');
+        });
+        
+        // Tambahkan kelas aktif ke musim yang sesuai
+        document.querySelector(`.season-dot[data-season="${currentSeason}"]`).classList.add('active');
+        
+        // Terapkan overlay musim
+        const overlay = document.getElementById('seasonOverlay');
+        overlay.className = 'season-overlay ' + currentSeason;
+        overlay.classList.add('active');
+        
+        // Update teks informasi musim
+        const seasonNames = {
+          'spring': 'Musim Semi - Sakura',
+          'summer': 'Musim Panas - Fireflies',
+          'autumn': 'Musim Gugur - Momiji',
+          'winter': 'Musim Dingin - Snow'
+        };
+        document.getElementById('seasonInfo').textContent = seasonNames[currentSeason];
+        
+        // Buat efek musim
+        createSeasonEffects(currentSeason);
+      }
+      
+      // Fungsi untuk membuat efek musim
+      function createSeasonEffects(season) {
+        const overlay = document.getElementById('seasonOverlay');
+        
+        // Hapus efek yang ada
+        overlay.innerHTML = '';
+        
+        if (season === 'spring') {
+          // Buat efek sakura petals
+          for (let i = 0; i < 15; i++) {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.style.left = Math.random() * 100 + '%';
+            petal.style.animationDelay = Math.random() * 10 + 's';
+            petal.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            overlay.appendChild(petal);
+          }
+        } else if (season === 'summer') {
+          // Buat efek fireflies
+          for (let i = 0; i < 20; i++) {
+            const firefly = document.createElement('div');
+            firefly.className = 'firefly';
+            firefly.style.left = Math.random() * 100 + '%';
+            firefly.style.top = Math.random() * 100 + '%';
+            firefly.style.animationDelay = Math.random() * 5 + 's';
+            firefly.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            overlay.appendChild(firefly);
+          }
+        } else if (season === 'autumn') {
+          // Buat efek falling leaves
+          for (let i = 0; i < 15; i++) {
+            const leaf = document.createElement('div');
+            leaf.className = 'leaf';
+            leaf.style.left = Math.random() * 100 + '%';
+            leaf.style.animationDelay = Math.random() * 10 + 's';
+            leaf.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            
+            // Warna daun acak
+            const colors = ['#FF8C00', '#CD853F', '#D2691E', '#A0522D'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            leaf.style.setProperty('--leaf-color', randomColor);
+            
+            overlay.appendChild(leaf);
+          }
+        } else if (season === 'winter') {
+          // Buat efek snowflakes
+          for (let i = 0; i < 30; i++) {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+            snowflake.innerHTML = '❄';
+            snowflake.style.left = Math.random() * 100 + '%';
+            snowflake.style.animationDelay = Math.random() * 10 + 's';
+            snowflake.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+            overlay.appendChild(snowflake);
+          }
+        }
+      }
+      
+      // Inisialisasi musim Jepang
+      setJapanSeason();
+      
+      // Event listener untuk indikator musim
+      document.querySelectorAll('.season-dot').forEach(dot => {
+        dot.addEventListener('click', function() {
+          const season = this.getAttribute('data-season');
+          
+          // Hapus kelas aktif dari semua indikator
+          document.querySelectorAll('.season-dot').forEach(d => {
+            d.classList.remove('active');
+          });
+          
+          // Tambahkan kelas aktif ke yang diklik
+          this.classList.add('active');
+          
+          // Terapkan overlay musim
+          const overlay = document.getElementById('seasonOverlay');
+          overlay.className = 'season-overlay ' + season;
+          overlay.classList.add('active');
+          
+          // Update teks informasi musim
+          const seasonNames = {
+            'spring': 'Musim Semi - Sakura',
+            'summer': 'Musim Panas - Fireflies',
+            'autumn': 'Musim Gugur - Momiji',
+            'winter': 'Musim Dingin - Snow'
+          };
+          document.getElementById('seasonInfo').textContent = seasonNames[season];
+          
+          // Buat efek musim
+          createSeasonEffects(season);
+        });
+      });
+      
+      // Event listener untuk upload gambar
+      document.getElementById('imageUpload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+              // Simpan gambar asli
+              originalImage = img;
+              currentImage = img;
+              
+              // Tampilkan gambar di preview
+              document.getElementById('preview').src = event.target.result;
+              document.getElementById('preview').style.display = 'block';
+              document.getElementById('placeholder').style.display = 'none';
+              
+              // Update informasi gambar
+              updateImageInfo(img, file);
+              
+              // Terapkan filter dan resize awal
+              applyFiltersAndResize();
+              
+              // Aktifkan tombol download
+              document.getElementById('downloadBtn').disabled = false;
+            };
+            img.src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      
+      // Event listener untuk perubahan resolusi
+      document.getElementById('sizeRange').addEventListener('input', function() {
+        document.getElementById('sizeVal').textContent = this.value;
+        applyFiltersAndResize();
+      });
+      
+      // Event listener untuk perubahan kualitas
+      document.getElementById('qualityRange').addEventListener('input', function() {
+        document.getElementById('qualityVal').textContent = this.value;
+        // Kualitas hanya berpengaruh saat menyimpan, jadi tidak perlu applyFiltersAndResize di sini
+      });
+      
+      // Event listener untuk tab
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          // Hapus kelas aktif dari semua tab
+          document.querySelectorAll('.tab').forEach(t => {
+            t.classList.remove('active');
+          });
+          
+          // Tambahkan kelas aktif ke tab yang diklik
+          this.classList.add('active');
+          
+          // Sembunyikan semua konten tab
+          document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+          });
+          
+          // Tampilkan konten tab yang sesuai
+          const tabId = this.getAttribute('data-tab');
+          document.getElementById(tabId + '-tab').classList.add('active');
+          
+          // Simpan tab aktif
+          activeTab = tabId;
+        });
+      });
+      
+      // Event listener untuk mode filter
+      document.getElementById('mode').addEventListener('change', function() {
+        // Sembunyikan semua kontrol filter
+        document.querySelectorAll('.filter-controls').forEach(control => {
+          control.classList.remove('active');
+        });
+        
+        // Tampilkan kontrol filter yang sesuai
+        const selectedMode = this.value;
+        if (selectedMode && document.getElementById(selectedMode + 'Controls')) {
+          document.getElementById(selectedMode + 'Controls').classList.add('active');
+        }
+        
+        // Simpan mode aktif
+        activeMode = selectedMode;
+        
+        // Terapkan filter
+        applyFiltersAndResize();
+      });
+      
+      // Event listener untuk mode artistic
+      document.getElementById('artisticMode').addEventListener('change', function() {
+        // Sembunyikan semua kontrol filter
+        document.querySelectorAll('.filter-controls').forEach(control => {
+          control.classList.remove('active');
+        });
+        
+        // Tampilkan kontrol filter yang sesuai
+        const selectedMode = this.value;
+        if (selectedMode && selectedMode !== 'none' && document.getElementById(selectedMode + 'Controls')) {
+          document.getElementById(selectedMode + 'Controls').classList.add('active');
+        }
+        
+        // Simpan mode aktif
+        activeMode = selectedMode;
+        
+        // Terapkan filter
+        applyFiltersAndResize();
+      });
+
+      // Event listener untuk mode distortion
+      document.getElementById('distortionMode').addEventListener('change', function() {
+        // Sembunyikan semua kontrol filter
+        document.querySelectorAll('.filter-controls').forEach(control => {
+          control.classList.remove('active');
+        });
+        
+        // Tampilkan kontrol filter yang sesuai
+        const selectedMode = this.value;
+        if (selectedMode && selectedMode !== 'none' && document.getElementById(selectedMode + 'Controls')) {
+          document.getElementById(selectedMode + 'Controls').classList.add('active');
+        }
+        
+        // Simpan mode aktif
+        activeMode = selectedMode;
+        
+        // Terapkan filter
+        applyFiltersAndResize();
+      });
+      
+      // Event listener untuk mode color
+      document.getElementById('colorMode').addEventListener('change', function() {
+        // Sembunyikan semua kontrol filter
+        document.querySelectorAll('.filter-controls').forEach(control => {
+          control.classList.remove('active');
+        });
+        
+        // Tampilkan kontrol filter yang sesuai
+        const selectedMode = this.value;
+        if (selectedMode && selectedMode !== 'none' && document.getElementById(selectedMode + 'Controls')) {
+          document.getElementById(selectedMode + 'Controls').classList.add('active');
+        }
+        
+        // Simpan mode aktif
+        activeMode = selectedMode;
+        
+        // Terapkan filter
+        applyFiltersAndResize();
+      });
+      
+      // Event listener untuk mode cyberfunk
+      document.getElementById('cyberfunkMode').addEventListener('change', function() {
+        // Sembunyikan semua kontrol filter
+        document.querySelectorAll('.filter-controls').forEach(control => {
+          control.classList.remove('active');
+        });
+        
+        // Tampilkan kontrol filter yang sesuai
+        const selectedMode = this.value;
+        if (selectedMode && selectedMode !== 'none' && document.getElementById(selectedMode + 'Controls')) {
+          document.getElementById(selectedMode + 'Controls').classList.add('active');
+        }
+        
+        // Simpan mode aktif
+        activeMode = selectedMode;
+        
+        // Terapkan filter
+        applyFiltersAndResize();
+      });
+      
+      // Event listener untuk kontrol filter
+      document.querySelectorAll('.filter-control input[type="range"]').forEach(input => {
+        input.addEventListener('input', function() {
+          // Update nilai tampilan
+          const valueDisplay = document.getElementById(this.id + 'Value');
+          if (valueDisplay) {
+            let value = this.value;
+            if (this.id === 'saturationAmount' || this.id === 'burnedAmount') {
+              value = parseFloat(value).toFixed(1);
+            }
+            valueDisplay.textContent = value;
+          }
+          
+          // Terapkan filter
+          applyFiltersAndResize();
+        });
+      });
+      
+      // Event listener untuk frame options
+      document.querySelectorAll('.frame-option').forEach(option => {
+        option.addEventListener('click', function() {
+          // Hapus kelas aktif dari semua opsi
+          document.querySelectorAll('.frame-option').forEach(o => {
+            o.classList.remove('active');
+          });
+          
+          // Tambahkan kelas aktif ke opsi yang diklik
+          this.classList.add('active');
+          
+          // Terapkan filter
+          applyFiltersAndResize();
+        });
+      });
+      
+      // Event listener untuk text style options
+      document.querySelectorAll('.text-style-option').forEach(option => {
+        option.addEventListener('click', function() {
+          // Hapus kelas aktif dari semua opsi
+          document.querySelectorAll('.text-style-option').forEach(o => {
+            o.classList.remove('active');
+          });
+          
+          // Tambahkan kelas aktif ke opsi yang diklik
+          this.classList.add('active');
+          
+          // Terapkan filter
+          applyFiltersAndResize();
+        });
+      });
+      
+      // Event listener untuk sticker items
+      document.querySelectorAll('.sticker-item').forEach(sticker => {
+        sticker.addEventListener('click', function() {
+          // Simpan sticker yang dipilih
+          selectedSticker = this.getAttribute('data-sticker');
+          
+          // Hapus kelas aktif dari semua sticker
+          document.querySelectorAll('.sticker-item').forEach(s => {
+            s.classList.remove('active');
+          });
+          
+          // Tambahkan kelas aktif ke sticker yang diklik
+          this.classList.add('active');
+          
+          // Terapkan filter
+          applyFiltersAndResize();
+        });
+      });
+      
+      // Event listener untuk kontrol di tab lainnya
+      document.querySelectorAll('#brightness, #contrast, #saturation, #exposure, #temperature, #frameSize, #fontSize, #stickerSize, #blur, #sharpen, #noiseReduction, #perspectiveH, #perspectiveV').forEach(input => {
+        input.addEventListener('input', function() {
+          // Update nilai tampilan
+          const valueDisplay = document.getElementById(this.id + 'Value');
+          if (valueDisplay) {
+            valueDisplay.textContent = this.value;
+          }
+
+          // Terapkan filter
+          applyFiltersAndResize();
+        });
+      });
+      
+      // Event listener untuk color inputs
+      document.querySelectorAll('#frameColor, #textColor, #duotoneDark, #duotoneLight, #neonColor, #gridColor, #sunColor, #accentColor, #rainColor').forEach(input => {
+        input.addEventListener('input', function() {
+          // Terapkan filter
+          applyFiltersAndResize();
+        });
+      });
+      
+      // Event listener untuk selects di tab lainnya
+      document.querySelectorAll('#textPosition').forEach(select => {
+        select.addEventListener('change', function() {
+          // Terapkan filter
+          applyFiltersAndResize();
+        });
+      });
+      
+      // Event listener untuk tombol download
+      document.getElementById('downloadBtn').addEventListener('click', function() {
+        if (!originalImage) return;
+        
+        const canvas = document.getElementById('canvas');
+        const quality = document.getElementById('qualityRange').value / 100;
+        
+        // Buat link download
+        const link = document.createElement('a');
+        link.download = 'edited-image.jpg';
+        link.href = canvas.toDataURL('image/jpeg', quality);
+        link.click();
+        
+        // Tampilkan toast
+        showToast('Image downloaded successfully!');
+      });
+      
+      // Event listener untuk tombol reset
+      document.getElementById('resetBtn').addEventListener('click', function() {
+        // Reset semua kontrol ke nilai default
+        document.getElementById('sizeRange').value = 100;
+        document.getElementById('sizeVal').textContent = '100';
+        document.getElementById('qualityRange').value = 92;
+        document.getElementById('qualityVal').textContent = '92';
+        document.getElementById('mode').value = 'resize';
+        document.getElementById('artisticMode').value = 'none';
+        document.getElementById('distortionMode').value = 'none';
+        document.getElementById('colorMode').value = 'none';
+        document.getElementById('cyberfunkMode').value = 'none';
+        
+        // Reset kontrol adjustments
+        document.getElementById('brightness').value = 0;
+        document.getElementById('brightnessValue').textContent = '0';
+        document.getElementById('contrast').value = 0;
+        document.getElementById('contrastValue').textContent = '0';
+        document.getElementById('saturation').value = 0;
+        document.getElementById('saturationValue').textContent = '0';
+        document.getElementById('exposure').value = 0;
+        document.getElementById('exposureValue').textContent = '0';
+        document.getElementById('temperature').value = 0;
+        document.getElementById('temperatureValue').textContent = '0';
+        
+        // Reset frame
+        document.querySelectorAll('.frame-option').forEach(option => {
+          option.classList.remove('active');
+        });
+        document.querySelector('.frame-option[data-frame="none"]').classList.add('active');
+        document.getElementById('frameSize').value = 10;
+        document.getElementById('frameSizeValue').textContent = '10';
+        document.getElementById('frameColor').value = '#ffffff';
+        
+        // Reset text
+        document.getElementById('textContent').value = '';
+        document.querySelectorAll('.text-style-option').forEach(option => {
+          option.classList.remove('active');
+        });
+        document.querySelector('.text-style-option[data-style="normal"]').classList.add('active');
+        document.getElementById('fontSize').value = 24;
+        document.getElementById('fontSizeValue').textContent = '24';
+        document.getElementById('textColor').value = '#ffffff';
+        document.getElementById('textPosition').value = 'center';
+        
+        // Reset stickers
+        document.querySelectorAll('.sticker-item').forEach(sticker => {
+          sticker.classList.remove('active');
+        });
+        document.getElementById('stickerSize').value = 50;
+        document.getElementById('stickerSizeValue').textContent = '50';
+        selectedSticker = null;
+        
+        // Reset advanced
+        document.getElementById('blur').value = 0;
+        document.getElementById('blurValue').textContent = '0';
+        document.getElementById('sharpen').value = 0;
+        document.getElementById('sharpenValue').textContent = '0';
+        document.getElementById('noiseReduction').value = 0;
+        document.getElementById('noiseReductionValue').textContent = '0';
+        document.getElementById('perspectiveH').value = 0;
+        document.getElementById('perspectiveHValue').textContent = '0';
+        document.getElementById('perspectiveV').value = 0;
+        document.getElementById('perspectiveVValue').textContent = '0';
+        
+        // Sembunyikan semua kontrol filter
+        document.querySelectorAll('.filter-controls').forEach(control => {
+          control.classList.remove('active');
+        });
+        
+        // Reset tab aktif
+        document.querySelectorAll('.tab').forEach(tab => {
+          tab.classList.remove('active');
+        });
+        document.querySelector('.tab[data-tab="basic"]').classList.add('active');
+        
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        document.getElementById('basic-tab').classList.add('active');
+        
+        activeTab = 'basic';
+        activeMode = 'resize';
+        
+        // Terapkan perubahan
+        if (originalImage) {
+          applyFiltersAndResize();
+        }
+        
+        // Tampilkan toast
+        showToast('Settings reset successfully!');
+      });
+      
+      // Event listener untuk crop tool
+      document.getElementById('cropTool').addEventListener('click', function() {
+        // Implementasi crop tool
+        showToast('Crop tool will be implemented soon!');
+      });
+      
+      // Event listener untuk tombol compare
+      document.getElementById('compareBtn').addEventListener('click', function() {
+        if (!originalImage) {
+          showToast('Please upload an image first!', true);
+          return;
+        }
+        
+        isComparing = !isComparing;
+        const compareBtn = document.getElementById('compareBtn');
+        
+        if (isComparing) {
+          compareBtn.classList.add('active');
+          compareBtn.title = 'Stop Compare';
+          
+          // Mulai bergantian antara gambar asli dan hasil edit
+          let showOriginal = true;
+          compareInterval = setInterval(() => {
+            const preview = document.getElementById('preview');
+            if (showOriginal) {
+              // Tampilkan gambar asli
+              preview.src = originalImage.src;
+            } else {
+              // Tampilkan hasil edit
+              const canvas = document.getElementById('canvas');
+              const quality = document.getElementById('qualityRange').value / 100;
+              preview.src = canvas.toDataURL('image/jpeg', quality);
+            }
+            showOriginal = !showOriginal;
+          }, 500);
+        } else {
+          compareBtn.classList.remove('active');
+          compareBtn.title = 'Compare Original vs Edited';
+
+          // Hentikan interval
+          if (compareInterval) {
+            clearInterval(compareInterval);
+            compareInterval = null;
+          }
+          
+          // Tampilkan hasil edit
+          const canvas = document.getElementById('canvas');
+          const quality = document.getElementById('qualityRange').value / 100;
+          document.getElementById('preview').src = canvas.toDataURL('image/jpeg', quality);
+        }
+      });
+      
+      // Fungsi untuk menerapkan filter dan resize
+      function applyFiltersAndResize() {
+        if (!originalImage) return;
+        
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Dapatkan nilai resolusi
+        const sizePercent = document.getElementById('sizeRange').value / 100;
+        
+        // Hitung ukuran baru
+        const newWidth = Math.round(originalImage.width * sizePercent);
+        const newHeight = Math.round(originalImage.height * sizePercent);
+        
+        // Set ukuran canvas
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+        
+        // Gambar gambar asli ke canvas dengan ukuran baru
+        ctx.drawImage(originalImage, 0, 0, newWidth, newHeight);
+        
+        // Terapkan filter berdasarkan tab aktif
+        if (activeTab === 'basic') {
+          applyBasicFilter(ctx, activeMode, newWidth, newHeight);
+        } else if (activeTab === 'artistic') {
+          applyArtisticFilter(ctx, document.getElementById('artisticMode').value, newWidth, newHeight);
+        } else if (activeTab === 'distortion') {
+          applyDistortionFilter(ctx, document.getElementById('distortionMode').value, newWidth, newHeight);
+        } else if (activeTab === 'color') {
+          applyColorFilter(ctx, document.getElementById('colorMode').value, newWidth, newHeight);
+        } else if (activeTab === 'cyberfunk') {
+          applyCyberfunkFilter(ctx, document.getElementById('cyberfunkMode').value, newWidth, newHeight);
+        }
+        
+        // Terapkan adjustments
+        applyAdjustments(ctx, newWidth, newHeight);
+        
+        // Terapkan frame
+        applyFrame(ctx, newWidth, newHeight);
+        
+        // Terapkan text
+        applyText(ctx, newWidth, newHeight);
+        
+        // Terapkan sticker
+        applySticker(ctx, newWidth, newHeight);
+        
+        // Terapkan advanced effects
+        applyAdvancedEffects(ctx, newWidth, newHeight);
+        
+        // Update preview dengan canvas
+        const quality = document.getElementById('qualityRange').value / 100;
+        document.getElementById('preview').src = canvas.toDataURL('image/jpeg', quality);
+        
+        // Update informasi output
+        updateOutputInfo(newWidth, newHeight);
+      }
+      
+      // Fungsi untuk menerapkan filter dasar
+      function applyBasicFilter(ctx, mode, width, height) {
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        
+        switch(mode) {
+          case 'resize':
+            // Tidak ada filter khusus untuk resize biasa
+            break;
+            
+          case 'noise':
+            // Noise Glitch
+            const noiseAmount = document.getElementById('noiseAmount') ? 
+              parseInt(document.getElementById('noiseAmount').value) : 40;
+            
+            for (let i = 0; i < data.length; i += 4) {
+              if (Math.random() * 100 < noiseAmount) {
+                const offset = Math.floor(Math.random() * 20) - 10;
+                data[i] = Math.min(255, Math.max(0, data[i] + offset));     // R
+                data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + offset)); // G
+                data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + offset)); // B
+              }
+            }
+            break;
+            
+          case 'rgb':
+            // RGB Shift
+            const rgbShiftAmount = document.getElementById('rgbShiftAmount') ? 
+              parseInt(document.getElementById('rgbShiftAmount').value) : 15;
+            
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = width;
+            tempCanvas.height = height;
+            tempCtx.putImageData(imageData, 0, 0);
+            
+            // Hapus canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Gambar channel merah dengan offset
+            ctx.globalCompositeOperation = 'screen';
+            ctx.drawImage(tempCanvas, rgbShiftAmount, 0, width, height);
+            
+            // Gambar channel hijau dengan offset berbeda
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.drawImage(tempCanvas, -rgbShiftAmount, 0, width, height);
+            
+            // Gambar channel biru dengan offset berbeda
+            ctx.globalCompositeOperation = 'screen';
+            ctx.drawImage(tempCanvas, 0, rgbShiftAmount, width, height);
+            
+            // Kembali ke mode normal
+            ctx.globalCompositeOperation = 'source-over';
+            return; // Karena kita sudah menggambar langsung ke ctx
+            
+          case 'vhs':
+            // VHS Tracking
+            const vhsDistortion = document.getElementById('vhsDistortion') ? 
+              parseInt(document.getElementById('vhsDistortion').value) : 10;
+            
+            for (let y = 0; y < height; y++) {
+              if (Math.random() * 100 < vhsDistortion) {
+                const offset = Math.floor(Math.random() * 10) - 5;
+                const lineData = ctx.getImageData(0, y, width, 1);
+                ctx.putImageData(lineData, offset, y);
+              }
+            }
+            break;
+            
+          case 'invert':
+            // Invert Colors
+            for (let i = 0; i < data.length; i += 4) {
+              data[i] = 255 - data[i];     // R
+              data[i + 1] = 255 - data[i + 1]; // G
+              data[i + 2] = 255 - data[i + 2]; // B
+            }
+            break;
+            
+          case 'ghost':
+            // Ghost Echo
+            const ghostCount = document.getElementById('ghostCount') ? 
+              parseInt(document.getElementById('ghostCount').value) : 2;
+            const ghostOpacity = document.getElementById('ghostOpacity') ? 
+              parseInt(document.getElementById('ghostOpacity').value) / 100 : 0.25;
+            
+            const ghostCanvas = document.createElement('canvas');
+            const ghostCtx = ghostCanvas.getContext('2d');
+            ghostCanvas.width = width;
+            ghostCanvas.height = height;
+            ghostCtx.putImageData(imageData, 0, 0);
+            
+            ctx.globalAlpha = ghostOpacity;
+            for (let i = 1; i <= ghostCount; i++) {
+              ctx.drawImage(ghostCanvas, i * 5, i * 5, width, height);
+            }
+            ctx.globalAlpha = 1.0;
+            break;
+            
+          case 'pixelate':
+            // Pixelate
+            const pixelSize = document.getElementById('pixelSize') ? 
+              parseInt(document.getElementById('pixelSize').value) : 8;
+            
+            for (let y = 0; y < height; y += pixelSize) {
+              for (let x = 0; x < width; x += pixelSize) {
+                const pixelData = ctx.getImageData(x, y, 1, 1).data;
+                ctx.fillStyle = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
+                ctx.fillRect(x, y, pixelSize, pixelSize);
+              }
+            }
+            break;
+            
+          case 'sepia':
+            // Sepia Rusak
+            for (let i = 0; i < data.length; i += 4) {
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+              
+              data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));     // R
+              data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168)); // G
+              data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131)); // B
+            }
+            break;
+            
+          case 'oversat':
+            // Over Saturation
+            const saturationAmount = document.getElementById('saturationAmount') ? 
+              parseFloat(document.getElementById('saturationAmount').value) : 1.6;
+            
+            for (let i = 0; i < data.length; i += 4) {
+              const r = data[i] / 255;
+              const g = data[i + 1] / 255;
+              const b = data[i + 2] / 255;
+              
+              const max = Math.max(r, g, b);
+              const min = Math.min(r, g, b);
+              let h, s, l = (max + min) / 2;
+              
+              if (max === min) {
+                h = s = 0;
+              } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                
+                switch (max) {
+                  case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                  case g: h = (b - r) / d + 2; break;
+                  case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+              }
+
+              // Tingkatkan saturasi
+              s = Math.min(1, s * saturationAmount);
+              
+              // Konversi kembali ke RGB
+              let r2, g2, b2;
+              
+              if (s === 0) {
+                r2 = g2 = b2 = l;
+              } else {
+                const hue2rgb = (p, q, t) => {
+                  if (t < 0) t += 1;
+                  if (t > 1) t -= 1;
+                  if (t < 1/6) return p + (q - p) * 6 * t;
+                  if (t < 1/2) return q;
+                  if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                  return p;
+                };
+                
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                
+                r2 = hue2rgb(p, q, h + 1/3);
+                g2 = hue2rgb(p, q, h);
+                b2 = hue2rgb(p, q, h - 1/3);
+              }
+              
+              data[i] = Math.round(r2 * 255);
+              data[i + 1] = Math.round(g2 * 255);
+              data[i + 2] = Math.round(b2 * 255);
+            }
+            break;
+            
+          case 'graynoise':
+            // Grayscale Noise
+            const graynoiseAmount = document.getElementById('graynoiseAmount') ? 
+              parseInt(document.getElementById('graynoiseAmount').value) : 50;
+            
+            for (let i = 0; i < data.length; i += 4) {
+              // Konversi ke grayscale
+              const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+              
+              // Tambahkan noise
+              const noise = (Math.random() - 0.5) * graynoiseAmount;
+              const noisyGray = Math.min(255, Math.max(0, gray + noise));
+              
+              data[i] = noisyGray;     // R
+              data[i + 1] = noisyGray; // G
+              data[i + 2] = noisyGray; // B
+            }
+            break;
+            
+          case 'scanline':
+            // Scanline CRT
+            const scanlineSize = document.getElementById('scanlineSize') ? 
+              parseInt(document.getElementById('scanlineSize').value) : 4;
+            const scanlineOpacity = document.getElementById('scanlineOpacity') ? 
+              parseInt(document.getElementById('scanlineOpacity').value) / 100 : 0.3;
+            
+            for (let y = 0; y < height; y += scanlineSize * 2) {
+              ctx.fillStyle = `rgba(0, 0, 0, ${scanlineOpacity})`;
+              ctx.fillRect(0, y, width, scanlineSize);
+            }
+            break;
+            
+          case 'burned':
+            // Burned Contrast
+            const burnedAmount = document.getElementById('burnedAmount') ? 
+              parseFloat(document.getElementById('burnedAmount').value) : 1.8;
+            
+            for (let i = 0; i < data.length; i += 4) {
+              // Tingkatkan kontras
+              const factor = (259 * (burnedAmount + 255)) / (255 * (259 - burnedAmount));
+              
+              data[i] = Math.min(255, Math.max(0, factor * (data[i] - 128) + 128));     // R
+              data[i + 1] = Math.min(255, Math.max(0, factor * (data[i + 1] - 128) + 128)); // G
+              data[i + 2] = Math.min(255, Math.max(0, factor * (data[i + 2] - 128) + 128)); // B
+            }
+            break;
+            
+          case 'swap':
+            // Random Color Swap
+            for (let i = 0; i < data.length; i += 4) {
+              if (Math.random() < 0.1) {
+                // Tukar nilai RGB secara acak
+                const temp = data[i];
+                data[i] = data[i + 1];
+                data[i + 1] = data[i + 2];
+                data[i + 2] = temp;
+              }
+            }
+            break;
+        }
+        
+        // Jika bukan filter khusus yang sudah ditangani di atas, terapkan perubahan ke imageData
+        if (mode !== 'rgb' && mode !== 'vhs' && mode !== 'ghost' && mode !== 'pixelate' && mode !== 'scanline') {
+          ctx.putImageData(imageData, 0, 0);
+        }
+      }
+      
+      // Fungsi untuk menerapkan filter artistic
+      function applyArtisticFilter(ctx, mode, width, height) {
+        if (mode === 'none') return;
+        
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        
+        switch(mode) {
+          case 'watercolor':
+            // Watercolor Effect
+            const watercolorBrush = document.getElementById('watercolorBrush') ? 
+              parseInt(document.getElementById('watercolorBrush').value) : 8;
+            const watercolorIntensity = document.getElementById('watercolorIntensity') ? 
+              parseInt(document.getElementById('watercolorIntensity').value) / 100 : 0.7;
+            
+            // Buat efek watercolor dengan blur dan noise
+            ctx.filter = `blur(${watercolorBrush / 2}px)`;
+            ctx.drawImage(ctx.canvas, 0, 0);
+            ctx.filter = 'none';
+            
+            // Tambahkan noise untuk tekstur
+            const watercolorData = ctx.getImageData(0, 0, width, height);
+            const watercolorPixels = watercolorData.data;
+            
+            for (let i = 0; i < watercolorPixels.length; i += 4) {
+              if (Math.random() < watercolorIntensity * 0.1) {
+                const noise = (Math.random() - 0.5) * 50;
+                watercolorPixels[i] = Math.min(255, Math.max(0, watercolorPixels[i] + noise));
+                watercolorPixels[i + 1] = Math.min(255, Math.max(0, watercolorPixels[i + 1] + noise));
+                watercolorPixels[i + 2] = Math.min(255, Math.max(0, watercolorPixels[i + 2] + noise));
+              }
+            }
+            
+            ctx.putImageData(watercolorData, 0, 0);
+            break;
+            
+          case 'oilpainting':
+            // Oil Painting Effect
+            const oilBrush = document.getElementById('oilBrush') ? 
+              parseInt(document.getElementById('oilBrush').value) : 5;
+            const oilIntensity = document.getElementById('oilIntensity') ? 
+              parseInt(document.getElementById('oilIntensity').value) / 100 : 0.6;
+            
+            // Buat efek oil painting dengan median filter
+            const oilData = ctx.createImageData(width, height);
+            const oilPixels = oilData.data;
+            
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                const r = [], g = [], b = [];
+                
+                // Kumpulkan piksel di sekitar
+                for (let dy = -oilBrush; dy <= oilBrush; dy++) {
+                  for (let dx = -oilBrush; dx <= oilBrush; dx++) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    
+                    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                      const idx = (ny * width + nx) * 4;
+                      r.push(data[idx]);
+                      g.push(data[idx + 1]);
+                      b.push(data[idx + 2]);
+                    }
+                  }
+                }
+                
+                // Hitung median
+                r.sort((a, b) => a - b);
+                g.sort((a, b) => a - b);
+                b.sort((a, b) => a - b);
+                
+                const medianIdx = Math.floor(r.length / 2);
+                
+                const idx = (y * width + x) * 4;
+                oilPixels[idx] = r[medianIdx];
+                oilPixels[idx + 1] = g[medianIdx];
+                oilPixels[idx + 2] = b[medianIdx];
+                oilPixels[idx + 3] = 255;
+              }
+            }
+            
+            ctx.putImageData(oilData, 0, 0);
+            break;
+            
+          case 'sketch':
+            // Pencil Sketch Effect
+            const sketchPencil = document.getElementById('sketchPencil') ? 
+              parseFloat(document.getElementById('sketchPencil').value) : 1;
+            const sketchDarkness = document.getElementById('sketchDarkness') ? 
+              parseInt(document.getElementById('sketchDarkness').value) / 100 : 0.7;
+            
+            // Konversi ke grayscale
+            const grayData = ctx.createImageData(width, height);
+            const grayPixels = grayData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+              const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+              grayPixels[i] = gray;
+              grayPixels[i + 1] = gray;
+              grayPixels[i + 2] = gray;
+              grayPixels[i + 3] = 255;
+            }
+            
+            ctx.putImageData(grayData, 0, 0);
+            
+            // Terapkan edge detection
+            const sketchData = ctx.getImageData(0, 0, width, height);
+            const sketchPixels = sketchData.data;
+            
+            for (let y = 1; y < height - 1; y++) {
+              for (let x = 1; x < width - 1; x++) {
+                const idx = (y * width + x) * 4;
+                
+                // Hitung gradien
+                const gx = 
+                  -grayPixels[((y - 1) * width + (x - 1)) * 4] +
+                  grayPixels[((y - 1) * width + (x + 1)) * 4] +
+                  -2 * grayPixels[(y * width + (x - 1)) * 4] +
+                  2 * grayPixels[(y * width + (x + 1)) * 4] +
+                  -grayPixels[((y + 1) * width + (x - 1)) * 4] +
+                  grayPixels[((y + 1) * width + (x + 1)) * 4];
+                
+                const gy = 
+                  -grayPixels[((y - 1) * width + (x - 1)) * 4] +
+                  -2 * grayPixels[((y - 1) * width + x) * 4] +
+                  -grayPixels[((y - 1) * width + (x + 1)) * 4] +
+                  grayPixels[((y + 1) * width + (x - 1)) * 4] +
+                  2 * grayPixels[((y + 1) * width + x) * 4] +
+                  grayPixels[((y + 1) * width + (x + 1)) * 4];
+                
+                const magnitude = Math.sqrt(gx * gx + gy * gy);
+                const edge = Math.min(255, magnitude * sketchPencil);
+
+                // Invert untuk membuat sketsa
+                const sketchValue = 255 - (edge * sketchDarkness);
+                
+                sketchPixels[idx] = sketchValue;
+                sketchPixels[idx + 1] = sketchValue;
+                sketchPixels[idx + 2] = sketchValue;
+              }
+            }
+            
+            ctx.putImageData(sketchData, 0, 0);
+            break;
+            
+          case 'pointillism':
+            // Pointillism Effect
+            const pointSize = 3;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            for (let y = 0; y < height; y += pointSize * 2) {
+              for (let x = 0; x < width; x += pointSize * 2) {
+                const idx = (y * width + x) * 4;
+                const r = data[idx];
+                const g = data[idx + 1];
+                const b = data[idx + 2];
+                
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                
+                // Gambar titik dengan posisi acak
+                const offsetX = (Math.random() - 0.5) * pointSize * 2;
+                const offsetY = (Math.random() - 0.5) * pointSize * 2;
+                
+                ctx.beginPath();
+                ctx.arc(x + offsetX, y + offsetY, pointSize, 0, Math.PI * 2);
+                ctx.fill();
+              }
+            }
+            break;
+            
+          case 'halftone':
+            // Halftone Dots Effect
+            const dotSize = 4;
+            
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, width, height);
+            
+            for (let y = 0; y < height; y += dotSize * 2) {
+              for (let x = 0; x < width; x += dotSize * 2) {
+                const idx = (y * width + x) * 4;
+                const r = data[idx];
+                const g = data[idx + 1];
+                const b = data[idx + 2];
+                
+                // Hitung kecerahan
+                const brightness = (r + g + b) / 3;
+                const radius = (brightness / 255) * dotSize;
+                
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                
+                ctx.beginPath();
+                ctx.arc(x + dotSize, y + dotSize, radius, 0, Math.PI * 2);
+                ctx.fill();
+              }
+            }
+            break;
+            
+          case 'crosshatch':
+            // Cross Hatch Effect
+            const hatchSpacing = 4;
+            
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 1;
+            
+            // Gambar garis diagonal
+            for (let y = 0; y < height; y += hatchSpacing) {
+              for (let x = 0; x < width; x += hatchSpacing) {
+                const idx = (y * width + x) * 4;
+                const brightness = (data[idx] + data[idx + 1] + data[idx + 2]) / 3;
+                
+                if (brightness < 128) {
+                  ctx.beginPath();
+                  ctx.moveTo(x, y);
+                  ctx.lineTo(x + hatchSpacing, y + hatchSpacing);
+                  ctx.stroke();
+                  
+                  ctx.beginPath();
+                  ctx.moveTo(x + hatchSpacing, y);
+                  ctx.lineTo(x, y + hatchSpacing);
+                  ctx.stroke();
+                }
+              }
+            }
+            break;
+            
+          case 'mosaic':
+            // Mosaic Tiles Effect
+            const tileSize = 10;
+            
+            for (let y = 0; y < height; y += tileSize) {
+              for (let x = 0; x < width; x += tileSize) {
+                // Hitung rata-rata warna di tile
+                let r = 0, g = 0, b = 0, count = 0;
+                
+                for (let dy = 0; dy < tileSize && y + dy < height; dy++) {
+                  for (let dx = 0; dx < tileSize && x + dx < width; dx++) {
+                    const idx = ((y + dy) * width + (x + dx)) * 4;
+                    r += data[idx];
+                    g += data[idx + 1];
+                    b += data[idx + 2];
+                    count++;
+                  }
+                }
+                
+                r = Math.floor(r / count);
+                g = Math.floor(g / count);
+                b = Math.floor(b / count);
+                
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                ctx.fillRect(x, y, tileSize, tileSize);
+                
+                // Tambahkan garis tile
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(x, y, tileSize, tileSize);
+              }
+            }
+            break;
+            
+          case 'stainedglass':
+            // Stained Glass Effect
+            const glassSize = 15;
+            
+            for (let y = 0; y < height; y += glassSize) {
+              for (let x = 0; x < width; x += glassSize) {
+                // Ambil warna dari titik acak di dalam segmen
+                const rx = x + Math.floor(Math.random() * glassSize);
+                const ry = y + Math.floor(Math.random() * glassSize);
+                
+                if (rx < width && ry < height) {
+                  const idx = (ry * width + rx) * 4;
+                  const r = data[idx];
+                  const g = data[idx + 1];
+                  const b = data[idx + 2];
+                  
+                  ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                  
+                  // Gambar segmen dengan bentuk acak
+                  ctx.beginPath();
+                  ctx.moveTo(x, y);
+                  ctx.lineTo(x + glassSize, y);
+                  ctx.lineTo(x + glassSize / 2, y + glassSize);
+                  ctx.closePath();
+                  ctx.fill();
+                  
+                  // Tambahkan garis lead
+                  ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                  ctx.lineWidth = 1;
+                  ctx.stroke();
+                }
+              }
+            }
+            break;
+        }
+      }
+      
+      // Fungsi untuk menerapkan filter distortion
+      function applyDistortionFilter(ctx, mode, width, height) {
+        if (mode === 'none') return;
+        
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        
+        switch(mode) {
+          case 'ripple':
+            // Ripple Effect
+            const rippleSize = document.getElementById('rippleSize') ? 
+              parseInt(document.getElementById('rippleSize').value) : 20;
+            const rippleFreq = document.getElementById('rippleFreq') ? 
+              parseFloat(document.getElementById('rippleFreq').value) : 0.05;
+            
+            const rippleData = ctx.createImageData(width, height);
+            const ripplePixels = rippleData.data;
+            
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                // Hitung offset berdasarkan jarak dari pusat
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+                
+                // Hitung ripple
+                const ripple = Math.sin(distance * rippleFreq) * rippleSize;
+                
+                // Hitung koordinat sumber
+                const angle = Math.atan2(y - centerY, x - centerX);
+                const sourceX = Math.floor(centerX + (distance + ripple) * Math.cos(angle));
+                const sourceY = Math.floor(centerY + (distance + ripple) * Math.sin(angle));
+                
+                // Salin piksel
+                if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
+                  const sourceIdx = (sourceY * width + sourceX) * 4;
+                  const targetIdx = (y * width + x) * 4;
+                  
+                  ripplePixels[targetIdx] = data[sourceIdx];
+                  ripplePixels[targetIdx + 1] = data[sourceIdx + 1];
+                  ripplePixels[targetIdx + 2] = data[sourceIdx + 2];
+                  ripplePixels[targetIdx + 3] = data[sourceIdx + 3];
+                }
+              }
+            }
+
+            ctx.putImageData(rippleData, 0, 0);
+            break;
+            
+          case 'bulge':
+            // Bulge Effect
+            const bulgeStrength = 0.5;
+            const bulgeRadius = Math.min(width, height) / 2;
+            
+            const bulgeData = ctx.createImageData(width, height);
+            const bulgePixels = bulgeData.data;
+            
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const dx = x - centerX;
+                const dy = y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < bulgeRadius) {
+                  // Hitung faktor bulge
+                  const factor = 1 + bulgeStrength * (1 - distance / bulgeRadius);
+                  
+                  // Hitung koordinat sumber
+                  const sourceX = Math.floor(centerX + dx / factor);
+                  const sourceY = Math.floor(centerY + dy / factor);
+                  
+                  // Salin piksel
+                  if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
+                    const sourceIdx = (sourceY * width + sourceX) * 4;
+                    const targetIdx = (y * width + x) * 4;
+                    
+                    bulgePixels[targetIdx] = data[sourceIdx];
+                    bulgePixels[targetIdx + 1] = data[sourceIdx + 1];
+                    bulgePixels[targetIdx + 2] = data[sourceIdx + 2];
+                    bulgePixels[targetIdx + 3] = data[sourceIdx + 3];
+                  }
+                } else {
+                  // Salin piksel asli
+                  const idx = (y * width + x) * 4;
+                  bulgePixels[idx] = data[idx];
+                  bulgePixels[idx + 1] = data[idx + 1];
+                  bulgePixels[idx + 2] = data[idx + 2];
+                  bulgePixels[idx + 3] = data[idx + 3];
+                }
+              }
+            }
+            
+            ctx.putImageData(bulgeData, 0, 0);
+            break;
+            
+          case 'pinch':
+            // Pinch Effect
+            const pinchStrength = 0.5;
+            const pinchRadius = Math.min(width, height) / 2;
+            
+            const pinchData = ctx.createImageData(width, height);
+            const pinchPixels = pinchData.data;
+            
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const dx = x - centerX;
+                const dy = y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < pinchRadius) {
+                  // Hitung faktor pinch
+                  const factor = 1 - pinchStrength * (1 - distance / pinchRadius);
+                  
+                  // Hitung koordinat sumber
+                  const sourceX = Math.floor(centerX + dx * factor);
+                  const sourceY = Math.floor(centerY + dy * factor);
+                  
+                  // Salin piksel
+                  if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
+                    const sourceIdx = (sourceY * width + sourceX) * 4;
+                    const targetIdx = (y * width + x) * 4;
+                    
+                    pinchPixels[targetIdx] = data[sourceIdx];
+                    pinchPixels[targetIdx + 1] = data[sourceIdx + 1];
+                    pinchPixels[targetIdx + 2] = data[sourceIdx + 2];
+                    pinchPixels[targetIdx + 3] = data[sourceIdx + 3];
+                  }
+                } else {
+                  // Salin piksel asli
+                  const idx = (y * width + x) * 4;
+                  pinchPixels[idx] = data[idx];
+                  pinchPixels[idx + 1] = data[idx + 1];
+                  pinchPixels[idx + 2] = data[idx + 2];
+                  pinchPixels[idx + 3] = data[idx + 3];
+                }
+              }
+            }
+            
+            ctx.putImageData(pinchData, 0, 0);
+            break;
+            
+          case 'swirl':
+            // Swirl Effect
+            const swirlStrength = 5;
+            const swirlRadius = Math.min(width, height) / 2;
+            
+            const swirlData = ctx.createImageData(width, height);
+            const swirlPixels = swirlData.data;
+            
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const dx = x - centerX;
+                const dy = y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < swirlRadius) {
+                  // Hitung sudut
+                  let angle = Math.atan2(dy, dx);
+                  
+                  // Tambahkan swirl
+                  angle += swirlStrength * (1 - distance / swirlRadius);
+
+                  // Hitung koordinat sumber
+                  const sourceX = Math.floor(centerX + distance * Math.cos(angle));
+                  const sourceY = Math.floor(centerY + distance * Math.sin(angle));
+                  
+                  // Salin piksel
+                  if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
+                    const sourceIdx = (sourceY * width + sourceX) * 4;
+                    const targetIdx = (y * width + x) * 4;
+                    
+                    swirlPixels[targetIdx] = data[sourceIdx];
+                    swirlPixels[targetIdx + 1] = data[sourceIdx + 1];
+                    swirlPixels[targetIdx + 2] = data[sourceIdx + 2];
+                    swirlPixels[targetIdx + 3] = data[sourceIdx + 3];
+                  }
+                } else {
+                  // Salin piksel asli
+                  const idx = (y * width + x) * 4;
+                  swirlPixels[idx] = data[idx];
+                  swirlPixels[idx + 1] = data[idx + 1];
+                  swirlPixels[idx + 2] = data[idx + 2];
+                  swirlPixels[idx + 3] = data[idx + 3];
+                }
+              }
+            }
+            
+            ctx.putImageData(swirlData, 0, 0);
+            break;
+            
+          case 'fisheye':
+            // Fisheye Lens Effect
+            const fisheyeStrength = 0.5;
+            const fisheyeRadius = Math.min(width, height) / 2;
+            
+            const fisheyeData = ctx.createImageData(width, height);
+            const fisheyePixels = fisheyeData.data;
+            
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const dx = x - centerX;
+                const dy = y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < fisheyeRadius) {
+                  // Hitung faktor fisheye
+                  const normalizedDistance = distance / fisheyeRadius;
+                  const factor = Math.pow(normalizedDistance, fisheyeStrength);
+                  
+                  // Hitung koordinat sumber
+                  const sourceX = Math.floor(centerX + dx * factor);
+                  const sourceY = Math.floor(centerY + dy * factor);
+                  
+                  // Salin piksel
+                  if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
+                    const sourceIdx = (sourceY * width + sourceX) * 4;
+                    const targetIdx = (y * width + x) * 4;
+                    
+                    fisheyePixels[targetIdx] = data[sourceIdx];
+                    fisheyePixels[targetIdx + 1] = data[sourceIdx + 1];
+                    fisheyePixels[targetIdx + 2] = data[sourceIdx + 2];
+                    fisheyePixels[targetIdx + 3] = data[sourceIdx + 3];
+                  }
+                } else {
+                  // Salin piksel asli
+                  const idx = (y * width + x) * 4;
+                  fisheyePixels[idx] = data[idx];
+                  fisheyePixels[idx + 1] = data[idx + 1];
+                  fisheyePixels[idx + 2] = data[idx + 2];
+                  fisheyePixels[idx + 3] = data[idx + 3];
+                }
+              }
+            }
+            
+            ctx.putImageData(fisheyeData, 0, 0);
+            break;
+            
+          case 'kaleidoscope':
+            // Kaleidoscope Effect
+            const segments = 8;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) / 2;
+            
+            const kaleidoscopeData = ctx.createImageData(width, height);
+            const kaleidoscopePixels = kaleidoscopeData.data;
+            
+            // Buat segmen pertama
+            const segmentAngle = (Math.PI * 2) / segments;
+            
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                const dx = x - centerX;
+                const dy = y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < radius) {
+                  // Hitung sudut
+                  let angle = Math.atan2(dy, dx);
+                  
+                  // Normalisasi sudut ke segmen pertama
+                  angle = ((angle % segmentAngle) + segmentAngle) % segmentAngle;
+                  
+                  // Hitung koordinat sumber di segmen pertama
+                  const sourceX = Math.floor(centerX + distance * Math.cos(angle));
+                  const sourceY = Math.floor(centerY + distance * Math.sin(angle));
+                  
+                  // Salin piksel
+                  if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
+                    const sourceIdx = (sourceY * width + sourceX) * 4;
+                    const targetIdx = (y * width + x) * 4;
+                    
+                    kaleidoscopePixels[targetIdx] = data[sourceIdx];
+                    kaleidoscopePixels[targetIdx + 1] = data[sourceIdx + 1];
+                    kaleidoscopePixels[targetIdx + 2] = data[sourceIdx + 2];
+                    kaleidoscopePixels[targetIdx + 3] = data[sourceIdx + 3];
+                  }
+                }
+              }
+            }
+            
+            ctx.putImageData(kaleidoscopeData, 0, 0);
+            break;
+            
+          case 'mirror':
+            // Mirror Effect
+            const mirrorData = ctx.createImageData(width, height);
+            const mirrorPixels = mirrorData.data;
+            
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                // Hitung koordinat sumber (mirror horizontal)
+                const sourceX = width - x - 1;
+                
+                // Salin piksel
+                const sourceIdx = (y * width + sourceX) * 4;
+                const targetIdx = (y * width + x) * 4;
+                
+                mirrorPixels[targetIdx] = data[sourceIdx];
+                mirrorPixels[targetIdx + 1] = data[sourceIdx + 1];
+                mirrorPixels[targetIdx + 2] = data[sourceIdx + 2];
+                mirrorPixels[targetIdx + 3] = data[sourceIdx + 3];
+              }
+            }
+            
+            ctx.putImageData(mirrorData, 0, 0);
+            break;
+            
+          case 'tunnel':
+            // Tunnel Vision Effect
+            const tunnelStrength = 0.8;
+            const tunnelRadius = Math.min(width, height) / 2;
+            
+            const tunnelData = ctx.createImageData(width, height);
+            const tunnelPixels = tunnelData.data;
+            
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const dx = x - centerX;
+                const dy = y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < tunnelRadius) {
+                  // Hitung faktor tunnel
+                  const normalizedDistance = distance / tunnelRadius;
+                  const factor = Math.pow(normalizedDistance, tunnelStrength);
+                  
+                  // Hitung koordinat sumber
+                  const sourceX = Math.floor(centerX + dx * factor);
+                  const sourceY = Math.floor(centerY + dy * factor);
+                  
+                  // Salin piksel
+                  if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
+                    const sourceIdx = (sourceY * width + sourceX) * 4;
+                    const targetIdx = (y * width + x) * 4;
+                    
+                    tunnelPixels[targetIdx] = data[sourceIdx];
+                    tunnelPixels[targetIdx + 1] = data[sourceIdx + 1];
+                    tunnelPixels[targetIdx + 2] = data[sourceIdx + 2];
+                    tunnelPixels[targetIdx + 3] = data[sourceIdx + 3];
+                  }
+                } else {
+                  // Hitam di luar tunnel
+                  const idx = (y * width + x) * 4;
+                  tunnelPixels[idx] = 0;
+                  tunnelPixels[idx + 1] = 0;
+                  tunnelPixels[idx + 2] = 0;
+                  tunnelPixels[idx + 3] = 255;
+                }
+              }
+            }
+
+            ctx.putImageData(tunnelData, 0, 0);
+            break;
+        }
+      }
+      
+      // Fungsi untuk menerapkan filter color
+      function applyColorFilter(ctx, mode, width, height) {
+        if (mode === 'none') return;
+        
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        
+        switch(mode) {
+          case 'duotone':
+            // Duotone Effect
+            const duotoneDark = document.getElementById('duotoneDark') ? 
+              hexToRgb(document.getElementById('duotoneDark').value) : { r: 0, g: 0, b: 255 };
+            const duotoneLight = document.getElementById('duotoneLight') ? 
+              hexToRgb(document.getElementById('duotoneLight').value) : { r: 255, g: 255, b: 0 };
+            
+            for (let i = 0; i < data.length; i += 4) {
+              // Hitung kecerahan
+              const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3 / 255;
+              
+              // Interpolasi antara warna gelap dan terang
+              data[i] = duotoneDark.r + (duotoneLight.r - duotoneDark.r) * brightness;
+              data[i + 1] = duotoneDark.g + (duotoneLight.g - duotoneDark.g) * brightness;
+              data[i + 2] = duotoneDark.b + (duotoneLight.b - duotoneDark.b) * brightness;
+            }
+            break;
+            
+          case 'posterize':
+            // Posterize Effect
+            const levels = 4;
+            
+            for (let i = 0; i < data.length; i += 4) {
+              data[i] = Math.floor(data[i] / (256 / levels)) * (256 / levels);
+              data[i + 1] = Math.floor(data[i + 1] / (256 / levels)) * (256 / levels);
+              data[i + 2] = Math.floor(data[i + 2] / (256 / levels)) * (256 / levels);
+            }
+            break;
+            
+          case 'solarize':
+            // Solarize Effect
+            for (let i = 0; i < data.length; i += 4) {
+              data[i] = data[i] > 128 ? 255 - data[i] : data[i];
+              data[i + 1] = data[i + 1] > 128 ? 255 - data[i + 1] : data[i + 1];
+              data[i + 2] = data[i + 2] > 128 ? 255 - data[i + 2] : data[i + 2];
+            }
+            break;
+            
+          case 'edgeglow':
+            // Edge Glow Effect
+            const edgeData = ctx.createImageData(width, height);
+            const edgePixels = edgeData.data;
+            
+            // Deteksi tepi
+            for (let y = 1; y < height - 1; y++) {
+              for (let x = 1; x < width - 1; x++) {
+                const idx = (y * width + x) * 4;
+                
+                // Hitung gradien
+                const gx = 
+                  -data[((y - 1) * width + (x - 1)) * 4] +
+                  data[((y - 1) * width + (x + 1)) * 4] +
+                  -2 * data[(y * width + (x - 1)) * 4] +
+                  2 * data[(y * width + (x + 1)) * 4] +
+                  -data[((y + 1) * width + (x - 1)) * 4] +
+                  data[((y + 1) * width + (x + 1)) * 4];
+                
+                const gy = 
+                  -data[((y - 1) * width + (x - 1)) * 4] +
+                  -2 * data[((y - 1) * width + x) * 4] +
+                  -data[((y - 1) * width + (x + 1)) * 4] +
+                  data[((y + 1) * width + (x - 1)) * 4] +
+                  2 * data[((y + 1) * width + x) * 4] +
+                  data[((y + 1) * width + (x + 1)) * 4];
+                
+                const magnitude = Math.sqrt(gx * gx + gy * gy);
+                const edge = Math.min(255, magnitude);
+                
+                // Buat efek glow
+                const glow = Math.min(255, edge * 2);
+                
+                edgePixels[idx] = glow;
+                edgePixels[idx + 1] = glow * 0.8;
+                edgePixels[idx + 2] = glow * 0.6;
+                edgePixels[idx + 3] = 255;
+              }
+            }
+            
+            ctx.putImageData(edgeData, 0, 0);
+            break;
+            
+          case 'chromatic':
+            // Chromatic Aberration Effect
+            const shiftAmount = 5;
+            
+            const chromaticData = ctx.createImageData(width, height);
+            const chromaticPixels = chromaticData.data;
+            
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                const idx = (y * width + x) * 4;
+                
+                // Channel merah (shift kiri)
+                if (x - shiftAmount >= 0) {
+                  const redIdx = (y * width + (x - shiftAmount)) * 4;
+                  chromaticPixels[idx] = data[redIdx];
+                } else {
+                  chromaticPixels[idx] = data[idx];
+                }
+                
+                // Channel hijau (tidak di-shift)
+                chromaticPixels[idx + 1] = data[idx + 1];
+                
+                // Channel biru (shift kanan)
+                if (x + shiftAmount < width) {
+                  const blueIdx = (y * width + (x + shiftAmount)) * 4;
+                  chromaticPixels[idx + 2] = data[blueIdx + 2];
+                } else {
+                  chromaticPixels[idx + 2] = data[idx + 2];
+                }
+                
+                chromaticPixels[idx + 3] = data[idx + 3];
+              }
+            }
+            
+            ctx.putImageData(chromaticData, 0, 0);
+            break;
+            
+          case 'thermal':
+            // Thermal Vision Effect
+            for (let i = 0; i < data.length; i += 4) {
+              // Hitung kecerahan
+              const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+              
+              // Mapping ke warna thermal
+              if (brightness < 85) {
+                // Hitam ke biru
+                data[i] = 0;
+                data[i + 1] = 0;
+                data[i + 2] = brightness * 3;
+              } else if (brightness < 170) {
+                // Biru ke merah
+                const t = (brightness - 85) / 85;
+                data[i] = t * 255;
+                data[i + 1] = 0;
+                data[i + 2] = (1 - t) * 255;
+              } else {
+                // Merah ke kuning
+                const t = (brightness - 170) / 85;
+                data[i] = 255;
+                data[i + 1] = t * 255;
+                data[i + 2] = 0;
+              }
+            }
+            break;
+            
+          case 'xray':
+            // X-Ray Effect
+            for (let i = 0; i < data.length; i += 4) {
+              // Invert dan kontras tinggi
+              data[i] = Math.min(255, Math.max(0, 255 - data[i] * 1.5));
+              data[i + 1] = Math.min(255, Math.max(0, 255 - data[i + 1] * 1.5));
+              data[i + 2] = Math.min(255, Math.max(0, 255 - data[i + 2] * 1.5));
+            }
+            break;
+            
+          case 'infrared':
+            // Infrared Effect
+            for (let i = 0; i < data.length; i += 4) {
+              // Tukar merah dan biru, tingkatkan kontras
+              const temp = data[i];
+              data[i] = Math.min(255, data[i + 2] * 1.2);
+              data[i + 1] = Math.min(255, data[i + 1] * 0.8);
+              data[i + 2] = Math.min(255, temp * 0.5);
+            }
+            break;
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+      }
+      
+      // Fungsi untuk menerapkan filter cyberfunk
+      function applyCyberfunkFilter(ctx, mode, width, height) {
+        if (mode === 'none') return;
+        
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        
+        switch(mode) {
+          case 'neonglow':
+            // Neon Glow Effect
+            const neonColor = document.getElementById('neonColor') ? 
+              hexToRgb(document.getElementById('neonColor').value) : { r: 255, g: 0, b: 255 };
+            const glowIntensity = document.getElementById('glowIntensity') ? 
+              parseInt(document.getElementById('glowIntensity').value) / 100 : 0.8;
+            
+            // Buat efek glow dengan blur
+            ctx.filter = `blur(5px)`;
+            ctx.globalAlpha = glowIntensity;
+            ctx.fillStyle = `rgb(${neonColor.r}, ${neonColor.g}, ${neonColor.b})`;
+            ctx.fillRect(0, 0, width, height);
+            ctx.filter = 'none';
+            ctx.globalAlpha = 1.0;
+            
+            // Gambar gambar asli di atas
+            ctx.drawImage(ctx.canvas, 0, 0);
+            break;
+            
+          case 'cybergrid':
+            // Cyber Grid Effect
+            const gridSize = document.getElementById('gridSize') ? 
+              parseInt(document.getElementById('gridSize').value) : 20;
+            const gridColor = document.getElementById('gridColor') ? 
+              hexToRgb(document.getElementById('gridColor').value) : { r: 0, g: 255, b: 255 };
+            
+            // Gambar grid
+            ctx.strokeStyle = `rgba(${gridColor.r}, ${gridColor.g}, ${gridColor.b}, 0.7)`;
+            ctx.lineWidth = 1;
+            
+            for (let x = 0; x < width; x += gridSize) {
+              ctx.beginPath();
+              ctx.moveTo(x, 0);
+              ctx.lineTo(x, height);
+              ctx.stroke();
+            }
+            
+            for (let y = 0; y < height; y += gridSize) {
+              ctx.beginPath();
+              ctx.moveTo(0, y);
+              ctx.lineTo(width, y);
+              ctx.stroke();
+            }
+            break;
+            
+          case 'hologram':
+            // Hologram Effect
+            const interference = document.getElementById('interference') ? 
+              parseInt(document.getElementById('interference').value) / 100 : 0.5;
+            const transparency = document.getElementById('transparency') ? 
+              parseInt(document.getElementById('transparency').value) / 100 : 0.7;
+            
+            // Buat efek hologram dengan noise dan scanlines
+            const hologramData = ctx.createImageData(width, height);
+            const hologramPixels = hologramData.data;
+            
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                const idx = (y * width + x) * 4;
+                
+                // Tambahkan noise
+                const noise = (Math.random() - 0.5) * interference * 255;
+                
+                // Tambahkan efek scanline
+                const scanline = (y % 4 < 2) ? 1 : 0.7;
+                
+                hologramPixels[idx] = Math.min(255, Math.max(0, data[idx] + noise)) * scanline;
+                hologramPixels[idx + 1] = Math.min(255, Math.max(0, data[idx + 1] + noise)) * scanline;
+                hologramPixels[idx + 2] = Math.min(255, Math.max(0, data[idx + 2] + noise)) * scanline;
+                hologramPixels[idx + 3] = data[idx + 3] * transparency;
+              }
+            }
+            
+            ctx.putImageData(hologramData, 0, 0);
+            break;
+            
+          case 'digitalglitch':
+            // Digital Glitch Effect
+            const glitchAmount = document.getElementById('glitchAmount') ? 
+              parseInt(document.getElementById('glitchAmount').value) / 100 : 0.3;
+            const colorShift = document.getElementById('colorShift') ? 
+              parseInt(document.getElementById('colorShift').value) : 15;
+            
+            const glitchData = ctx.createImageData(width, height);
+            const glitchPixels = glitchData.data;
+            
+            for (let y = 0; y < height; y++) {
+              // Acak apakah baris ini akan di-glitch
+              if (Math.random() < glitchAmount) {
+                // Pilih jenis glitch secara acak
+                const glitchType = Math.floor(Math.random() * 3);
+                
+                if (glitchType === 0) {
+                  // Shift channel warna
+                  for (let x = 0; x < width; x++) {
+                    const idx = (y * width + x) * 4;
+                    
+                    // Channel merah (shift kiri)
+                    if (x - colorShift >= 0) {
+                      const redIdx = (y * width + (x - colorShift)) * 4;
+                      glitchPixels[idx] = data[redIdx];
+                    } else {
+                      glitchPixels[idx] = data[idx];
+                    }
+                    
+                    // Channel hijau (tidak di-shift)
+                    glitchPixels[idx + 1] = data[idx + 1];
+                    
+                    // Channel biru (shift kanan)
+                    if (x + colorShift < width) {
+                      const blueIdx = (y * width + (x + colorShift)) * 4;
+                      glitchPixels[idx + 2] = data[blueIdx + 2];
+                    } else {
+                      glitchPixels[idx + 2] = data[idx + 2];
+                    }
+                    
+                    glitchPixels[idx + 3] = data[idx + 3];
+                  }
+                } else if (glitchType === 1) {
+                  // Duplikasi baris
+                  const sourceY = Math.floor(Math.random() * height);
+                  const sourceRowStart = sourceY * width * 4;
+                  const targetRowStart = y * width * 4;
+                  
+                  for (let x = 0; x < width * 4; x++) {
+                    glitchPixels[targetRowStart + x] = data[sourceRowStart + x];
+                  }
+                } else {
+                  // Noise
+                  for (let x = 0; x < width; x++) {
+                    const idx = (y * width + x) * 4;
+                    
+                    glitchPixels[idx] = Math.random() * 255;
+                    glitchPixels[idx + 1] = Math.random() * 255;
+                    glitchPixels[idx + 2] = Math.random() * 255;
+                    glitchPixels[idx + 3] = 255;
+                  }
+                }
+              } else {
+                // Salin baris asli
+                for (let x = 0; x < width; x++) {
+                  const idx = (y * width + x) * 4;
+                  glitchPixels[idx] = data[idx];
+                  glitchPixels[idx + 1] = data[idx + 1];
+                  glitchPixels[idx + 2] = data[idx + 2];
+                  glitchPixels[idx + 3] = data[idx + 3];
+                }
+              }
+            }
+            
+            ctx.putImageData(glitchData, 0, 0);
+            break;
+            
+          case 'synthwave':
+            // Synthwave Effect
+            const sunColor = document.getElementById('sunColor') ? 
+              hexToRgb(document.getElementById('sunColor').value) : { r: 255, g: 0, b: 170 };
+            const horizonHeight = document.getElementById('horizonHeight') ? 
+              parseInt(document.getElementById('horizonHeight').value) / 100 : 0.6;
+            
+            // Buat gradien synthwave
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, '#1a0033');
+            gradient.addColorStop(horizonHeight, '#330066');
+            gradient.addColorStop(1, '#ff0066');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Gambar matahari
+            const sunY = height * horizonHeight;
+            const sunRadius = height * 0.1;
+            
+            const sunGradient = ctx.createRadialGradient(
+              width / 2, sunY, 0,
+              width / 2, sunY, sunRadius
+            );
+            sunGradient.addColorStop(0, `rgba(${sunColor.r}, ${sunColor.g}, ${sunColor.b}, 1)`);
+            sunGradient.addColorStop(1, `rgba(${sunColor.r}, ${sunColor.g}, ${sunColor.b}, 0)`);
+            
+            ctx.fillStyle = sunGradient;
+            ctx.fillRect(0, sunY - sunRadius, width, sunRadius * 2);
+            
+            // Gambar grid
+            ctx.strokeStyle = 'rgba(255, 0, 255, 0.3)';
+            ctx.lineWidth = 1;
+            
+            for (let x = 0; x < width; x += 20) {
+              ctx.beginPath();
+              ctx.moveTo(x, 0);
+              ctx.lineTo(x + (height - sunY) * 0.5, height);
+              ctx.stroke();
+            }
+            
+            // Gambar gambar asli dengan blending
+            ctx.globalCompositeOperation = 'screen';
+            ctx.globalAlpha = 0.7;
+            ctx.drawImage(ctx.canvas, 0, 0);
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 1.0;
+            break;
+            
+          case 'cyberpunk':
+            // Cyberpunk Effect
+            const accentColor = document.getElementById('accentColor') ? 
+              hexToRgb(document.getElementById('accentColor').value) : { r: 0, g: 255, b: 0 };
+            const darkness = document.getElementById('darkness') ? 
+              parseInt(document.getElementById('darkness').value) / 100 : 0.4;
+            
+            // Terapkan darkness
+            for (let i = 0; i < data.length; i += 4) {
+              data[i] *= (1 - darkness);
+              data[i + 1] *= (1 - darkness);
+              data[i + 2] *= (1 - darkness);
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+            
+            // Tambahkan aksen cyberpunk
+            ctx.globalCompositeOperation = 'screen';
+            ctx.globalAlpha = 0.5;
+            
+            // Gambar garis vertikal
+            ctx.strokeStyle = `rgba(${accentColor.r}, ${accentColor.g}, ${accentColor.b}, 0.7)`;
+            ctx.lineWidth = 2;
+            
+            for (let x = 0; x < width; x += 30) {
+              if (Math.random() > 0.7) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+              }
+            }
+            
+            // Gambar teks cyberpunk
+            ctx.font = '20px monospace';
+            ctx.fillStyle = `rgba(${accentColor.r}, ${accentColor.g}, ${accentColor.b}, 0.8)`;
+            
+            for (let y = 20; y < height; y += 30) {
+              for (let x = 0; x < width; x += 100) {
+                if (Math.random() > 0.8) {
+                  const text = Math.random() > 0.5 ? '01' : '10';
+                  ctx.fillText(text, x, y);
+                }
+              }
+            }
+            
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 1.0;
+            break;
+            
+          case 'neonrain':
+            // Neon Rain Effect
+            const rainDensity = document.getElementById('rainDensity') ? 
+              parseInt(document.getElementById('rainDensity').value) / 100 : 0.5;
+            const rainColor = document.getElementById('rainColor') ? 
+              hexToRgb(document.getElementById('rainColor').value) : { r: 255, g: 0, b: 255 };
+            
+            // Gambar hujan
+            ctx.strokeStyle = `rgba(${rainColor.r}, ${rainColor.g}, ${rainColor.b}, 0.7)`;
+            ctx.lineWidth = 2;
+            
+            for (let i = 0; i < width * height * rainDensity / 1000; i++) {
+              const x = Math.random() * width;
+              const y = Math.random() * height;
+              const length = 10 + Math.random() * 20;
+              
+              ctx.beginPath();
+              ctx.moveTo(x, y);
+              ctx.lineTo(x, y + length);
+              ctx.stroke();
+            }
+            
+            // Gambar gambar asli dengan blending
+            ctx.globalCompositeOperation = 'screen';
+            ctx.globalAlpha = 0.7;
+            ctx.drawImage(ctx.canvas, 0, 0);
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 1.0;
+            break;
+        }
+      }
+
+      // Fungsi untuk menerapkan adjustments
+      function applyAdjustments(ctx, width, height) {
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        
+        const brightness = parseInt(document.getElementById('brightness').value);
+        const contrast = parseInt(document.getElementById('contrast').value);
+        const saturation = parseInt(document.getElementById('saturation').value);
+        const exposure = parseInt(document.getElementById('exposure').value);
+        const temperature = parseInt(document.getElementById('temperature').value);
+        
+        for (let i = 0; i < data.length; i += 4) {
+          let r = data[i];
+          let g = data[i + 1];
+          let b = data[i + 2];
+          
+          // Brightness
+          r += brightness;
+          g += brightness;
+          b += brightness;
+          
+          // Contrast
+          const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+          r = contrastFactor * (r - 128) + 128;
+          g = contrastFactor * (g - 128) + 128;
+          b = contrastFactor * (b - 128) + 128;
+          
+          // Exposure
+          const exposureFactor = Math.pow(2, exposure / 100);
+          r *= exposureFactor;
+          g *= exposureFactor;
+          b *= exposureFactor;
+          
+          // Temperature
+          const tempFactor = temperature / 100;
+          r += tempFactor * 30;
+          b -= tempFactor * 30;
+          
+          // Saturation
+          const gray = 0.2989 * r + 0.5870 * g + 0.1140 * b;
+          const satFactor = saturation / 100 + 1;
+          r = gray + satFactor * (r - gray);
+          g = gray + satFactor * (g - gray);
+          b = gray + satFactor * (b - gray);
+          
+          // Clamp values
+          data[i] = Math.min(255, Math.max(0, r));
+          data[i + 1] = Math.min(255, Math.max(0, g));
+          data[i + 2] = Math.min(255, Math.max(0, b));
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+      }
+      
+      // Fungsi untuk menerapkan frame
+      function applyFrame(ctx, width, height) {
+        const frameStyle = document.querySelector('.frame-option.active').getAttribute('data-frame');
+        const frameSize = parseInt(document.getElementById('frameSize').value);
+        const frameColor = document.getElementById('frameColor').value;
+        
+        if (frameStyle === 'none') return;
+        
+        ctx.strokeStyle = frameColor;
+        
+        switch(frameStyle) {
+          case 'simple':
+            ctx.lineWidth = frameSize;
+            ctx.strokeRect(frameSize / 2, frameSize / 2, width - frameSize, height - frameSize);
+            break;
+            
+          case 'vintage':
+            ctx.lineWidth = frameSize;
+            ctx.strokeRect(frameSize / 2, frameSize / 2, width - frameSize, height - frameSize);
+            
+            // Tambahkan inner frame
+            ctx.lineWidth = frameSize / 2;
+            ctx.strokeRect(frameSize, frameSize, width - frameSize * 2, height - frameSize * 2);
+            break;
+            
+          case 'modern':
+            // Frame modern dengan sudut bulat
+            const cornerRadius = frameSize * 2;
+            
+            ctx.beginPath();
+            ctx.moveTo(cornerRadius, 0);
+            ctx.lineTo(width - cornerRadius, 0);
+            ctx.quadraticCurveTo(width, 0, width, cornerRadius);
+            ctx.lineTo(width, height - cornerRadius);
+            ctx.quadraticCurveTo(width, height, width - cornerRadius, height);
+            ctx.lineTo(cornerRadius, height);
+            ctx.quadraticCurveTo(0, height, 0, height - cornerRadius);
+            ctx.lineTo(0, cornerRadius);
+            ctx.quadraticCurveTo(0, 0, cornerRadius, 0);
+            ctx.closePath();
+            
+            ctx.lineWidth = frameSize;
+            ctx.stroke();
+            break;
+            
+          case 'polaroid':
+            // Frame polaroid
+            ctx.fillStyle = frameColor;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Buat bagian dalam gambar
+            ctx.fillStyle = 'white';
+            const innerWidth = width - frameSize * 2;
+            const innerHeight = height - frameSize * 3;
+            ctx.fillRect(frameSize, frameSize, innerWidth, innerHeight);
+            
+            // Gambar gambar di bagian dalam
+            ctx.drawImage(
+              ctx.canvas, 
+              frameSize, frameSize, innerWidth, innerHeight,
+              frameSize, frameSize, innerWidth, innerHeight
+            );
+            break;
+            
+          case 'film':
+            // Frame film strip
+            ctx.fillStyle = frameColor;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Buat bagian dalam gambar
+            const filmInnerWidth = width - frameSize * 2;
+            const filmInnerHeight = height - frameSize * 2;
+            ctx.fillStyle = 'white';
+            ctx.fillRect(frameSize, frameSize, filmInnerWidth, filmInnerHeight);
+            
+            // Gambar gambar di bagian dalam
+            ctx.drawImage(
+              ctx.canvas, 
+              frameSize, frameSize, filmInnerWidth, filmInnerHeight,
+              frameSize, frameSize, filmInnerWidth, filmInnerHeight
+            );
+            
+            // Tambahkan lubang film
+            ctx.fillStyle = frameColor;
+            const holeSize = frameSize / 2;
+            const holeSpacing = frameSize * 2;
+            
+            for (let y = frameSize; y < height - frameSize; y += holeSpacing) {
+              ctx.beginPath();
+              ctx.arc(frameSize / 2, y, holeSize, 0, Math.PI * 2);
+              ctx.fill();
+              
+              ctx.beginPath();
+              ctx.arc(width - frameSize / 2, y, holeSize, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            break;
+        }
+      }
+      
+      // Fungsi untuk menerapkan text
+      function applyText(ctx, width, height) {
+        const textContent = document.getElementById('textContent').value;
+        if (!textContent) return;
+        
+        const textStyle = document.querySelector('.text-style-option.active').getAttribute('data-style');
+        const fontSize = parseInt(document.getElementById('fontSize').value);
+        const textColor = document.getElementById('textColor').value;
+        const textPosition = document.getElementById('textPosition').value;
+        
+        ctx.font = `${fontSize}px Poppins`;
+        ctx.fillStyle = textColor;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        let x, y;
+        
+        switch(textPosition) {
+          case 'top-left':
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            x = fontSize;
+            y = fontSize;
+            break;
+          case 'top-center':
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            x = width / 2;
+            y = fontSize;
+            break;
+          case 'top-right':
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'top';
+            x = width - fontSize;
+            y = fontSize;
+            break;
+          case 'center':
+            x = width / 2;
+            y = height / 2;
+            break;
+          case 'bottom-left':
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'bottom';
+            x = fontSize;
+            y = height - fontSize;
+            break;
+          case 'bottom-center':
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            x = width / 2;
+            y = height - fontSize;
+            break;
+          case 'bottom-right':
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'bottom';
+            x = width - fontSize;
+            y = height - fontSize;
+            break;
+        }
+        
+        if (textStyle === 'bold') {
+          ctx.font = `bold ${fontSize}px Poppins`;
+        } else if (textStyle === 'italic') {
+          ctx.font = `italic ${fontSize}px Poppins`;
+        }
+        
+        if (textStyle === 'outline') {
+          ctx.strokeStyle = textColor;
+          ctx.lineWidth = 2;
+          ctx.strokeText(textContent, x, y);
+        } else {
+          ctx.fillText(textContent, x, y);
+        }
+      }
+      
+      // Fungsi untuk menerapkan sticker
+      function applySticker(ctx, width, height) {
+        if (!selectedSticker) return;
+        
+        const stickerSize = parseInt(document.getElementById('stickerSize').value);
+        
+        ctx.font = `${stickerSize}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Default position di tengah
+        const x = width / 2;
+        const y = height / 2;
+        
+        ctx.fillText(selectedSticker, x, y);
+      }
+      
+      // Fungsi untuk menerapkan advanced effects
+      function applyAdvancedEffects(ctx, width, height) {
+        const blur = parseInt(document.getElementById('blur').value);
+        const sharpen = parseInt(document.getElementById('sharpen').value);
+        const noiseReduction = parseInt(document.getElementById('noiseReduction').value);
+        const perspectiveH = parseInt(document.getElementById('perspectiveH').value);
+        const perspectiveV = parseInt(document.getElementById('perspectiveV').value);
+        
+        // Blur
+        if (blur > 0) {
+          ctx.filter = `blur(${blur}px)`;
+          ctx.drawImage(ctx.canvas, 0, 0);
+          ctx.filter = 'none';
+        }
+        
+        // Sharpen
+        if (sharpen > 0) {
+          const sharpenAmount = sharpen / 100;
+          const imageData = ctx.getImageData(0, 0, width, height);
+          const data = imageData.data;
+          
+          const sharpenData = ctx.createImageData(width, height);
+          const sharpenPixels = sharpenData.data;
+          
+          for (let y = 1; y < height - 1; y++) {
+            for (let x = 1; x < width - 1; x++) {
+              const idx = (y * width + x) * 4;
+              
+              // Hitung sharpen
+              const sharpenR = data[idx] + sharpenAmount * (
+                data[idx] - (
+                  data[((y - 1) * width + (x - 1)) * 4] +
+                  data[((y - 1) * width + x) * 4] +
+                  data[((y - 1) * width + (x + 1)) * 4] +
+                  data[(y * width + (x - 1)) * 4] +
+                  data[(y * width + (x + 1)) * 4] +
+                  data[((y + 1) * width + (x - 1)) * 4] +
+                  data[((y + 1) * width + x) * 4] +
+                  data[((y + 1) * width + (x + 1)) * 4]
+                ) / 8
+              );
+              
+              const sharpenG = data[idx + 1] + sharpenAmount * (
+                data[idx + 1] - (
+                  data[((y - 1) * width + (x - 1)) * 4 + 1] +
+                  data[((y - 1) * width + x) * 4 + 1] +
+                  data[((y - 1) * width + (x + 1)) * 4 + 1] +
+                  data[(y * width + (x - 1)) * 4 + 1] +
+                  data[(y * width + (x + 1)) * 4 + 1] +
+                  data[((y + 1) * width + (x - 1)) * 4 + 1] +
+                  data[((y + 1) * width + x) * 4 + 1] +
+                  data[((y + 1) * width + (x + 1)) * 4 + 1]
+                ) / 8
+              );
+              
+              const sharpenB = data[idx + 2] + sharpenAmount * (
+                data[idx + 2] - (
+                  data[((y - 1) * width + (x - 1)) * 4 + 2] +
+                  data[((y - 1) * width + x) * 4 + 2] +
+                  data[((y - 1) * width + (x + 1)) * 4 + 2] +
+                  data[(y * width + (x - 1)) * 4 + 2] +
+                  data[(y * width + (x + 1)) * 4 + 2] +
+                  data[((y + 1) * width + (x - 1)) * 4 + 2] +
+                  data[((y + 1) * width + x) * 4 + 2] +
+                  data[((y + 1) * width + (x + 1)) * 4 + 2]
+                ) / 8
+              );
+              
+              sharpenPixels[idx] = Math.min(255, Math.max(0, sharpenR));
+              sharpenPixels[idx + 1] = Math.min(255, Math.max(0, sharpenG));
+              sharpenPixels[idx + 2] = Math.min(255, Math.max(0, sharpenB));
+              sharpenPixels[idx + 3] = data[idx + 3];
+            }
+          }
+          
+          ctx.putImageData(sharpenData, 0, 0);
+        }
+        
+        // Noise Reduction
+        if (noiseReduction > 0) {
+          const noiseAmount = noiseReduction / 100;
+          const imageData = ctx.getImageData(0, 0, width, height);
+          const data = imageData.data;
+          
+          const noiseData = ctx.createImageData(width, height);
+          const noisePixels = noiseData.data;
+          
+          for (let y = 1; y < height - 1; y++) {
+            for (let x = 1; x < width - 1; x++) {
+              const idx = (y * width + x) * 4;
+              
+              // Hitung rata-rata piksel di sekitar
+              let r = 0, g = 0, b = 0, count = 0;
+              
+              for (let dy = -1; dy <= 1; dy++) {
+                for (let dx = -1; dx <= 1; dx++) {
+                  const nIdx = ((y + dy) * width + (x + dx)) * 4;
+                  r += data[nIdx];
+                  g += data[nIdx + 1];
+                  b += data[nIdx + 2];
+                  count++;
+                }
+              }
+              
+              // Interpolasi antara piksel asli dan rata-rata
+              noisePixels[idx] = data[idx] * (1 - noiseAmount) + (r / count) * noiseAmount;
+              noisePixels[idx + 1] = data[idx + 1] * (1 - noiseAmount) + (g / count) * noiseAmount;
+              noisePixels[idx + 2] = data[idx + 2] * (1 - noiseAmount) + (b / count) * noiseAmount;
+              noisePixels[idx + 3] = data[idx + 3];
+            }
+          }
+          
+          ctx.putImageData(noiseData, 0, 0);
+        }
+        
+        // Perspective Correction
+        if (perspectiveH !== 0 || perspectiveV !== 0) {
+          const perspectiveData = ctx.createImageData(width, height);
+          const perspectivePixels = perspectiveData.data;
+          
+          const hFactor = perspectiveH / 100;
+          const vFactor = perspectiveV / 100;
+          
+          for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+              // Hitung offset perspective
+              const offsetX = (x - width / 2) * hFactor * (y / height);
+              const offsetY = (y - height / 2) * vFactor * (x / width);
+              
+              // Hitung koordinat sumber
+              const sourceX = Math.floor(x + offsetX);
+              const sourceY = Math.floor(y + offsetY);
+              
+              // Salin piksel
+              if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
+                const sourceIdx = (sourceY * width + sourceX) * 4;
+                const targetIdx = (y * width + x) * 4;
+                
+                perspectivePixels[targetIdx] = data[sourceIdx];
+                perspectivePixels[targetIdx + 1] = data[sourceIdx + 1];
+                perspectivePixels[targetIdx + 2] = data[sourceIdx + 2];
+                perspectivePixels[targetIdx + 3] = data[sourceIdx + 3];
+              }
+            }
+          }
+          
+          ctx.putImageData(perspectiveData, 0, 0);
+        }
+      }
+      
+      // Fungsi untuk update informasi gambar
+      function updateImageInfo(img, file) {
+        document.getElementById('oriDim').textContent = `${img.width} × ${img.height} px`;
+        document.getElementById('oriSize').textContent = formatFileSize(file.size);
+      }
+      
+      // Fungsi untuk update informasi output
+      function updateOutputInfo(width, height) {
+        document.getElementById('outDim').textContent = `${width} × ${height} px`;
+        
+        // Hitung ukuran file output (perkiraan)
+        const quality = document.getElementById('qualityRange').value / 100;
+        const estimatedSize = originalImage ? width * height * quality * 0.1 : 0; // Perkiraan kasar
+        document.getElementById('outSize').textContent = formatFileSize(estimatedSize);
+        
+        // Update mode terpilih
+        document.getElementById('outMode').textContent = activeMode;
+        
+        // Update perubahan ukuran
+        const sizePercent = document.getElementById('sizeRange').value;
+        document.getElementById('ratio').textContent = `${sizePercent}%`;
+      }
+      
+      // Fungsi untuk format ukuran file
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+      
+      // Fungsi untuk konversi hex ke RGB
+      function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : { r: 0, g: 0, b: 0 };
+      }
+      
+      // Fungsi untuk menampilkan toast
+      function showToast(message, isError = false) {
+        const toast = document.getElementById('toast');
+        toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+        toast.className = isError ? 'toast error show' : 'toast show';
+        
+        setTimeout(() => {
+          toast.className = toast.className.replace('show', '');
+        }, 3000);
+      }
     });
     
-    /* ===== Update Season Info secara otomatis ===== */
-document.addEventListener('DOMContentLoaded', () => {
-  const currentSeason = getCurrentSeasonInJapan();
-  const seasonNames = {
-    spring: 'Spring - Cherry Blossoms',
-    summer: 'Summer - Fireflies',
-    autumn: 'Autumn - Momiji',
-    winter: 'Winter - Snow'
-  };
-  document.getElementById('seasonInfo').textContent = seasonNames[currentSeason];
+    document.addEventListener("DOMContentLoaded", () => {
+  const infoHeader = document.querySelector(".info-header");
+  const infoContent = document.querySelector(".info-content");
+  const icon = infoHeader.querySelector("i.fas.fa-chevron-down");
+
+  infoHeader.addEventListener("click", () => {
+    infoContent.classList.toggle("active");
+    icon.style.transform = infoContent.classList.contains("active")
+      ? "rotate(180deg)"
+      : "rotate(0deg)";
+  });
 });
-    /* ===== Initialize Season System ===== */
-    const seasonManager = new SeasonManager();
   </script>
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ambil elemen yang diperlukan
+    const qualityRange = document.getElementById('qualityRange');
+    const qualityVal = document.getElementById('qualityVal');
+    const preview = document.getElementById('preview');
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Fungsi untuk menerapkan efek kualitas secara     // Fungsi untuk menerapkan efek kualitas secara real-time
+    function applyQualityEffect() {
+        if (!preview.src || !preview.complete) return;
+        
+        const quality = parseInt(qualityRange.value);
+        qualityVal.textContent = quality;
+        
+        // Set canvas size sama dengan gambar
+        canvas.width = preview.naturalWidth;
+        canvas.height = preview.naturalHeight;
+        
+        // Gambar ulang ke canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(preview, 0, 0);
+        
+        // Terapkan efek berdasarkan kualitas
+        if (quality < 90) {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            // Efek kualitas rendah (noise dan blur)
+            const intensity = (90 - quality) / 10;
+            
+            // Tambahkan noise
+            for (let i = 0; i < data.length; i += 4) {
+                const noise = (Math.random() - 0.5) * intensity * 20;
+                data[i] = Math.max(0, Math.min(255, data[i] + noise));     // R
+                data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise)); // G
+                data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise)); // B
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+            
+            // Terapkan blur untuk kualitas sangat rendah
+            if (quality < 70) {
+                ctx.filter = `blur(${(70 - quality) / 20}px)`;
+                ctx.drawImage(canvas, 0, 0);
+                ctx.filter = 'none';
+            }
+        }
+        
+        // Update preview dengan hasil efek
+        preview.src = canvas.toDataURL('image/jpeg', quality / 100);
+    }
+    
+    // Event listener untuk slider kualitas
+    qualityRange.addEventListener('input', applyQualityEffect);
+    
+    // Event listener saat gambar di-upload
+    document.getElementById('imageUpload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                preview.src = event.target.result;
+                preview.onload = applyQualityEffect;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Inisialisasi jika sudah ada gambar
+    if (preview.src) {
+        preview.onload = applyQualityEffect;
+    }
+});
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    let index = 1;
+    const total = 10;
+    setInterval(() => {
+      index = (index % total) + 1; // looping 1-10
+      document.body.style.backgroundImage = `var(--bg${index})`;
+    }, 5000); // ganti tiap 5 detik
+  });
+</script>
 </body>
 </html>
