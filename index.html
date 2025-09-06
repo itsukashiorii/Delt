@@ -1,1 +1,3787 @@
-Our website is currently being updated. We’ll be back shortly
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Delta</title>
+  <link rel="icon" href="wuthering waves shoorekeeper.jpg" type="image/png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+  --bg1: url('wuthering waves shoorekeeper1.jpg');
+  --bg2: url('wuthering waves shoorekeeper2.jpg');
+  --bg3: url('wuthering waves shoorekeeper3.jpg');
+  --bg4: url('wuthering waves shoorekeeper4.jpg');
+  --bg5: url('wuthering waves shoorekeeper5.jpg');
+  --bg6: url('wuthering waves shoorekeeper6.jpg');
+  --bg7: url('wuthering waves shoorekeeper7.jpg');
+  --bg8: url('wuthering waves shoorekeeper8.jpg');
+  --bg9: url('wuthering waves shoorekeeper9.jpg');
+  --bg10: url('wuthering waves shoorekeeper10.jpg');
+      --accent: #00bcd4;
+      --accent-dark: #008ba3;
+      --text: #eee;
+      --text-light: #fff;
+      --text-muted: #bbb;
+      --bg-overlay: rgba(0, 0, 0, 0.65);
+      --panel-bg: rgba(49,255,75,0);
+      --panel-border: rgba(255, 255, 255, 0.2);
+      --card-bg: rgba(87,255,108,0);
+      --card-bg-hover: rgba(255, 255, 255, 0.15);
+      --glow: 0 0 15px rgba(0, 188, 212, 0.4);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: var(--bg1) center/cover fixed;
+      transition: background-image 1.5s ease-in-out;
+      position: relative;
+    }
+    body::before { 
+      content: ""; 
+      position: absolute; 
+      inset: 0; 
+      background: var(--bg-overlay); 
+      z-index: -1; 
+    }
+
+    h1 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.8em; 
+      margin-bottom: 25px; 
+      letter-spacing: 2px;
+      color: var(--text-light);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+      background: linear-gradient(90deg, #00bcd4, #00ffaa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      padding: 0 15px;
+    }
+
+    #toast {
+      position: fixed; 
+      top: 25px; 
+      right: 25px; 
+      background: #4caf50; 
+      color: #fff;
+      padding: 15px 25px; 
+      border-radius: 8px; 
+      font-weight: 600;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3); 
+      opacity: 0; 
+      transform: translateY(-30px);
+      transition: all 0.4s ease; 
+      z-index: 9999; 
+      display: flex; 
+      align-items: center; 
+      gap: 10px;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.error { background: #f44336; }
+
+    .panel {
+      background: var(--panel-bg); 
+      border: 1px solid var(--panel-border); 
+      border-radius: 16px;
+      padding: 35px 40px; 
+      width: 100%; 
+      max-width: 1200px; 
+      display: grid; 
+      grid-template-columns: 1fr 2fr; 
+      gap: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+      transition: all 0.3s;
+      backdrop-filter: blur(0px);
+    }
+    .panel:hover { 
+      transform: translateY(-5px); 
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    }
+
+    .controls { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 25px; 
+    }
+    .control-group { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 15px; 
+    }
+    .control-group-title { 
+      font-size: 1.1em; 
+      font-weight: 600; 
+      color: var(--text-light); 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      padding-bottom: 5px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .control-group-title i { 
+      color: var(--accent); 
+      font-size: 1.2em;
+    }
+    .controls label { 
+      font-size: 0.95em; 
+      color: var(--text); 
+      font-weight: 600; 
+      display: block;
+      margin-bottom: 5px;
+    }
+    .controls input[type="file"] {
+      color: var(--text); 
+      font-size: 0.9em; 
+      width: 100%; 
+      padding: 10px;
+      background: rgba(240,0,0,0); 
+      border: 1px dashed rgba(255,255,255,0.3); 
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    .controls input[type="file"]:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: var(--accent);
+    }
+    .controls input[type="range"] { 
+      width: 100%; 
+      margin-top: 6px; 
+      height: 6px;
+      accent-color: var(--accent); 
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+    }
+    select, button {
+      padding: 12px 18px; 
+      border: 1px solid rgba(255,255,255,0.2); 
+      background: hsla(0,100%,51.2%,0);
+      color: #fff; 
+      border-radius: 8px; 
+      font-size: 0.95em; 
+      transition: all 0.3s; 
+      width: 100%;
+    }
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 15px;
+    }
+    select:focus, button:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+    }
+    button {
+      cursor: pointer; 
+      font-weight: 600; 
+      background: linear-gradient(135deg, rgba(0,188,212,0.3), rgba(0,150,200,0.4));
+      border-color: var(--accent);
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 8px;
+    }
+    button:hover { 
+      background: linear-gradient(135deg, rgba(0,188,212,0.5), rgba(0,150,200,0.6));
+      transform: translateY(-2px);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    button:disabled { 
+      opacity: 0.5; 
+      cursor: not-allowed; 
+      transform: none !important;
+    }
+
+    .preview-wrapper {
+      position: relative; 
+      border: 1px solid rgba(255,255,255,0.2); 
+      border-radius: 12px; 
+      overflow: hidden;
+      background: rgba(0,0,0,0.1); 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center;
+      min-height: 400px; 
+      height: 100%;
+      transition: all 0.3s;
+    }
+    .preview-wrapper:hover {
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+    }
+    #preview { 
+      width: 100%; 
+      max-height: 500px; 
+      object-fit: contain; 
+      border-radius: 4px; 
+      display: none; 
+    }
+    canvas { display: none; }
+    .placeholder-text {
+      color: var(--text-muted);
+      font-size: 1.1em;
+      text-align: center;
+      padding: 0 20px;
+    }
+    .placeholder-text i {
+      font-size: 2em;
+      margin-bottom: 15px;
+      color: var(--accent);
+      opacity: 0.7;
+    }
+
+    .info-panel { 
+      width: 100%; 
+      margin-top: 15px; 
+      font-family: 'JetBrains Mono', monospace; 
+      border-radius: 12px; 
+      overflow: hidden; 
+      transition: all 0.3s ease; 
+      max-height: 500px; 
+    }
+    .info-header {
+      background: rgba(0,188,212,0.2); 
+      padding: 12px 15px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      cursor: pointer; 
+      border: 1px solid var(--accent); 
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    .info-header:hover { 
+      background: rgba(0,188,212,0.3); 
+      box-shadow: var(--glow);
+    }
+    .info-header span { 
+      font-weight: 600; 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+    }
+    .info-content {
+      background: var(--panel-bg); 
+      border: 1px solid var(--panel-border); 
+      border-top: none; 
+      border-radius: 0 0 8px 8px;
+      padding: 15px; 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 15px;
+    }
+    .info-card { 
+      background: var(--card-bg); 
+      border-radius: 8px; 
+      padding: 12px 15px; 
+      border-left: 3px solid var(--accent); 
+      transition: all 0.3s; 
+    }
+    .info-card:hover { 
+      background: var(--card-bg-hover); 
+      transform: translateY(-3px);
+    }
+    .info-card span { 
+      display: block; 
+      font-weight: 700; 
+      font-size: 1.05em; 
+      color: var(--text-light); 
+    }
+    .info-card small { 
+      color: var(--text-muted); 
+      font-size: 0.85em; 
+    }
+
+    /* Filter controls styling */
+    .filter-controls {
+      display: none;
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .filter-controls.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    .filter-control {
+      margin-bottom: 15px;
+    }
+    .filter-control:last-child {
+      margin-bottom: 0;
+    }
+    .filter-control label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.9em;
+    }
+    .filter-control-value {
+      float: right;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* Tab Layout - Vertikal */
+    .tab-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .tab-container {
+      display: flex;
+      flex-direction: column;
+      border-right: none;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-right: 0;
+      margin-bottom: 15px;
+      width: 100%;
+      gap: 5px;
+    }
+    
+    .tab {
+      padding: 12px 15px;
+      cursor: pointer;
+      font-size: 0.9em;
+      border-left: 3px solid transparent;
+      border-radius: 0 8px 8px 0;
+      transition: all 0.3s;
+      text-align: left;
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .tab.active {
+      border-left-color: var(--accent);
+      background: rgba(0,188,212,0.15);
+      color: var(--text-light);
+    }
+    
+    .tab:hover:not(.active) {
+      background: rgba(255,255,255,0.1);
+      border-left-color: rgba(255,255,255,0.3);
+    }
+    
+    .tab-content-container {
+      flex: 1;
+      overflow-y: auto;
+      max-height: 400px;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Feature Controls */
+    .feature-control {
+      margin-bottom: 15px;
+      padding: 12px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .feature-control h4 {
+      margin-bottom: 10px;
+      color: var(--accent);
+      font-size: 1em;
+    }
+    
+    .feature-control label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.9em;
+    }
+    
+    .feature-control input, 
+    .feature-control select {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+    
+    .feature-control input[type="range"] {
+      margin-bottom: 5px;
+    }
+    
+    .feature-control-value {
+      float: right;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* Frame Grid */
+    .frame-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .frame-option {
+      padding: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .frame-option:hover {
+      background: rgba(0,188,212,0.3);
+    }
+    
+    .frame-option.active {
+      background: rgba(0,188,212,0.5);
+      border: 1px solid var(--accent);
+    }
+
+    /* Text Style Grid */
+    .text-style-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .text-style-option {
+      padding: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .text-style-option:hover {
+      background: rgba(0,188,212,0.3);
+    }
+    
+    .text-style-option.active {
+      background: rgba(0,188,212,0.5);
+      border: 1px solid var(--accent);
+    }
+
+    /* Sticker Grid */
+    .sticker-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .sticker-item {
+      font-size: 24px;
+      text-align: center;
+      padding: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .sticker-item:hover {
+      background: rgba(0,188,212,0.2);
+      transform: scale(1.1);
+    }
+
+    /* Advanced Controls */
+    .advanced-control {
+      margin-bottom: 15px;
+      padding: 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+    }
+    
+    .advanced-control h4 {
+      margin-bottom: 8px;
+      color: var(--text-light);
+      font-size: 0.95em;
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== Season Effects Overlay ===== */
+    .season-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+    }
+
+    .season-overlay.active {
+      opacity: 1;
+    }
+
+    /* Spring - Sakura Petals */
+    .season-overlay.spring {
+      background: linear-gradient(
+        135deg,
+        rgba(255, 182, 193, 0.3) 0%,
+        rgba(255, 192, 203, 0.2) 30%,
+        rgba(255, 240, 245, 0.1) 70%,
+        transparent 100%
+      );
+    }
+
+    .petal {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: linear-gradient(45deg, #FFB6C1, #FFC0CB);
+      border-radius: 150% 0 150% 0;
+      animation: fall 10s infinite linear;
+      box-shadow: 0 0 10px rgba(255, 182, 193, 0.8);
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Summer - Fireflies & Warm Glow */
+    .season-overlay.summer {
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 215, 0, 0.1) 0%,
+        rgba(255, 140, 0, 0.1) 30%,
+        transparent 70%
+      );
+    }
+
+    .firefly {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #FFFF00;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #FFFF00, 0 0 20px #FFD700;
+      animation: float 8s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+      }
+      25% {
+        transform: translateY(-50px) translateX(30px);
+      }
+      50% {
+        transform: translateY(-20px) translateX(-20px);
+      }
+      75% {
+        transform: translateY(-80px) translateX(10px);
+      }
+    }
+
+    /* Autumn - Falling Leaves */
+    .season-overlay.autumn {
+      background: linear-gradient(
+        45deg,
+        rgba(255, 140, 0, 0.2) 0%,
+        rgba(139, 69, 19, 0.15) 40%,
+        rgba(205, 133, 63, 0.1) 80%,
+        transparent 100%
+      );
+    }
+
+    .leaf {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      animation: fall 12s infinite linear;
+    }
+
+    .leaf::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #FF8C00, #CD853F);
+      clip-path: polygon(50% 0%, 0% 100%, 50% 80%, 100% 100%);
+      transform: rotate(45deg);
+    }
+
+    /* Winter - Snow & Frost */
+    .season-overlay.winter {
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(240, 248, 255, 0.05) 50%,
+        rgba(230, 230, 250, 0.05) 100%
+      );
+    }
+
+    .snowflake {
+      position: absolute;
+      color: white;
+      font-size: 1em;
+      animation: snowfall 8s infinite linear;
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+    }
+
+    @keyframes snowfall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Season Indicator */
+    .season-indicator {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 15px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .season-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    .season-dot.active {
+      transform: scale(1.3);
+      border-color: white;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .season-dot.spring { background: #FFB6C1; }
+    .season-dot.summer { background: #FFD700; }
+    .season-dot.autumn { background: #FF8C00; }
+    .season-dot.winter { background: #87CEEB; }
+
+    /* Season Info Tooltip */
+    .season-info {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,150,200,0.4);
+      backdrop-filter: blur(5px);
+      color: white;
+      padding: 5px 20px;
+      border-radius: 2px;
+      font-size: 0.9em;
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .season-indicator {
+        top: auto;
+        bottom: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        flex-direction: row;
+        padding: 10px 15px;
+      }
+      
+      .tab-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        border-bottom: none;
+        border-right: 1px solid rgba(255,255,255,0.1);
+        margin-right: 15px;
+        margin-bottom: 0;
+        width: auto;
+        max-width: 100%;
+      }
+      
+      .tab {
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        border-radius: 8px 8px 0 0;
+        white-space: nowrap;
+        flex: 1 0 auto;
+        min-width: 80px;
+        text-align: center;
+      }
+      
+      .tab.active {
+        border-left: none;
+        border-bottom-color: var(--accent);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .panel { 
+        grid-template-columns: 1fr; 
+        gap: 25px; 
+        padding: 25px 20px; 
+      }
+      h1 { 
+        font-size: 2em; 
+        text-align: center;
+      }
+      .info-content { 
+        grid-template-columns: 1fr; 
+      }
+      .preview-wrapper {
+        min-height: 300px;
+      }
+    }
+    
+    /* Mini Social Bar */
+    .social-mini {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      gap: 5px;
+      z-index: 1000;
+    }
+    
+    .social-mini-icon {
+      width: 25px;
+      height: 25px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      font-size: 10px;
+      transition: all 0.2s ease;
+    }
+    
+    .social-mini-icon:hover {
+      background: var(--accent);
+      transform: scale(1.1);
+    }
+    
+    /* Mobile */
+    @media (max-width: 768px) {
+      .social-mini {
+        bottom: 5px;
+        right: 5px;
+        gap: 3px;
+      }
+      
+      .social-mini-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Season Overlays -->
+  <div class="season-overlay" id="seasonOverlay"></div>
+  
+  <!-- Season Indicator -->
+  <div class="season-indicator">
+    <div class="season-dot spring" data-season="spring" title="Spring - Sakura"></div>
+    <div class="season-dot summer" data-season="summer" title="Summer - Fireflies"></div>
+    <div class="season-dot autumn" data-season="autumn" title="Autumn - Momiji"></div>
+    <div class="season-dot winter" data-season="winter" title="Winter - Snow"></div>
+  </div>
+
+  <!-- Season Info Original -->
+<div class="season-info" id="seasonInfo">Loading...</div>
+
+
+  <h1>ubah gambar jadi 8k/32p <h2>😹</h2></h1>
+
+  <div id="toast"><i class="fas fa-check-circle"></i> Upload berhasil!</div>
+
+  <div class="panel">
+    <div class="controls">
+      <div class="control-group">
+        <label>
+          <i class="fas fa-cloud-upload-alt"></i> Upload Gambar
+          <input type="file" id="imageUpload" accept="image/*">
+        </label>
+      </div>
+
+      <div class="control-group">
+        <div class="control-group-title"><i class="fas fa-sliders-h"></i> Pengaturan Dasar</div>
+        <label>
+          Resolusi Output: <span id="sizeVal">100</span>%
+          <input type="range" id="sizeRange" min="1" max="200" value="100">
+        </label>
+        
+        <label>
+          Kualitas Output: <span id="qualityVal">92</span>%
+          <input type="range" id="qualityRange" min="10" max="100" value="92">
+        </label>
+      </div>
+
+      <div class="control-group">
+        <div class="control-group-title"><i class="fas fa-magic"></i> Filter & Efek</div>
+        
+        <div class="tab-layout">
+          <div class="tab-container">
+            <div class="tab active" data-tab="basic">Basic</div>
+            <div class="tab" data-tab="artistic">Artistic</div>
+            <div class="tab" data-tab="distortion">Distortion</div>
+            <div class="tab" data-tab="color">Color</div>
+            <div class="tab" data-tab="cyberfunk">Cyber Funk</div>
+            <div class="tab" data-tab="adjustments">Adjustments</div>
+            <div class="tab" data-tab="frames">Frames</div>
+            <div class="tab" data-tab="text">Text</div>
+            <div class="tab" data-tab="stickers">Stickers</div>
+            <div class="tab" data-tab="advanced">Advanced</div>
+          </div>
+          
+          <div class="tab-content-container">
+            <!-- Tab Basic -->
+            <div class="tab-content active" id="basic-tab">
+              <select id="mode">
+                <option value="resize">Resize Biasa</option>
+                <option value="noise">Noise Glitch</option>
+                <option value="rgb">RGB Shift</option>
+                <option value="vhs">VHS Tracking</option>
+                <option value="invert">Invert Colors</option>
+                <option value="ghost">Ghost Echo</option>
+                <option value="pixelate">Pixelate</option>
+                <option value="sepia">Sepia Rusak</option>
+                <option value="oversat">Over Saturation</option>
+                <option value="graynoise">Grayscale Noise</option>
+                <option value="scanline">Scanline CRT</option>
+                <option value="burned">Burned Contrast</option>
+                <option value="swap">Random Color Swap</option>
+              </select>
+            </div>
+            
+            <!-- Tab Artistic -->
+            <div class="tab-content" id="artistic-tab">
+              <select id="artisticMode">
+                <option value="none">Pilih Efek Artistik</option>
+                <option value="watercolor">Watercolor</option>
+                <option value="oilpainting">Oil Painting</option>
+                <option value="sketch">Pencil Sketch</option>
+                <option value="pointillism">Pointillism</option>
+                <option value="halftone">Halftone Dots</option>
+                <option value="crosshatch">Cross Hatch</option>
+                <option value="mosaic">Mosaic Tiles</option>
+                <option value="stainedglass">Stained Glass</option>
+              </select>
+            </div>
+            
+            <!-- Tab Distortion -->
+            <div class="tab-content" id="distortion-tab">
+              <select id="distortionMode">
+                <option value="none">Pilih Distorsi</option>
+                <option value="ripple">Ripple Effect</option>
+                <option value="bulge">Bulge Effect</option>
+                <option value="pinch">Pinch Effect</option>
+                <option value="swirl">Swirl Effect</option>
+                <option value="fisheye">Fisheye Lens</option>
+                <option value="kaleidoscope">Kaleidoscope</option>
+                <option value="mirror">Mirror Effect</option>
+                <option value="tunnel">Tunnel Vision</option>
+              </select>
+            </div>
+            
+            <!-- Tab Color -->
+            <div class="tab-content" id="color-tab">
+              <select id="colorMode">
+                <option value="none">Pilih Efek Warna</option>
+                <option value="duotone">Duotone</option>
+                <option value="posterize">Posterize</option>
+                <option value="solarize">Solarize</option>
+                <option value="edgeglow">Edge Glow</option>
+                <option value="chromatic">Chromatic Aberration</option>
+                <option value="thermal">Thermal Vision</option>
+                <option value="xray">X-Ray</option>
+                <option value="infrared">Infrared</option>
+              </select>
+            </div>
+            
+            <!-- Tab Cyber Funk -->
+            <div class="tab-content" id="cyberfunk-tab">
+              <select id="cyberfunkMode">
+                <option value="none">Pilih Efek Cyber Funk</option>
+                <option value="neonglow">Neon Glow</option>
+                <option value="cybergrid">Cyber Grid</option>
+                <option value="hologram">Hologram</option>
+                <option value="digitalglitch">Digital Glitch</option>
+                <option value="synthwave">Synthwave</option>
+                <option value="cyberpunk">Cyberpunk</option>
+                <option value="neonrain">Neon Rain</option>
+              </select>
+            </div>
+            
+            <!-- Tab Adjustments -->
+            <div class="tab-content" id="adjustments-tab">
+              <div class="feature-control">
+                <h4><i class="fas fa-sun"></i> Brightness</h4>
+                <label>Level: <span class="feature-control-value" id="brightnessValue">0</span></label>
+                <input type="range" id="brightness" min="-100" max="100" value="0">
+              </div>
+              
+              <div class="feature-control">
+                <h4><i class="fas fa-adjust"></i> Contrast</h4>
+                <label>Level: <span class="feature-control-value" id="contrastValue">0</span></label>
+                <input type="range" id="contrast" min="-100" max="100" value="0">
+              </div>
+              
+              <div class="feature-control">
+                <h4><i class="fas fa-tint"></i> Saturation</h4>
+                <label>Level: <span class="feature-control-value" id="saturationValue">0</span></label>
+                <input type="range" id="saturation" min="-100" max="100" value="0">
+              </div>
+              
+              <div class="feature-control">
+                <h4><i class="fas fa-eye"></i> Exposure</h4>
+                <label>Level: <span class="feature-control-value" id="exposureValue">0</span></label>
+                <input type="range" id="exposure" min="-100" max="100" value="0">
+              </div>
+              
+              <div class="feature-control">
+                <h4><i class="fas fa-thermometer-half"></i> Temperature</h4>
+                <label>Level: <span class="feature-control-value" id="temperatureValue">0</span></label>
+                <input type="range" id="temperature" min="-100" max="100" value="0">
+              </div>
+            </div>
+            
+            <!-- Tab Frames -->
+            <div class="tab-content" id="frames-tab">
+              <div class="feature-control">
+                <h4><i class="fas fa-border-style"></i> Frame Style</h4>
+                <div class="frame-grid">
+                  <div class="frame-option active" data-frame="none">None</div>
+                  <div class="frame-option" data-frame="simple">Simple</div>
+                  <div class="frame-option" data-frame="vintage">Vintage</div>
+                  <div class="frame-option" data-frame="modern">Modern</div>
+                  <div class="frame-option" data-frame="polaroid">Polaroid</div>
+                  <div class="frame-option" data-frame="film">Film Strip</div>
+                </div>
+              </div>
+              
+              <div class="feature-control">
+                <h4><i class="fas fa-expand-arrows-alt"></i> Frame Size</h4>
+                <label>Thickness: <span class="feature-control-value" id="frameSizeValue">10</span>px</label>
+                <input type="range" id="frameSize" min="1" max="50" value="10">
+              </div>
+              
+              <div class="feature-control">
+                <h4><i class="fas fa-palette"></i> Frame Color</h4>
+                <input type="color" id="frameColor" value="#ffffff">
+              </div>
+            </div>
+            
+            <!-- Tab Text -->
+            <div class="tab-content" id="text-tab">
+              <div class="feature-control">
+                <h4><i class="fas fa-font"></i> Text Content</h4>
+                <input type="text" id="textContent" placeholder="Enter your text here">
+              </div>
+              
+              <div class="feature-control">
+                <h4><i class="fas fa-text-height"></i> Text Style</h4>
+                <div class="text-style-grid">
+                  <div class="text-style-option active" data-style="normal">Normal</div>
+                  <div class="text-style-option" data-style="bold">Bold</div>
+                  <div class="text-style-option" data-style="italic">Italic</div>
+                  <div class="text-style-option" data-style="outline">Outline</div>
+                </div>
+              </div>
+              
+              <div class="feature-control">
+                <h4><i class="fas fa-text-width"></i> Font Size</h4>
+                <label>Size: <span class="feature-control-value" id="fontSizeValue">24</span>px</label>
+                <input type="range" id="fontSize" min="10" max="100" value="24">
+              </div>
+              
+              <div class="feature-control">
+                <h4><i class="fas fa-palette"></i> Text Color</h4>
+                <input type="color" id="textColor" value="#ffffff">
+              </div>
+              
+              <div class="feature-control">
+                <h4><i class="fas fa-arrows-alt"></i> Text Position</h4>
+                <select id="textPosition">
+                  <option value="top-left">Top Left</option>
+                  <option value="top-center">Top Center</option>
+                  <option value="top-right">Top Right</option>
+                  <option value="center">Center</option>
+                  <option value="bottom-left">Bottom Left</option>
+                  <option value="bottom-center">Bottom Center</option>
+                  <option value="bottom-right">Bottom Right</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Tab Stickers -->
+            <div class="tab-content" id="stickers-tab">
+              <div class="feature-control">
+                <h4><i class="fas fa-icons"></i> Emoji Stickers</h4>
+                <div class="sticker-grid">
+                  <div class="sticker-item" data-sticker="😀">😀</div>
+                  <div class="sticker-item" data-sticker="😂">😂</div>
+                  <div class="sticker-item" data-sticker="😍">😍</div>
+                  <div class="sticker-item" data-sticker="🤩">🤩</div>
+                  <div class="sticker-item" data-sticker="😎">😎</div>
+                  <div class="sticker-item" data-sticker="🥳">🥳</div>
+                  <div class="sticker-item" data-sticker="😭">😭</div>
+                  <div class="sticker-item" data-sticker="😡">😡</div>
+                  <div class="sticker-item" data-sticker="👍">👍</div>
+                  <div class="sticker-item" data-sticker="👎">👎</div>
+                  <div class="sticker-item" data-sticker="👏">👏</div>
+                  <div class="sticker-item" data-sticker="🙏">🙏</div>
+                </div>
+              </div>
+              
+              <div class="feature-control">
+                <h4><i class="fas fa-expand-arrows-alt"></i> Sticker Size</h4>
+                <label>Size: <span class="feature-control-value" id="stickerSizeValue">50</span>px</label>
+                <input type="range" id="stickerSize" min="20" max="200" value="50">
+              </div>
+            </div>
+            
+            <!-- Tab Advanced -->
+            <div class="tab-content" id="advanced-tab">
+              <div class="advanced-control">
+                <h4><i class="fas fa-blur"></i> Blur & Sharpen</h4>
+                <label>Blur: <span class="feature-control-value" id="blurValue">0</span>px</label>
+                <input type="range" id="blur" min="0" max="20" value="0">
+                
+                <label>Sharpen: <span class="feature-control-value" id="sharpenValue">0</span></label>
+                <input type="range" id="sharpen" min="0" max="100" value="0">
+              </div>
+              
+              <div class="advanced-control">
+                <h4><i class="fas fa-magic"></i> Noise Reduction</h4>
+                <label>Level: <span class="feature-control-value" id="noiseReductionValue">0</span></label>
+                <input type="range" id="noiseReduction" min="0" max="100" value="0">
+              </div>
+              
+              <div class="advanced-control">
+                <h4><i class="fas fa-crop"></i> Crop Tool</h4>
+                <button id="cropTool"><i class="fas fa-crop-alt"></i> Enable Crop</button>
+              </div>
+              
+              <div class="advanced-control">
+                <h4><i class="fas fa-redo"></i> Perspective Correction</h4>
+                <label>Horizontal: <span class="feature-control-value" id="perspectiveHValue">0</span></label>
+                <input type="range" id="perspectiveH" min="-45" max="45" value="0">
+                
+                <label>Vertical: <span class="feature-control-value" id="perspectiveVValue">0</span></label>
+                <input type="range" id="perspectiveV" min="-45" max="45" value="0">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter controls container -->
+        <div id="filterControlsContainer">
+          <!-- Noise Glitch Controls -->
+          <div id="noiseControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Jumlah Noise: <span class="filter-control-value" id="noiseAmountValue">40</span></label>
+              <input type="range" id="noiseAmount" min="0" max="100" value="40">
+            </div>
+          </div>
+          
+          <!-- RGB Shift Controls -->
+          <div id="rgbControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Jumlah RGB Shift: <span class="filter-control-value" id="rgbShiftAmountValue">15</span></label>
+              <input type="range" id="rgbShiftAmount" min="0" max="50" value="15">
+            </div>
+          </div>
+          
+          <!-- VHS Tracking Controls -->
+          <div id="vhsControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Distorsi VHS: <span class="filter-control-value" id="vhsDistortionValue">10</span></label>
+              <input type="range" id="vhsDistortion" min="0" max="20" value="10">
+            </div>
+          </div>
+          
+          <!-- Ghost Echo Controls -->
+          <div id="ghostControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Jumlah Echo: <span class="filter-control-value" id="ghostCountValue">2</span></label>
+              <input type="range" id="ghostCount" min="1" max="5" value="2">
+            </div>
+            <div class="filter-control">
+              <label>Opacity Echo: <span class="filter-control-value" id="ghostOpacityValue">25</span>%</label>
+              <input type="range" id="ghostOpacity" min="5" max="50" value="25">
+            </div>
+          </div>
+          
+          <!-- Pixelate Controls -->
+          <div id="pixelateControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Ukuran Pixel: <span class="filter-control-value" id="pixelSizeValue">8</span>px</label>
+              <input type="range" id="pixelSize" min="2" max="20" value="8">
+            </div>
+          </div>
+          
+                    <!-- Over Saturation Controls -->
+          <div id="oversatControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Jumlah Saturasi: <span class="filter-control-value" id="saturationAmountValue">1.6</span>x</label>
+              <input type="range" id="saturationAmount" min="1" max="3" step="0.1" value="1.6">
+            </div>
+          </div>
+          
+          <!-- Grayscale Noise Controls -->
+          <div id="graynoiseControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Jumlah Noise: <span class="filter-control-value" id="graynoiseAmountValue">50</span></label>
+              <input type="range" id="graynoiseAmount" min="0" max="100" value="50">
+            </div>
+          </div>
+          
+          <!-- Scanline CRT Controls -->
+          <div id="scanlineControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Ukuran Scanline: <span class="filter-control-value" id="scanlineSizeValue">4</span>px</label>
+              <input type="range" id="scanlineSize" min="1" max="8" value="4">
+            </div>
+            <div class="filter-control">
+              <label>Opacity Scanline: <span class="filter-control-value" id="scanlineOpacityValue">30</span>%</label>
+              <input type="range" id="scanlineOpacity" min="10" max="70" value="30">
+            </div>
+          </div>
+          
+          <!-- Burned Contrast Controls -->
+          <div id="burnedControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Jumlah Kontras: <span class="filter-control-value" id="burnedAmountValue">1.8</span>x</label>
+              <input type="range" id="burnedAmount" min="1" max="3" step="0.1" value="1.8">
+            </div>
+          </div>
+          
+          <!-- Watercolor Controls -->
+          <div id="watercolorControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Brush Size: <span class="filter-control-value" id="watercolorBrushValue">8</span></label>
+              <input type="range" id="watercolorBrush" min="3" max="15" value="8">
+            </div>
+            <div class="filter-control">
+              <label>Intensity: <span class="filter-control-value" id="watercolorIntensityValue">70</span>%</label>
+              <input type="range" id="watercolorIntensity" min="20" max="100" value="70">
+            </div>
+          </div>
+          
+          <!-- Oil Painting Controls -->
+          <div id="oilpaintingControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Brush Size: <span class="filter-control-value" id="oilBrushValue">5</span></label>
+              <input type="range" id="oilBrush" min="1" max="10" value="5">
+            </div>
+            <div class="filter-control">
+              <label>Intensity: <span class="filter-control-value" id="oilIntensityValue">60</span>%</label>
+              <input type="range" id="oilIntensity" min="10" max="100" value="60">
+            </div>
+          </div>
+          
+          <!-- Sketch Controls -->
+          <div id="sketchControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Pencil Size: <span class="filter-control-value" id="sketchPencilValue">1</span></label>
+              <input type="range" id="sketchPencil" min="1" max="5" step="0.5" value="1">
+            </div>
+            <div class="filter-control">
+              <label>Darkness: <span class="filter-control-value" id="sketchDarknessValue">70</span>%</label>
+              <input type="range" id="sketchDarkness" min="30" max="100" value="70">
+            </div>
+          </div>
+          
+          <!-- Ripple Controls -->
+          <div id="rippleControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Wave Size: <span class="filter-control-value" id="rippleSizeValue">20</span></label>
+              <input type="range" id="rippleSize" min="5" max="50" value="20">
+            </div>
+            <div class="filter-control">
+              <label>Frequency: <span class="filter-control-value" id="rippleFreqValue">0.05</span></label>
+              <input type="range" id="rippleFreq" min="0.01" max="0.1" step="0.01" value="0.05">
+            </div>
+          </div>
+          
+          <!-- Duotone Controls -->
+          <div id="duotoneControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Dark Color</label>
+              <input type="color" id="duotoneDark" value="#0000ff">
+            </div>
+            <div class="filter-control">
+              <label>Light Color</label>
+              <input type="color" id="duotoneLight" value="#ffff00">
+            </div>
+          </div>
+          
+          <!-- Cyber Funk Controls -->
+          <div id="neonglowControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Neon Color</label>
+              <input type="color" id="neonColor" value="#ff00ff">
+            </div>
+            <div class="filter-control">
+              <label>Glow Intensity: <span class="filter-control-value" id="glowIntensityValue">80</span>%</label>
+              <input type="range" id="glowIntensity" min="0" max="100" value="80">
+            </div>
+          </div>
+          
+          <div id="cybergridControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Grid Size: <span class="filter-control-value" id="gridSizeValue">20</span>px</label>
+              <input type="range" id="gridSize" min="5" max="50" value="20">
+            </div>
+            <div class="filter-control">
+              <label>Grid Color</label>
+              <input type="color" id="gridColor" value="#00ffff">
+            </div>
+          </div>
+          
+          <div id="hologramControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Interference: <span class="filter-control-value" id="interferenceValue">50</span>%</label>
+              <input type="range" id="interference" min="0" max="100" value="50">
+            </div>
+            <div class="filter-control">
+              <label>Transparency: <span class="filter-control-value" id="transparencyValue">70</span>%</label>
+              <input type="range" id="transparency" min="0" max="100" value="70">
+            </div>
+          </div>
+          
+          <div id="digitalglitchControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Glitch Amount: <span class="filter-control-value" id="glitchAmountValue">30</span>%</label>
+              <input type="range" id="glitchAmount" min="0" max="100" value="30">
+            </div>
+            <div class="filter-control">
+              <label>Color Shift: <span class="filter-control-value" id="colorShiftValue">15</span>px</label>
+              <input type="range" id="colorShift" min="0" max="50" value="15">
+            </div>
+          </div>
+          
+          <div id="synthwaveControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Sun Color</label>
+              <input type="color" id="sunColor" value="#ff00aa">
+            </div>
+            <div class="filter-control">
+              <label>Horizon Height: <span class="filter-control-value" id="horizonHeightValue">60</span>%</label>
+              <input type="range" id="horizonHeight" min="0" max="100" value="60">
+            </div>
+          </div>
+          
+          <div id="cyberpunkControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Accent Color</label>
+              <input type="color" id="accentColor" value="#00ff00">
+            </div>
+            <div class="filter-control">
+              <label>Darkness: <span class="feature-control-value" id="darknessValue">40</span>%</label>
+              <input type="range" id="darkness" min="0" max="100" value="40">
+            </div>
+          </div>
+          
+          <div id="neonrainControls" class="filter-controls">
+            <div class="filter-control">
+              <label>Rain Density: <span class="filter-control-value" id="rainDensityValue">50</span>%</label>
+              <input type="range" id="rainDensity" min="0" max="100" value="50">
+            </div>
+            <div class="filter-control">
+              <label>Rain Color</label>
+              <input type="color" id="rainColor" value="#ff00ff">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <button id="downloadBtn" disabled><i class="fas fa-download"></i> Download disini/Tekan lama Pada Gambar Agar Sesuai</button>
+        <button id="resetBtn"><i class="fas fa-undo"></i> Reset All</button>
+      </div>
+
+      <div class="info-panel">
+        <div class="info-header">
+          <span><i class="fas fa-info-circle"></i> Informasi Media</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="info-content">
+          <div class="info-card"><span id="oriDim">-</span><small>Dimensi Asli</small></div>
+          <div class="info-card"><span id="oriSize">-</span><small>Ukuran File Asli</small></div>
+          <div class="info-card"><span id="outDim">-</span><small>Resolusi Output</small></div>
+          <div class="info-card"><span id="outSize">-</span><small>Ukuran File Output</small></div>
+          <div class="info-card"><span id="outMode">-</span><small>Mode Terpilih</small></div>
+          <div class="info-card"><span id="ratio">-</span><small>Perubahan Ukuran</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-wrapper">
+      <img id="preview"/>
+      <canvas id="canvas"></canvas>
+      <div class="placeholder-text" id="placeholder">
+        <i class="fas fa-image"></i>
+        <p>Upload gambar untuk memulai editing</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Compact Social Bar -->
+  <div class="social-mini">
+    <a href="https://facebook.com" target="_blank" class="social-mini-icon" title="Facebook">
+      <i class="fab fa-facebook-f"></i>
+    </a>
+    <a href="https://twitter.com" target="_blank" class="social-mini-icon" title="Twitter">
+      <i class="fab fa-twitter"></i>
+    </a>
+    <a href="https://instagram.com" target="_blank" class="social-mini-icon" title="Instagram">
+      <i class="fab fa-instagram"></i>
+    </a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Elements
+      const imageUpload = document.getElementById('imageUpload');
+      const preview = document.getElementById('preview');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const placeholder = document.getElementById('placeholder');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const toast = document.getElementById('toast');
+      
+      // Info elements
+      const oriDim = document.getElementById('oriDim');
+      const oriSize = document.getElementById('oriSize');
+      const outDim = document.getElementById('outDim');
+      const outSize = document.getElementById('outSize');
+      const outMode = document.getElementById('outMode');
+      const ratio = document.getElementById('ratio');
+      
+      // Control elements
+      const sizeRange = document.getElementById('sizeRange');
+      const sizeVal = document.getElementById('sizeVal');
+      const qualityRange = document.getElementById('qualityRange');
+      const qualityVal = document.getElementById('qualityVal');
+      const modeSelect = document.getElementById('mode');
+      
+      // Tab elements
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      // Season elements
+      const seasonOverlay = document.getElementById('seasonOverlay');
+      const seasonDots = document.querySelectorAll('.season-dot');
+      const seasonInfo = document.getElementById('seasonInfo');
+      
+      // Filter controls
+      const filterControls = document.querySelectorAll('.filter-controls');
+      
+      // Variables
+      let originalImage = null;
+      let currentImage = null;
+      let currentSeason = 'spring';
+      
+      // Initialize
+      initSeasonEffects();
+      setupEventListeners();
+      
+      // Initialize season effects
+      function initSeasonEffects() {
+        // Determine current season based on Japanese calendar
+        const now = new Date();
+        const month = now.getMonth() + 1; // JavaScript months are 0-11
+        
+        let season;
+        if (month >= 3 && month <= 5) {
+          season = 'spring'; // March - May
+        } else if (month >= 6 && month <= 8) {
+          season = 'summer'; // June - August
+        } else if (month >= 9 && month <= 11) {
+          season = 'autumn'; // September - November
+        } else {
+          season = 'winter'; // December - February
+        }
+        
+        // Set initial season
+        setSeason(season);
+        
+        // Add event listeners to season dots
+        seasonDots.forEach(dot => {
+          dot.addEventListener('click', function() {
+            const season = this.getAttribute('data-season');
+            setSeason(season);
+          });
+        });
+        
+        // Auto-change season based on time
+        setInterval(() => {
+          const now = new Date();
+          const month = now.getMonth() + 1;
+          
+          let newSeason;
+          if (month >= 3 && month <= 5) {
+            newSeason = 'spring';
+          } else if (month >= 6 && month <= 8) {
+            newSeason = 'summer';
+          } else if (month >= 9 && month <= 11) {
+            newSeason = 'autumn';
+          } else {
+            newSeason = 'winter';
+          }
+          
+          if (newSeason !== currentSeason) {
+            setSeason(newSeason);
+          }
+        }, 60000); // Check every minute
+      }
+      
+      // Set season
+      function setSeason(season) {
+        // Remove active class from all dots
+        seasonDots.forEach(dot => {
+          dot.classList.remove('active');
+        });
+        
+        // Add active class to selected dot
+        document.querySelector(`.season-dot.${season}`).classList.add('active');
+        
+        // Remove all season classes from overlay
+        seasonOverlay.className = 'season-overlay';
+        
+        // Add selected season class
+        seasonOverlay.classList.add(season);
+        seasonOverlay.classList.add('active');
+        
+        // Clear existing elements
+        while (seasonOverlay.firstChild) {
+          seasonOverlay.removeChild(seasonOverlay.firstChild);
+        }
+        
+        // Create season-specific elements
+        switch(season) {
+          case 'spring':
+            createPetals();
+            seasonInfo.textContent = 'Spring - Sakura Petals (Mar-May)';
+            break;
+          case 'summer':
+            createFireflies();
+            seasonInfo.textContent = 'Summer - Fireflies (Jun-Aug)';
+            break;
+          case 'autumn':
+            createLeaves();
+            seasonInfo.textContent = 'Autumn - Falling Leaves (Sep-Nov)';
+            break;
+          case 'winter':
+            createSnowflakes();
+            seasonInfo.textContent = 'Winter - Snow & Frost (Dec-Feb)';
+            break;
+        }
+        
+        currentSeason = season;
+      }
+      
+      // Create sakura petals for spring
+      function createPetals() {
+        for (let i = 0; i < 30; i++) {
+          const petal = document.createElement('div');
+          petal.className = 'petal';
+          
+          // Random position
+          const left = Math.random() * 100;
+          const delay = Math.random() * 10;
+          const duration = 10 + Math.random() * 10;
+          
+          petal.style.left = `${left}%`;
+          petal.style.animationDelay = `${delay}s`;
+          petal.style.animationDuration = `${duration}s`;
+          
+          seasonOverlay.appendChild(petal);
+        }
+      }
+      
+      // Create fireflies for summer
+      function createFireflies() {
+        for (let i = 0; i < 20; i++) {
+          const firefly = document.createElement('div');
+          firefly.className = 'firefly';
+          
+          // Random position
+          const left = Math.random() * 100;
+          const top = Math.random() * 100;
+          const delay = Math.random() * 8;
+          const duration = 8 + Math.random() * 8;
+          
+          firefly.style.left = `${left}%`;
+          firefly.style.top = `${top}%`;
+          firefly.style.animationDelay = `${delay}s`;
+          firefly.style.animationDuration = `${duration}s`;
+          
+          seasonOverlay.appendChild(firefly);
+        }
+      }
+      
+      // Create leaves for autumn
+      function createLeaves() {
+        for (let i = 0; i < 25; i++) {
+          const leaf = document.createElement('div');
+          leaf.className = 'leaf';
+          
+          // Random position
+          const left = Math.random() * 100;
+          const delay = Math.random() * 12;
+          const duration = 12 + Math.random() * 10;
+          
+          leaf.style.left = `${left}%`;
+          leaf.style.animationDelay = `${delay}s`;
+          leaf.style.animationDuration = `${duration}s`;
+          
+          seasonOverlay.appendChild(leaf);
+        }
+      }
+      
+      // Create snowflakes for winter
+      function createSnowflakes() {
+        const snowflakeChars = ['❄', '❅', '❆'];
+        
+        for (let i = 0; i < 40; i++) {
+          const snowflake = document.createElement('div');
+          snowflake.className = 'snowflake';
+          
+          // Random character
+          const char = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+          snowflake.textContent = char;
+          
+          // Random position
+          const left = Math.random() * 100;
+          const delay = Math.random() * 8;
+          const duration = 8 + Math.random() * 8;
+          const size = 0.8 + Math.random() * 1.2;
+          
+          snowflake.style.left = `${left}%`;
+          snowflake.style.animationDelay = `${delay}s`;
+          snowflake.style.animationDuration = `${duration}s`;
+          snowflake.style.fontSize = `${size}em`;
+          
+          seasonOverlay.appendChild(snowflake);
+        }
+      }
+      
+      // Setup event listeners
+      function setupEventListeners() {
+        // Image upload
+        imageUpload.addEventListener('change', handleImageUpload);
+        
+        // Range inputs - PERBAIKAN: Update preview secara real-time
+        sizeRange.addEventListener('input', function() {
+          sizeVal.textContent = this.value;
+          if (originalImage) {
+            applyEffects();
+            updatePreviewWithQuality();
+          }
+        });
+        
+        qualityRange.addEventListener('input', function() {
+          qualityVal.textContent = this.value;
+          if (originalImage) {
+            updatePreviewWithQuality();
+          }
+        });
+        
+        // Mode select
+        modeSelect.addEventListener('change', function() {
+          // Hide all filter controls
+          filterControls.forEach(control => {
+            control.classList.remove('active');
+          });
+          
+          // Show selected filter control
+          const selectedControl = document.getElementById(`${this.value}Controls`);
+          if (selectedControl) {
+            selectedControl.classList.add('active');
+          }
+          
+          // Update mode info
+          outMode.textContent = this.options[this.selectedIndex].text;
+          
+          if (originalImage) {
+            applyEffects();
+            updatePreviewWithQuality();
+          }
+        });
+        
+        // Tabs
+                // Tabs
+        tabs.forEach(tab => {
+          tab.addEventListener('click', function() {
+            const tabName = this.getAttribute('data-tab');
+            
+            // Remove active class from all tabs and contents
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to selected tab and content
+            this.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+          });
+        });
+        
+        // Download button
+        downloadBtn.addEventListener('click', downloadImage);
+        
+        // Reset button
+        resetBtn.addEventListener('click', resetAll);
+        
+        // Info panel toggle
+        const infoHeader = document.querySelector('.info-header');
+        const infoContent = document.querySelector('.info-content');
+        
+        infoHeader.addEventListener('click', function() {
+          infoContent.style.display = infoContent.style.display === 'none' ? 'grid' : 'none';
+          const icon = this.querySelector('i:last-child');
+          icon.classList.toggle('fa-chevron-down');
+          icon.classList.toggle('fa-chevron-up');
+        });
+        
+        // Frame options
+        const frameOptions = document.querySelectorAll('.frame-option');
+        frameOptions.forEach(option => {
+          option.addEventListener('click', function() {
+            frameOptions.forEach(o => o.classList.remove('active'));
+            this.classList.add('active');
+            if (originalImage) {
+              applyEffects();
+              updatePreviewWithQuality();
+            }
+          });
+        });
+        
+        // Text style options
+        const textStyleOptions = document.querySelectorAll('.text-style-option');
+        textStyleOptions.forEach(option => {
+          option.addEventListener('click', function() {
+            textStyleOptions.forEach(o => o.classList.remove('active'));
+            this.classList.add('active');
+          });
+        });
+        
+        // Sticker items
+        const stickerItems = document.querySelectorAll('.sticker-item');
+        stickerItems.forEach(item => {
+          item.addEventListener('click', function() {
+            const sticker = this.getAttribute('data-sticker');
+            if (originalImage) {
+              applyEffects();
+              // Add sticker to canvas
+              const stickerSize = document.getElementById('stickerSize').value;
+              ctx.font = `${stickerSize}px Arial`;
+              ctx.fillText(sticker, 50, 50);
+              updatePreviewWithQuality();
+            }
+          });
+        });
+        
+        // Range inputs with value display - PERBAIKAN: Update preview secara real-time
+        const rangeInputs = document.querySelectorAll('input[type="range"]');
+        rangeInputs.forEach(input => {
+          input.addEventListener('input', function() {
+            const valueDisplay = document.getElementById(`${this.id}Value`);
+            if (valueDisplay) {
+              valueDisplay.textContent = this.value;
+            }
+            if (originalImage && this.id !== 'sizeRange' && this.id !== 'qualityRange') {
+              applyEffects();
+              updatePreviewWithQuality();
+            }
+          });
+        });
+        
+        // Artistic mode
+        const artisticMode = document.getElementById('artisticMode');
+        artisticMode.addEventListener('change', function() {
+          if (originalImage && this.value !== 'none') {
+            applyEffects();
+            updatePreviewWithQuality();
+          }
+        });
+        
+        // Distortion mode
+        const distortionMode = document.getElementById('distortionMode');
+        distortionMode.addEventListener('change', function() {
+          if (originalImage && this.value !== 'none') {
+            applyEffects();
+            updatePreviewWithQuality();
+          }
+        });
+        
+        // Color mode
+        const colorMode = document.getElementById('colorMode');
+        colorMode.addEventListener('change', function() {
+          if (originalImage && this.value !== 'none') {
+            applyEffects();
+            updatePreviewWithQuality();
+          }
+        });
+        
+        // Cyber funk mode
+        const cyberfunkMode = document.getElementById('cyberfunkMode');
+        cyberfunkMode.addEventListener('change', function() {
+          if (originalImage && this.value !== 'none') {
+            applyEffects();
+            updatePreviewWithQuality();
+          }
+        });
+      }
+      
+      // Handle image upload
+      function handleImageUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // Check if file is an image
+        if (!file.type.match('image.*')) {
+          showToast('Please upload an image file', 'error');
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const img = new Image();
+          img.onload = function() {
+            // Set original image
+            originalImage = img;
+            currentImage = img;
+            
+            // Update info
+            oriDim.textContent = `${img.width} × ${img.height}`;
+            oriSize.textContent = formatFileSize(file.size);
+            
+            // Show preview
+            preview.src = event.target.result;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+            
+            // Enable download button
+            downloadBtn.disabled = false;
+            
+            // Apply initial effects
+            applyEffects();
+            updatePreviewWithQuality();
+            
+            // Show toast
+            showToast('Upload berhasil!');
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+      
+      // PERBAIKAN: Fungsi untuk memperbarui preview dengan kualitas yang benar
+      function updatePreviewWithQuality() {
+        if (!canvas.width || !canvas.height) return;
+        
+        const quality = qualityRange.value / 100;
+        
+        // Update preview image with current quality
+        preview.src = canvas.toDataURL('image/jpeg', quality);
+      }
+      
+      // Apply effects
+      function applyEffects() {
+        if (!originalImage) return;
+        
+        // Get scale and quality values
+        const scale = sizeRange.value / 100;
+        
+        // PERBAIKAN: Set canvas size berdasarkan scale dengan benar
+        const newWidth = Math.max(1, Math.floor(originalImage.width * scale));
+        const newHeight = Math.max(1, Math.floor(originalImage.height * scale));
+        
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+        
+        // PERBAIKAN: Gunakan imageSmoothing untuk kualitas yang lebih baik
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // PERBAIKAN: Draw original image dengan scaling yang benar
+        ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+        
+        // Get image data for processing
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        // Apply selected effect
+        const mode = modeSelect.value;
+        
+        switch(mode) {
+          case 'resize':
+            // No additional effect, just resize (already done)
+            break;
+            
+          case 'noise':
+            applyNoiseEffect(data);
+            break;
+            
+          case 'rgb':
+            applyRGBShift(data);
+            break;
+            
+          case 'vhs':
+            applyVHSEffect(data);
+            break;
+            
+          case 'invert':
+            applyInvertEffect(data);
+            break;
+            
+          case 'ghost':
+            applyGhostEffect(data);
+            break;
+            
+          case 'pixelate':
+            applyPixelateEffect(data);
+            break;
+            
+          case 'sepia':
+            applySepiaEffect(data);
+            break;
+            
+          case 'oversat':
+            applyOversatEffect(data);
+            break;
+            
+          case 'graynoise':
+            applyGrayNoiseEffect(data);
+            break;
+            
+          case 'scanline':
+            applyScanlineEffect(data);
+            break;
+            
+          case 'burned':
+            applyBurnedEffect(data);
+            break;
+            
+          case 'swap':
+            applyColorSwapEffect(data);
+            break;
+        }
+        
+        // Apply artistic effects
+        const artisticMode = document.getElementById('artisticMode').value;
+        if (artisticMode !== 'none') {
+          switch(artisticMode) {
+            case 'watercolor':
+              applyWatercolorEffect(data);
+              break;
+            case 'oilpainting':
+              applyOilPaintingEffect(data);
+              break;
+            case 'sketch':
+              applySketchEffect(data);
+              break;
+            case 'pointillism':
+              applyPointillismEffect(data);
+              break;
+            case 'halftone':
+              applyHalftoneEffect(data);
+              break;
+            case 'crosshatch':
+              applyCrosshatchEffect(data);
+              break;
+            case 'mosaic':
+              applyMosaicEffect(data);
+              break;
+            case 'stainedglass':
+              applyStainedGlassEffect(data);
+              break;
+          }
+        }
+        
+        // Apply distortion effects
+        const distortionMode = document.getElementById('distortionMode').value;
+        if (distortionMode !== 'none') {
+          switch(distortionMode) {
+            case 'ripple':
+              applyRippleEffect(data);
+              break;
+            case 'bulge':
+              applyBulgeEffect(data);
+              break;
+            case 'pinch':
+              applyPinchEffect(data);
+              break;
+            case 'swirl':
+              applySwirlEffect(data);
+              break;
+            case 'fisheye':
+              applyFisheyeEffect(data);
+              break;
+            case 'kaleidoscope':
+              applyKaleidoscopeEffect(data);
+              break;
+            case 'mirror':
+              applyMirrorEffect(data);
+              break;
+            case 'tunnel':
+              applyTunnelEffect(data);
+              break;
+          }
+        }
+        
+        // Apply color effects
+        const colorMode = document.getElementById('colorMode').value;
+        if (colorMode !== 'none') {
+          switch(colorMode) {
+            case 'duotone':
+              applyDuotoneEffect(data);
+              break;
+            case 'posterize':
+              applyPosterizeEffect(data);
+              break;
+            case 'solarize':
+              applySolarizeEffect(data);
+              break;
+            case 'edgeglow':
+              applyEdgeGlowEffect(data);
+              break;
+            case 'chromatic':
+              applyChromaticEffect(data);
+              break;
+            case 'thermal':
+              applyThermalEffect(data);
+              break;
+            case 'xray':
+              applyXRayEffect(data);
+              break;
+            case 'infrared':
+              applyInfraredEffect(data);
+              break;
+          }
+        }
+        
+        // Apply cyber funk effects
+        const cyberfunkMode = document.getElementById('cyberfunkMode').value;
+        if (cyberfunkMode !== 'none') {
+          switch(cyberfunkMode) {
+            case 'neonglow':
+              applyNeonGlowEffect(data);
+              break;
+            case 'cybergrid':
+              applyCyberGridEffect(data);
+              break;
+            case 'hologram':
+              applyHologramEffect(data);
+              break;
+            case 'digitalglitch':
+              applyDigitalGlitchEffect(data);
+              break;
+            case 'synthwave':
+              applySynthwaveEffect(data);
+              break;
+            case 'cyberpunk':
+              applyCyberpunkEffect(data);
+              break;
+            case 'neonrain':
+              applyNeonRainEffect(data);
+              break;
+          }
+        }
+        
+        // Apply adjustments
+        const brightness = document.getElementById('brightness').value;
+        const contrast = document.getElementById('contrast').value;
+        const saturation = document.getElementById('saturation').value;
+        const exposure = document.getElementById('exposure').value;
+        const temperature = document.getElementById('temperature').value;
+        
+        if (brightness != 0 || contrast != 0 || saturation != 0 || exposure != 0 || temperature != 0) {
+          applyAdjustments(data, brightness, contrast, saturation, exposure, temperature);
+        }
+        
+        // Put image data back
+        ctx.putImageData(imageData, 0, 0);
+        
+        // Apply frame
+        const frameOption = document.querySelector('.frame-option.active').getAttribute('data-frame');
+        if (frameOption !== 'none') {
+          applyFrame(frameOption);
+        }
+        
+        // Update output info
+        outDim.textContent = `${canvas.width} × ${canvas.height}`;
+        outSize.textContent = formatFileSize(estimateFileSize());
+        ratio.textContent = `${scale}x`;
+      }
+      
+      // Noise effect
+      function applyNoiseEffect(data) {
+        const amount = document.getElementById('noiseAmount').value / 100;
+        
+        for (let i = 0; i < data.length; i += 4) {
+          const noise = (Math.random() - 0.5) * amount * 255;
+          
+          data[i] = Math.max(0, Math.min(255, data[i] + noise));     // Red
+          data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise)); // Green
+          data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise)); // Blue
+        }
+      }
+      
+      // RGB Shift effect
+      function applyRGBShift(data) {
+        const shift = parseInt(document.getElementById('rgbShiftAmount').value);
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+            
+            // Red channel - shift right
+            if (x + shift < width) {
+              const redIdx = (y * width + (x + shift)) * 4;
+              data[idx] = tempData[redIdx];
+            }
+            
+            // Blue channel - shift left
+            if (x - shift >= 0) {
+              const blueIdx = (y * width + (x - shift)) * 4;
+              data[idx + 2] = tempData[blueIdx + 2];
+            }
+          }
+        }
+      }
+      
+      // VHS Tracking effect
+      function applyVHSEffect(data) {
+        const distortion = parseInt(document.getElementById('vhsDistortion').value);
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        for (let y = 0; y < height; y++) {
+          // Apply horizontal distortion to random lines
+          if (Math.random() < 0.1) {
+            const shift = (Math.random() - 0.5) * distortion;
+            
+            for (let x = 0; x < width; x++) {
+              const idx = (y * width + x) * 4;
+              
+              if (x + shift >= 0 && x + shift < width) {
+                const shiftIdx = (y * width + Math.floor(x + shift)) * 4;
+                
+                data[idx] = data[shiftIdx];
+                data[idx + 1] = data[shiftIdx + 1];
+                data[idx + 2] = data[shiftIdx + 2];
+              }
+            }
+          }
+        }
+      }
+      
+      // Invert Colors effect
+      function applyInvertEffect(data) {
+        for (let i = 0; i < data.length; i += 4) {
+          data[i] = 255 - data[i];         // Red
+          data[i + 1] = 255 - data[i + 1]; // Green
+          data[i + 2] = 255 - data[i + 2]; // Blue
+        }
+      }
+      
+      // Ghost Echo effect
+      function applyGhostEffect(data) {
+        const count = parseInt(document.getElementById('ghostCount').value);
+        const opacity = parseInt(document.getElementById('ghostOpacity').value) / 100;
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        for (let echo = 1; echo <= count; echo++) {
+          const offset = echo * 5;
+          
+          for (let y = 0; y < height - offset; y++) {
+            for (let x = 0; x < width - offset; x++) {
+              const idx = (y * width + x) * 4;
+              const echoIdx = ((y + offset) * width + (x + offset)) * 4;
+              
+              // Blend with ghost pixels
+              data[idx] = data[idx] * (1 - opacity) + tempData[echoIdx] * opacity;
+              data[idx + 1] = data[idx + 1] * (1 - opacity) + tempData[echoIdx + 1] * opacity;
+              data[idx + 2] = data[idx + 2] * (1 - opacity) + tempData[echoIdx + 2] * opacity;
+            }
+          }
+        }
+      }
+      
+      // Pixelate effect
+      function applyPixelateEffect(data) {
+        const pixelSize = parseInt(document.getElementById('pixelSize').value);
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        for (let y = 0; y < height; y += pixelSize) {
+          for (let x = 0; x < width; x += pixelSize) {
+            // Get the color of the top-left pixel in this block
+            const idx = (y * width + x) * 4;
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+            
+            // Fill the entire block with this color
+            for (let py = y; py < y + pixelSize && py < height; py++) {
+              for (let px = x; px < x + pixelSize && px < width; px++) {
+                const pidx = (py * width + px) * 4;
+                data[pidx] = r;
+                data[pidx + 1] = g;
+                data[pidx + 2] = b;
+              }
+            }
+          }
+        }
+      }
+      
+      // Sepia effect
+      function applySepiaEffect(data) {
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          
+          // Sepia formula
+          data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
+          data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
+          data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
+        }
+      }
+      
+      // Over Saturation effect
+      function applyOversatEffect(data) {
+        const amount = parseFloat(document.getElementById('saturationAmount').value);
+        
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i] / 255;
+          const g = data[i + 1] / 255;
+          const b = data[i + 2] / 255;
+          
+          // Convert to HSL
+          const max = Math.max(r, g, b);
+          const min = Math.min(r, g, b);
+          let h, s, l = (max + min) / 2;
+          
+          if (max === min) {
+            h = s = 0; // achromatic
+          } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            
+            switch (max) {
+              case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+              case g: h = (b - r) / d + 2; break;
+              case b: h = (r - g) / d + 4; break;
+            }
+            
+            h /= 6;
+          }
+          
+                    // Increase saturation
+          s = Math.min(1, s * amount);
+          
+          // Convert back to RGB
+          let r2, g2, b2;
+          
+          if (s === 0) {
+            r2 = g2 = b2 = l; // achromatic
+          } else {
+            const hue2rgb = (p, q, t) => {
+              if (t < 0) t += 1;
+              if (t > 1) t -= 1;
+              if (t < 1/6) return p + (q - p) * 6 * t;
+              if (t < 1/2) return q;
+              if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+              return p;
+            };
+            
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
+            
+            r2 = hue2rgb(p, q, h + 1/3);
+            g2 = hue2rgb(p, q, h);
+            b2 = hue2rgb(p, q, h - 1/3);
+          }
+          
+          data[i] = Math.round(r2 * 255);
+          data[i + 1] = Math.round(g2 * 255);
+          data[i + 2] = Math.round(b2 * 255);
+        }
+      }
+      
+      // Grayscale Noise effect
+      function applyGrayNoiseEffect(data) {
+        const amount = parseInt(document.getElementById('graynoiseAmount').value);
+        
+        for (let i = 0; i < data.length; i += 4) {
+          // Convert to grayscale
+          const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+          
+          // Add noise
+          const noise = (Math.random() - 0.5) * amount;
+          const noisyGray = Math.min(255, Math.max(0, gray + noise));
+          
+          data[i] = noisyGray;
+          data[i + 1] = noisyGray;
+          data[i + 2] = noisyGray;
+        }
+      }
+      
+      // Scanline CRT effect
+      function applyScanlineEffect(data) {
+        const scanlineSize = parseInt(document.getElementById('scanlineSize').value);
+        const opacity = parseInt(document.getElementById('scanlineOpacity').value) / 100;
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        for (let y = 0; y < height; y++) {
+          // Apply scanlines
+          if (y % scanlineSize === 0) {
+            for (let x = 0; x < width; x++) {
+              const idx = (y * width + x) * 4;
+              
+              // Darken the scanline
+              data[idx] *= (1 - opacity);
+              data[idx + 1] *= (1 - opacity);
+              data[idx + 2] *= (1 - opacity);
+            }
+          }
+        }
+      }
+      
+      // Burned Contrast effect
+      function applyBurnedEffect(data) {
+        const amount = parseFloat(document.getElementById('burnedAmount').value);
+        
+        for (let i = 0; i < data.length; i += 4) {
+          // Increase contrast with a burned look
+          const factor = (259 * (amount + 255)) / (255 * (259 - amount));
+          
+          data[i] = factor * (data[i] - 128) + 128;
+          data[i + 1] = factor * (data[i + 1] - 128) + 128;
+          data[i + 2] = factor * (data[i + 2] - 128) + 128;
+          
+          // Clamp values
+          data[i] = Math.min(255, Math.max(0, data[i]));
+          data[i + 1] = Math.min(255, Math.max(0, data[i + 1]));
+          data[i + 2] = Math.min(255, Math.max(0, data[i + 2]));
+        }
+      }
+      
+      // Random Color Swap effect
+      function applyColorSwapEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        // Randomly swap color channels
+        const channelMap = [
+          Math.floor(Math.random() * 3),
+          Math.floor(Math.random() * 3),
+          Math.floor(Math.random() * 3)
+        ];
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+            
+            data[idx] = tempData[idx + channelMap[0]];
+            data[idx + 1] = tempData[idx + channelMap[1]];
+            data[idx + 2] = tempData[idx + channelMap[2]];
+          }
+        }
+      }
+      
+      // Watercolor effect
+      function applyWatercolorEffect(data) {
+        const brushSize = parseInt(document.getElementById('watercolorBrush').value);
+        const intensity = parseInt(document.getElementById('watercolorIntensity').value) / 100;
+        
+        // Simplified watercolor effect - blur and increase saturation
+        for (let i = 0; i < data.length; i += 4) {
+          // Get neighboring pixels (simplified)
+          const neighbors = [];
+          const width = canvas.width;
+          
+          // Simple blur
+          for (let j = -1; j <= 1; j++) {
+            for (let k = -1; k <= 1; k++) {
+              const ni = i + (j * width + k) * 4;
+              if (ni >= 0 && ni < data.length) {
+                neighbors.push({
+                  r: data[ni],
+                  g: data[ni + 1],
+                  b: data[ni + 2]
+                });
+              }
+            }
+          }
+          
+          if (neighbors.length > 0) {
+            // Average the neighbors
+            const avgR = neighbors.reduce((sum, p) => sum + p.r, 0) / neighbors.length;
+            const avgG = neighbors.reduce((sum, p) => sum + p.g, 0) / neighbors.length;
+            const avgB = neighbors.reduce((sum, p) => sum + p.b, 0) / neighbors.length;
+            
+            // Mix with original
+            data[i] = data[i] * (1 - intensity) + avgR * intensity;
+            data[i + 1] = data[i + 1] * (1 - intensity) + avgG * intensity;
+            data[i + 2] = data[i + 2] * (1 - intensity) + avgB * intensity;
+          }
+        }
+      }
+      
+      // Oil Painting effect
+      function applyOilPaintingEffect(data) {
+        const brushSize = parseInt(document.getElementById('oilBrush').value);
+        const intensity = parseInt(document.getElementById('oilIntensity').value) / 100;
+        
+        // Simplified oil painting effect - stronger blur and reduce detail
+        for (let i = 0; i < data.length; i += 4) {
+          // Get neighboring pixels (simplified)
+          const neighbors = [];
+          const width = canvas.width;
+          
+          // Larger blur for oil painting
+          for (let j = -brushSize; j <= brushSize; j++) {
+            for (let k = -brushSize; k <= brushSize; k++) {
+              const ni = i + (j * width + k) * 4;
+              if (ni >= 0 && ni < data.length) {
+                neighbors.push({
+                  r: data[ni],
+                  g: data[ni + 1],
+                  b: data[ni + 2]
+                });
+              }
+            }
+          }
+          
+          if (neighbors.length > 0) {
+            // Average the neighbors
+            const avgR = neighbors.reduce((sum, p) => sum + p.r, 0) / neighbors.length;
+            const avgG = neighbors.reduce((sum, p) => sum + p.g, 0) / neighbors.length;
+            const avgB = neighbors.reduce((sum, p) => sum + p.b, 0) / neighbors.length;
+            
+            // Mix with original
+            data[i] = data[i] * (1 - intensity) + avgR * intensity;
+            data[i + 1] = data[i + 1] * (1 - intensity) + avgG * intensity;
+            data[i + 2] = data[i + 2] * (1 - intensity) + avgB * intensity;
+          }
+        }
+      }
+      
+      // Pencil Sketch effect
+      function applySketchEffect(data) {
+        const pencilSize = parseFloat(document.getElementById('sketchPencil').value);
+        const darkness = parseInt(document.getElementById('sketchDarkness').value) / 100;
+        
+        // Convert to grayscale first
+        for (let i = 0; i < data.length; i += 4) {
+          const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+          data[i] = gray;
+          data[i + 1] = gray;
+          data[i + 2] = gray;
+        }
+        
+        // Apply edge detection
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        for (let y = 1; y < height - 1; y++) {
+          for (let x = 1; x < width - 1; x++) {
+            const idx = (y * width + x) * 4;
+            
+            // Get surrounding pixels
+            const tl = tempData[((y - 1) * width + (x - 1)) * 4];
+            const tm = tempData[((y - 1) * width + x) * 4];
+            const tr = tempData[((y - 1) * width + (x + 1)) * 4];
+            const ml = tempData[(y * width + (x - 1)) * 4];
+            const mm = tempData[idx];
+            const mr = tempData[(y * width + (x + 1)) * 4];
+            const bl = tempData[((y + 1) * width + (x - 1)) * 4];
+            const bm = tempData[((y + 1) * width + x) * 4];
+            const br = tempData[((y + 1) * width + (x + 1)) * 4];
+            
+            // Apply Sobel operator
+            const gx = -tl - 2 * ml - bl + tr + 2 * mr + br;
+            const gy = -tl - 2 * tm - tr + bl + 2 * bm + br;
+            
+            // Calculate edge magnitude
+            const magnitude = Math.min(255, Math.sqrt(gx * gx + gy * gy) * pencilSize);
+            
+            // Invert for sketch effect
+            const sketch = 255 - magnitude * darkness;
+            
+            data[idx] = sketch;
+            data[idx + 1] = sketch;
+            data[idx + 2] = sketch;
+          }
+        }
+      }
+      
+      // Pointillism effect
+      function applyPointillismEffect(data) {
+        // Simplified pointillism - add colored dots
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Add random dots
+        for (let i = 0; i < width * height / 100; i++) {
+          const x = Math.floor(Math.random() * width);
+          const y = Math.floor(Math.random() * height);
+          const size = Math.floor(Math.random() * 3) + 1;
+          
+          // Get color at this position
+          const idx = (y * width + x) * 4;
+          const r = data[idx];
+          const g = data[idx + 1];
+          const b = data[idx + 2];
+          
+          // Draw a dot
+          for (let dy = -size; dy <= size; dy++) {
+            for (let dx = -size; dx <= size; dx++) {
+              if (dx * dx + dy * dy <= size * size) {
+                const nx = x + dx;
+                const ny = y + dy;
+                
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                  const nidx = (ny * width + nx) * 4;
+                  data[nidx] = r;
+                  data[nidx + 1] = g;
+                  data[nidx + 2] = b;
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Halftone effect
+      function applyHalftoneEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        const dotSize = 3;
+        
+        // Convert to grayscale first
+        for (let i = 0; i < data.length; i += 4) {
+          const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+          data[i] = gray;
+          data[i + 1] = gray;
+          data[i + 2] = gray;
+        }
+        
+        // Create halftone pattern
+        for (let y = 0; y < height; y += dotSize * 2) {
+          for (let x = 0; x < width; x += dotSize * 2) {
+            // Get average brightness in this area
+            let brightness = 0;
+            let count = 0;
+            
+            for (let dy = 0; dy < dotSize * 2; dy++) {
+              for (let dx = 0; dx < dotSize * 2; dx++) {
+                if (y + dy < height && x + dx < width) {
+                  const idx = ((y + dy) * width + (x + dx)) * 4;
+                  brightness += data[idx];
+                  count++;
+                }
+              }
+            }
+            
+            brightness = brightness / count;
+            
+            // Draw dots based on brightness
+            const dotRadius = (1 - brightness / 255) * dotSize;
+            
+            for (let dy = -dotSize; dy <= dotSize; dy++) {
+              for (let dx = -dotSize; dx <= dotSize; dx++) {
+                if (dx * dx + dy * dy <= dotRadius * dotRadius) {
+                  const nx = x + dotSize + dx;
+                  const ny = y + dotSize + dy;
+                  
+                  if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                    const nidx = (ny * width + nx) * 4;
+                    data[nidx] = 0; // Black dot
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Cross Hatch effect
+      function applyCrosshatchEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Convert to grayscale first
+        for (let i = 0; i < data.length; i += 4) {
+          const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+          data[i] = gray;
+          data[i + 1] = gray;
+          data[i + 2] = gray;
+        }
+        
+        // Apply cross hatch pattern
+        const spacing = 5;
+        const threshold = 128;
+        
+        // Horizontal lines
+        for (let y = 0; y < height; y += spacing) {
+          for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+            
+            if (data[idx] < threshold) {
+              // Draw a dark line
+              for (let dy = 0; dy < 2; dy++) {
+                if (y + dy < height) {
+                  const nidx = ((y + dy) * width + x) * 4;
+                  data[nidx] = 0;
+                }
+              }
+            }
+          }
+        }
+        
+        // Vertical lines
+        for (let x = 0; x < width; x += spacing) {
+          for (let y = 0; y < height; y++) {
+            const idx = (y * width + x) * 4;
+            
+            if (data[idx] < threshold) {
+              // Draw a dark line
+              for (let dx = 0; dx < 2; dx++) {
+                if (x + dx < width) {
+                  const nidx = (y * width + (x + dx)) * 4;
+                  data[nidx] = 0;
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Mosaic Tiles effect
+      function applyMosaicEffect(data) {
+        const tileSize = 10;
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        for (let y = 0; y < height; y += tileSize) {
+          for (let x = 0; x < width; x += tileSize) {
+            // Calculate average color for this tile
+            let r = 0, g = 0, b = 0, count = 0;
+            
+            for (let ty = 0; ty < tileSize && y + ty < height; ty++) {
+              for (let tx = 0; tx < tileSize && x + tx < width; tx++) {
+                const idx = ((y + ty) * width + (x + tx)) * 4;
+                r += data[idx];
+                g += data[idx + 1];
+                b += data[idx + 2];
+                count++;
+              }
+            }
+            
+            if (count > 0) {
+              r = Math.floor(r / count);
+              g = Math.floor(g / count);
+              b = Math.floor(b / count);
+              
+              // Fill the tile with the average color
+              for (let ty = 0; ty < tileSize && y + ty < height; ty++) {
+                for (let tx = 0; tx < tileSize && x + tx < width; tx++) {
+                  const idx = ((y + ty) * width + (x + tx)) * 4;
+                  data[idx] = r;
+                  data[idx + 1] = g;
+                  data[idx + 2] = b;
+                }
+              }
+            }
+          }
+        }
+        
+        // Draw grid lines
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.lineWidth = 1;
+        
+        for (let y = 0; y < height; y += tileSize) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(width, y);
+          ctx.stroke();
+        }
+        
+        for (let x = 0; x < width; x += tileSize) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        }
+      }
+      
+      // Stained Glass effect
+      function applyStainedGlassEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        const tileSize = 20;
+        
+        // Create mosaic of colored tiles with dark borders
+        for (let y = 0; y < height; y += tileSize) {
+          for (let x = 0; x < width; x += tileSize) {
+            // Get a random color for this tile
+            const idx = (y * width + x) * 4;
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+            
+            // Enhance the color
+            const enhancedR = Math.min(255, r * 1.2);
+            const enhancedG = Math.min(255, g * 1.2);
+            const enhancedB = Math.min(255, b * 1.2);
+            
+            // Fill the tile
+            for (let ty = 0; ty < tileSize && y + ty < height; ty++) {
+              for (let tx = 0; tx < tileSize && x + tx < width; tx++) {
+                const nidx = ((y + ty) * width + (x + tx)) * 4;
+                
+                // Add some variation to the color
+                const variation = 20;
+                data[nidx] = enhancedR + (Math.random() - 0.5) * variation;
+                data[nidx + 1] = enhancedG + (Math.random() - 0.5) * variation;
+                data[nidx + 2] = enhancedB + (Math.random() - 0.5) * variation;
+              }
+            }
+          }
+        }
+        
+        // Draw dark borders
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.lineWidth = 2;
+        
+        for (let y = 0; y < height; y += tileSize) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(width, y);
+          ctx.stroke();
+        }
+        
+        for (let x = 0; x < width; x += tileSize) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        }
+      }
+      
+      // Ripple effect
+      function applyRippleEffect(data) {
+        const waveSize = parseInt(document.getElementById('rippleSize').value);
+        const frequency = parseFloat(document.getElementById('rippleFreq').value);
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        const centerX = width / 2;
+        const centerY = height / 2;
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            // Calculate distance from center
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Calculate ripple offset
+            const ripple = Math.sin(distance * frequency) * waveSize;
+            
+            // Calculate source position
+            const angle = Math.atan2(dy, dx);
+            const srcX = Math.floor(centerX + Math.cos(angle) * (distance + ripple));
+            const srcY = Math.floor(centerY + Math.sin(angle) * (distance + ripple));
+            
+            // Check if source position is valid
+            if (srcX >= 0 && srcX < width && srcY >= 0 && srcY < height) {
+              const srcIdx = (srcY * width + srcX) * 4;
+              const dstIdx = (y * width + x) * 4;
+              
+              data[dstIdx] = tempData[srcIdx];
+              data[dstIdx + 1] = tempData[srcIdx + 1];
+              data[dstIdx + 2] = tempData[srcIdx + 2];
+            }
+          }
+        }
+      }
+      
+      // Bulge effect
+      function applyBulgeEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.min(width, height) / 2;
+        const strength = 0.5;
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            // Calculate distance from center
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < radius) {
+              // Calculate bulge factor
+              const bulge = 1 + strength * (1 - distance / radius);
+              
+              // Calculate source position
+              const srcX = Math.floor(centerX + dx / bulge);
+              const srcY = Math.floor(centerY + dy / bulge);
+              
+              // Check if source position is valid
+              if (srcX >= 0 && srcX < width && srcY >= 0 && srcY < height) {
+                const srcIdx = (srcY * width + srcX) * 4;
+                const dstIdx = (y * width + x) * 4;
+                
+                data[dstIdx] = tempData[srcIdx];
+                data[dstIdx + 1] = tempData[srcIdx + 1];
+                data[dstIdx + 2] = tempData[srcIdx + 2];
+              }
+            }
+          }
+        }
+      }
+      
+      // Pinch effect
+      function applyPinchEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.min(width, height) / 2;
+        const strength = 0.5;
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            // Calculate distance from center
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < radius) {
+              // Calculate pinch factor
+              const pinch = 1 - strength * (1 - distance / radius);
+              
+              // Calculate source position
+              const srcX = Math.floor(centerX + dx * pinch);
+              const srcY = Math.floor(centerY + dy * pinch);
+              
+              // Check if source position is valid
+              if (srcX >= 0 && srcX < width && srcY >= 0 && srcY < height) {
+                const srcIdx = (srcY * width + srcX) * 4;
+                const dstIdx = (y * width + x) * 4;
+                
+                data[dstIdx] = tempData[srcIdx];
+                data[dstIdx + 1] = tempData[srcIdx + 1];
+                data[dstIdx + 2] = tempData[srcIdx + 2];
+              }
+            }
+          }
+        }
+      }
+      
+      // Swirl effect
+      function applySwirlEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.min(width, height) / 2;
+        const strength = 5;
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            // Calculate distance from center
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < radius) {
+              // Calculate angle
+              let angle = Math.atan2(dy, dx);
+              
+              // Apply swirl
+              angle += strength * (1 - distance / radius);
+              
+              // Calculate source position
+              const srcX = Math.floor(centerX + Math.cos(angle) * distance);
+              const srcY = Math.floor(centerY + Math.sin(angle) * distance);
+              
+              // Check if source position is valid
+              if (srcX >= 0 && srcX < width && srcY >= 0 && srcY < height) {
+                const srcIdx = (srcY * width + srcX) * 4;
+                const dstIdx = (y * width + x) * 4;
+                
+                data[dstIdx] = tempData[srcIdx];
+                data[dstIdx + 1] = tempData[srcIdx + 1];
+                data[dstIdx + 2] = tempData[srcIdx + 2];
+              }
+            }
+          }
+        }
+      }
+      
+      // Fisheye effect
+      function applyFisheyeEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.min(width, height) / 2;
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            // Calculate distance from center
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < radius) {
+              // Calculate fisheye factor
+              const r = distance / radius;
+              const theta = Math.atan2(dy, dx);
+              
+              // Fisheye formula
+              const newR = Math.sqrt(r) * radius;
+              
+              // Calculate source position
+              const srcX = Math.floor(centerX + newR * Math.cos(theta));
+              const srcY = Math.floor(centerY + newR * Math.sin(theta));
+              
+              // Check if source position is valid
+              if (srcX >= 0 && srcX < width && srcY >= 0 && srcY < height) {
+                const srcIdx = (srcY * width + srcX) * 4;
+                const dstIdx = (y * width + x) * 4;
+                
+                data[dstIdx] = tempData[srcIdx];
+                data[dstIdx + 1] = tempData[srcIdx + 1];
+                data[dstIdx + 2] = tempData[srcIdx + 2];
+              }
+            }
+          }
+        }
+      }
+      
+      // Kaleidoscope effect
+      function applyKaleidoscopeEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const segments = 8; // Number of segments in the kaleidoscope
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            // Calculate distance and angle from center
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            let angle = Math.atan2(dy, dx);
+            
+            // Normalize angle to 0-2π
+            if (angle < 0) angle += 2 * Math.PI;
+            
+            // Calculate which segment this pixel is in
+            const segment = Math.floor(angle / (2 * Math.PI / segments));
+            
+            // Calculate angle within segment
+            const segmentAngle = angle % (2 * Math.PI / segments);
+            
+            // Mirror if segment is odd
+            const mirroredAngle = segment % 2 === 1 
+              ? (2 * Math.PI / segments) - segmentAngle 
+              : segmentAngle;
+            
+            // Calculate source position
+            const srcX = Math.floor(centerX + Math.cos(mirroredAngle) * distance);
+            const srcY = Math.floor(centerY + Math.sin(mirroredAngle) * distance);
+            
+            // Check if source position is valid
+            if (srcX >= 0 && srcX < width && srcY >= 0 && srcY < height) {
+              const srcIdx = (srcY * width + srcX) * 4;
+              const dstIdx = (y * width + x) * 4;
+              
+              data[dstIdx] = tempData[srcIdx];
+              data[dstIdx + 1] = tempData[srcIdx + 1];
+              data[dstIdx + 2] = tempData[srcIdx + 2];
+            }
+          }
+        }
+      }
+      
+      // Mirror effect
+      function applyMirrorEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        // Mirror horizontally
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width / 2; x++) {
+            const leftIdx = (y * width + x) * 4;
+            const rightIdx = (y * width + (width - x - 1)) * 4;
+            
+            // Swap left and right pixels
+            data[leftIdx] = tempData[rightIdx];
+            data[leftIdx + 1] = tempData[rightIdx + 1];
+            data[leftIdx + 2] = tempData[rightIdx + 2];
+            
+            data[rightIdx] = tempData[leftIdx];
+            data[rightIdx + 1] = tempData[leftIdx + 1];
+            data[rightIdx + 2] = tempData[leftIdx + 2];
+          }
+        }
+      }
+      
+      // Tunnel Vision effect
+      function applyTunnelEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const maxRadius = Math.min(width, height) / 2;
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            // Calculate distance from center
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < maxRadius) {
+              // Calculate angle
+              const angle = Math.atan2(dy, dx);
+              
+              // Calculate tunnel effect - stretch towards center
+              const tunnelRadius = distance * distance / maxRadius;
+              
+              // Calculate source position
+              const srcX = Math.floor(centerX + Math.cos(angle) * tunnelRadius);
+              const srcY = Math.floor(centerY + Math.sin(angle) * tunnelRadius);
+              
+              // Check if source position is valid
+              if (srcX >= 0 && srcX < width && srcY >= 0 && srcY < height) {
+                const srcIdx = (srcY * width + srcX) * 4;
+                const dstIdx = (y * width + x) * 4;
+                
+                data[dstIdx] = tempData[srcIdx];
+                data[dstIdx + 1] = tempData[srcIdx + 1];
+                data[dstIdx + 2] = tempData[srcIdx + 2];
+              }
+            }
+          }
+        }
+      }
+      
+      // Duotone effect
+      function applyDuotoneEffect(data) {
+        const darkColor = hexToRgb(document.getElementById('duotoneDark').value);
+        const lightColor = hexToRgb(document.getElementById('duotoneLight').value);
+        
+        for (let i = 0; i < data.length; i += 4) {
+          // Convert to grayscale
+          const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+          const normalized = gray / 255;
+          
+          // Interpolate between dark and light colors
+          data[i] = darkColor.r + (lightColor.r - darkColor.r) * normalized;
+          data[i + 1] = darkColor.g + (lightColor.g - darkColor.g) * normalized;
+          data[i + 2] = darkColor.b + (lightColor.b - darkColor.b) * normalized;
+        }
+      }
+      
+      // Posterize effect
+      function applyPosterizeEffect(data) {
+        const levels = 4; // Number of color levels
+        
+        for (let i = 0; i < data.length; i += 4) {
+          // Reduce each channel to a limited number of levels
+          data[i] = Math.floor(data[i] / 255 * levels) * (255 / levels);
+          data[i + 1] = Math.floor(data[i + 1] / 255 * levels) * (255 / levels);
+          data[i + 2] = Math.floor(data[i + 2] / 255 * levels) * (255 / levels);
+        }
+      }
+      
+      // Solarize effect
+      function applySolarizeEffect(data) {
+        const threshold = 128; // Midpoint for solarization
+        
+        for (let i = 0; i < data.length; i += 4) {
+          // Invert colors above the threshold
+          if (data[i] > threshold) data[i] = 255 - data[i];
+          if (data[i + 1] > threshold) data[i + 1] = 255 - data[i + 1];
+          if (data[i + 2] > threshold) data[i + 2] = 255 - data[i + 2];
+        }
+      }
+      
+      // Edge Glow effect
+      function applyEdgeGlowEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        // Apply edge detection
+        for (let y = 1; y < height - 1; y++) {
+          for (let x = 1; x < width - 1; x++) {
+            const idx = (y * width + x) * 4;
+            
+            // Get surrounding pixels
+            const tl = tempData[((y - 1) * width + (x - 1)) * 4];
+            const tm = tempData[((y - 1) * width + x) * 4];
+            const tr = tempData[((y - 1) * width + (x + 1)) * 4];
+            const ml = tempData[(y * width + (x - 1)) * 4];
+            const mm = tempData[idx];
+            const mr = tempData[(y * width + (x + 1)) * 4];
+            const bl = tempData[((y + 1) * width + (x - 1)) * 4];
+            const bm = tempData[((y + 1) * width + x) * 4];
+            const br = tempData[((y + 1) * width + (x + 1)) * 4];
+            
+            // Apply Sobel operator
+            const gx = -tl - 2 * ml - bl + tr + 2 * mr + br;
+            const gy = -tl - 2 * tm - tr + bl + 2 * bm + br;
+            
+            // Calculate edge magnitude
+            const magnitude = Math.min(255, Math.sqrt(gx * gx + gy * gy));
+            
+            // Create glow effect
+            const glow = magnitude > 50 ? 255 : 0;
+            
+            data[idx] = Math.min(255, tempData[idx] + glow);
+            data[idx + 1] = Math.min(255, tempData[idx + 1] + glow);
+            data[idx + 2] = Math.min(255, tempData[idx + 2] + glow);
+          }
+        }
+      }
+      
+      // Chromatic Aberration effect
+      function applyChromaticEffect(data) {
+        const width = canvas.width;
+        const height = canvas.height;
+        const shift = 5;
+        const tempData = new Uint8ClampedArray(data);
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+            
+            // Red channel - shift right
+            if (x + shift < width) {
+              const redIdx = (y * width + (x + shift)) * 4;
+              data[idx] = tempData[redIdx];
+            }
+            
+            // Blue channel - shift left
+            if (x - shift >= 0) {
+              const blueIdx = (y * width + (x - shift)) * 4;
+              data[idx + 2] = tempData[blueIdx + 2];
+            }
+          }
+        }
+      }
+      
+      // Thermal Vision effect
+      function applyThermalEffect(data) {
+        for (let i = 0; i < data.length; i += 4) {
+          // Convert to grayscale
+          const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+          
+          // Apply thermal color mapping
+          if (gray < 85) {
+            // Black to blue
+            data[i] = 0;
+            data[i + 1] = 0;
+            data[i + 2] = gray * 3;
+          } else if (gray < 170) {
+            // Blue to red
+            data[i] = (gray - 85) * 3;
+            data[i + 1] = 0;
+            data[i + 2] = 255 - (gray - 85) * 3;
+          } else {
+            // Red to white
+            data[i] = 255;
+            data[i + 1] = (gray - 170) * 3;
+            data[i + 2] = (gray - 170) * 3;
+          }
+        }
+      }
+      
+      // X-Ray effect
+      function applyXRayEffect(data) {
+        for (let i = 0; i < data.length; i += 4) {
+          // Invert and apply blue tint
+          data[i] = 255 - data[i] * 0.5;         // Red
+          data[i + 1] = 255 - data[i + 1] * 0.5; // Green
+          data[i + 2] = 255;                      // Blue
+        }
+      }
+      
+      // Infrared effect
+      function applyInfraredEffect(data) {
+        for (let i = 0; i < data.length; i += 4) {
+          // Convert to grayscale and apply red tint
+          const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+          
+          data[i] = Math.min(255, gray * 1.5);     // Red
+          data[i + 1] = gray * 0.3;                // Green
+          data[i + 2] = gray * 0.1;                // Blue
+        }
+      }
+      
+      // Neon Glow effect
+      function applyNeonGlowEffect(data) {
+        const neonColor = hexToRgb(document.getElementById('neonColor').value);
+        const intensity = parseInt(document.getElementById('glowIntensity').value) / 100;
+        
+        // Apply edge detection to find outlines
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        for (let y = 1; y < height - 1; y++) {
+          for (let x = 1; x < width - 1; x++) {
+            const idx = (y * width + x) * 4;
+            
+            // Get surrounding pixels
+            const tl = tempData[((y - 1) * width + (x - 1)) * 4];
+            const tm = tempData[((y - 1) * width + x) * 4];
+            const tr = tempData[((y - 1) * width + (x + 1)) * 4];
+            const ml = tempData[(y * width + (x - 1)) * 4];
+            const mm = tempData[idx];
+            const mr = tempData[(y * width + (x + 1)) * 4];
+            const bl = tempData[((y + 1) * width + (x - 1)) * 4];
+            const bm = tempData[((y + 1) * width + x) * 4];
+            const br = tempData[((y + 1) * width + (x + 1)) * 4];
+            
+            // Apply Sobel operator
+            const gx = -tl - 2 * ml - bl + tr + 2 * mr + br;
+            const gy = -tl - 2 * tm - tr + bl + 2 * bm + br;
+            
+            // Calculate edge magnitude
+            const magnitude = Math.min(255, Math.sqrt(gx * gx + gy * gy));
+            
+            // Apply neon glow to edges
+            if (magnitude > 50) {
+              data[idx] = Math.min(255, data[idx] + neonColor.r * intensity);
+              data[idx + 1] = Math.min(255, data[idx + 1] + neonColor.g * intensity);
+              data[idx + 2] = Math.min(255, data[idx + 2] + neonColor.b * intensity);
+            }
+          }
+        }
+      }
+      
+      // Cyber Grid effect
+      function applyCyberGridEffect(data) {
+        const gridSize = parseInt(document.getElementById('gridSize').value);
+        const gridColor = hexToRgb(document.getElementById('gridColor').value);
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Draw grid
+        ctx.strokeStyle = `rgba(${gridColor.r}, ${gridColor.g}, ${gridColor.b}, 0.7)`;
+        ctx.lineWidth = 1;
+        
+        for (let y = 0; y < height; y += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(width, y);
+          ctx.stroke();
+        }
+        
+        for (let x = 0; x < width; x += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        }
+        
+        // Add glow to grid intersections
+        for (let y = 0; y < height; y += gridSize) {
+          for (let x = 0; x < width; x += gridSize) {
+            ctx.fillStyle = `rgba(${gridColor.r}, ${gridColor.g}, ${gridColor.b}, 0.5)`;
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+      
+      // Hologram effect
+      function applyHologramEffect(data) {
+        const interference = parseInt(document.getElementById('interference').value) / 100;
+        const transparency = parseInt(document.getElementById('transparency').value) / 100;
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Create hologram pattern
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+            
+            // Create interference pattern
+            const pattern = Math.sin(x * 0.1) * Math.sin(y * 0.1);
+            const interferenceValue = pattern * interference * 255;
+            
+            // Apply blue-cyan tint
+            data[idx] = data[idx] * (1 - transparency) + 0 * transparency; // Red
+            data[idx + 1] = data[idx + 1] * (1 - transparency) + 255 * transparency; // Green
+            data[idx + 2] = data[idx + 2] * (1 - transparency) + 255 * transparency; // Blue
+            
+            // Add interference
+            data[idx] = Math.min(255, Math.max(0, data[idx] + interferenceValue));
+            data[idx + 1] = Math.min(255, Math.max(0, data[idx + 1] + interferenceValue));
+            data[idx + 2] = Math.min(255, Math.max(0, data[idx + 2] + interferenceValue));
+          }
+        }
+        
+        // Add scanlines
+        for (let y = 0; y < height; y += 4) {
+          for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+            data[idx] *= 0.8;
+            data[idx + 1] *= 0.8;
+            data[idx + 2] *= 0.8;
+          }
+        }
+      }
+      
+      // Digital Glitch effect
+      function applyDigitalGlitchEffect(data) {
+        const glitchAmount = parseInt(document.getElementById('glitchAmount').value) / 100;
+        const colorShift = parseInt(document.getElementById('colorShift').value);
+        const width = canvas.width;
+        const height = canvas.height;
+        const tempData = new Uint8ClampedArray(data);
+        
+        // Apply random glitches
+        for (let i = 0; i < height * glitchAmount; i++) {
+          const y = Math.floor(Math.random() * height);
+          const h = Math.floor(Math.random() * 10) + 1;
+          const shift = (Math.random() - 0.5) * colorShift * 2;
+          
+          for (let py = y; py < y + h && py < height; py++) {
+            for (let x = 0; x < width; x++) {
+              const idx = (py * width + x) * 4;
+              
+              if (x + shift >= 0 && x + shift < width) {
+                const shiftIdx = (py * width + Math.floor(x + shift)) * 4;
+                
+                // Randomly shift color channels
+                if (Math.random() < 0.3) {
+                  data[idx] = tempData[shiftIdx]; // Red
+                }
+                if (Math.random() < 0.3) {
+                  data[idx + 1] = tempData[shiftIdx + 1]; // Green
+                }
+                if (Math.random() < 0.3) {
+                  data[idx + 2] = tempData[shiftIdx + 2]; // Blue
+                }
+              }
+            }
+          }
+        }
+        
+        // Add digital noise
+        for (let i = 0; i < data.length; i += 4) {
+          if (Math.random() < 0.05 * glitchAmount) {
+            data[i] = Math.floor(Math.random() * 256);
+            data[i + 1] = Math.floor(Math.random() * 256);
+            data[i + 2] = Math.floor(Math.random() * 256);
+          }
+        }
+      }
+      
+      // Synthwave effect
+      function applySynthwaveEffect(data) {
+        const sunColor = hexToRgb(document.getElementById('sunColor').value);
+        const horizonHeight = parseInt(document.getElementById('horizonHeight').value) / 100 * canvas.height;
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Create gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, 'rgba(25, 0, 40, 0.7)');
+        gradient.addColorStop(horizonHeight / height, 'rgba(230, 0, 100, 0.7)');
+        gradient.addColorStop(1, 'rgba(25, 0, 40, 0.7)');
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+        
+        // Draw sun
+        ctx.beginPath();
+        ctx.arc(width / 2, horizonHeight, 50, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${sunColor.r}, ${sunColor.g}, ${sunColor.b}, 0.7)`;
+        ctx.fill();
+        
+        // Draw grid lines
+        ctx.strokeStyle = 'rgba(255, 0, 255, 0.3)';
+        ctx.lineWidth = 1;
+        
+        for (let y = horizonHeight; y < height; y += 20) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(width, y);
+          ctx.stroke();
+        }
+        
+        for (let x = 0; x < width; x += 30) {
+          ctx.beginPath();
+          ctx.moveTo(x, horizonHeight);
+          ctx.lineTo(x + (x - width/2) * 0.5, height);
+          ctx.stroke();
+        }
+      }
+      
+      // Cyberpunk effect
+      function applyCyberpunkEffect(data) {
+        const accentColor = hexToRgb(document.getElementById('accentColor').value);
+        const darkness = parseInt(document.getElementById('darkness').value) / 100;
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Apply darkness
+        for (let i = 0; i < data.length; i += 4) {
+          data[i] *= (1 - darkness);
+          data[i + 1] *= (1 - darkness);
+          data[i + 2] *= (1 - darkness);
+        }
+        
+        // Add accent color to highlights
+        for (let i = 0; i < data.length; i += 4) {
+          const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+          
+          if (brightness > 200) {
+            data[i] = Math.min(255, data[i] + accentColor.r * 0.5);
+            data[i + 1] = Math.min(255, data[i + 1] + accentColor.g * 0.5);
+            data[i + 2] = Math.min(255, data[i + 2] + accentColor.b * 0.5);
+          }
+        }
+        
+        // Draw grid
+        ctx.strokeStyle = `rgba(${accentColor.r}, ${accentColor.g}, ${accentColor.b}, 0.3)`;
+        ctx.lineWidth = 1;
+        
+        for (let y = 0; y < height; y += 20) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(width, y);
+          ctx.stroke();
+        }
+        
+        for (let x = 0; x < width; x += 20) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        }
+      }
+      
+      // Neon Rain effect
+      function applyNeonRainEffect(data) {
+        const rainDensity = parseInt(document.getElementById('rainDensity').value) / 100;
+        const rainColor = hexToRgb(document.getElementById('rainColor').value);
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Draw rain drops
+        const dropCount = Math.floor(width * rainDensity);
+        
+        for (let i = 0; i < dropCount; i++) {
+          const x = Math.floor(Math.random() * width);
+          const length = Math.floor(Math.random() * 30) + 10;
+          const y = Math.floor(Math.random() * height);
+          
+          ctx.strokeStyle = `rgba(${rainColor.r}, ${rainColor.g}, ${rainColor.b}, 0.7)`;
+          ctx.lineWidth = Math.random() * 2 + 1;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x, y + length);
+          ctx.stroke();
+          
+          // Add glow
+          ctx.shadowColor = `rgba(${rainColor.r}, ${rainColor.g}, ${rainColor.b}, 0.7)`;
+          ctx.shadowBlur = 10;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+      }
+      
+      // Apply adjustments
+      function applyAdjustments(data, brightness, contrast, saturation, exposure, temperature) {
+        for (let i = 0; i < data.length; i += 4) {
+          let r = data[i];
+          let g = data[i + 1];
+          let b = data[i + 2];
+          
+          // Apply brightness
+          r += brightness * 2.55;
+          g += brightness * 2.55;
+          b += brightness * 2.55;
+          
+          // Apply contrast
+          const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+          r = contrastFactor * (r - 128) + 128;
+          g = contrastFactor * (g - 128) + 128;
+          b = contrastFactor * (b - 128) + 128;
+          
+          // Apply exposure
+          const exposureFactor = Math.pow(2, exposure / 100);
+          r *= exposureFactor;
+          g *= exposureFactor;
+          b *= exposureFactor;
+          
+          // Apply temperature
+          if (temperature > 0) {
+            // Warmer (more red, less blue)
+            r += temperature * 0.5;
+            b -= temperature * 0.5;
+          } else {
+            // Cooler (more blue, less red)
+            r += temperature * 0.5;
+            b -= temperature * 0.5;
+          }
+          
+          // Apply saturation
+          const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+          r = gray + saturation * (r - gray) / 100;
+          g = gray + saturation * (g - gray) / 100;
+          b = gray + saturation * (b - gray) / 100;
+          
+          // Clamp values
+          data[i] = Math.min(255, Math.max(0, r));
+          data[i + 1] = Math.min(255, Math.max(0, g));
+          data[i + 2] = Math.min(255, Math.max(0, b));
+        }
+      }
+      
+      // Apply frame
+      function applyFrame(frameType) {
+        const frameSize = parseInt(document.getElementById('frameSize').value);
+        const frameColor = document.getElementById('frameColor').value;
+        
+        ctx.strokeStyle = frameColor;
+        ctx.lineWidth = frameSize;
+        
+        switch(frameType) {
+          case 'simple':
+            // Simple frame
+            ctx.strokeRect(frameSize/2, frameSize/2, canvas.width - frameSize, canvas.height - frameSize);
+            break;
+            
+          case 'vintage':
+            // Vintage frame with ornate corners
+            ctx.strokeRect(frameSize/2, frameSize/2, canvas.width - frameSize, canvas.height - frameSize);
+            
+            // Add corner decorations
+            const cornerSize = 30;
+            ctx.beginPath();
+            
+            // Top-left
+            ctx.moveTo(frameSize, frameSize + cornerSize);
+            ctx.lineTo(frameSize, frameSize);
+            ctx.lineTo(frameSize + cornerSize, frameSize);
+            
+            // Top-right
+            ctx.moveTo(canvas.width - frameSize - cornerSize, frameSize);
+            ctx.lineTo(canvas.width - frameSize, frameSize);
+            ctx.lineTo(canvas.width - frameSize, frameSize + cornerSize);
+            
+            // Bottom-right
+            ctx.moveTo(canvas.width - frameSize, canvas.height - frameSize - cornerSize);
+            ctx.lineTo(canvas.width - frameSize, canvas.height - frameSize);
+            ctx.lineTo(canvas.width - frameSize - cornerSize, canvas.height - frameSize);
+            
+            // Bottom-left
+            ctx.moveTo(frameSize + cornerSize, canvas.height - frameSize);
+            ctx.lineTo(frameSize, canvas.height - frameSize);
+            ctx.lineTo(frameSize, canvas.height - frameSize - cornerSize);
+            
+            ctx.stroke();
+            break;
+            
+          case 'modern':
+            // Modern frame with clean lines
+            ctx.strokeRect(frameSize/2, frameSize/2, canvas.width - frameSize, canvas.height - frameSize);
+            
+            // Add inner frame
+            ctx.lineWidth = frameSize / 2;
+            ctx.strokeRect(frameSize * 1.5, frameSize * 1.5, canvas.width - frameSize * 3, canvas.height - frameSize * 3);
+            break;
+            
+          case 'polaroid':
+            // Polaroid-style frame with larger bottom
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Create image area
+            ctx.clearRect(frameSize, frameSize, canvas.width - frameSize * 2, canvas.height - frameSize * 3);
+            
+            // Draw frame
+            ctx.strokeStyle = frameColor;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(frameSize, frameSize, canvas.width - frameSize * 2, canvas.height - frameSize * 3);
+            break;
+            
+          case 'film':
+            // Film strip frame
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Create image area
+            ctx.clearRect(frameSize * 2, frameSize * 2, canvas.width - frameSize * 4, canvas.height - frameSize * 4);
+            
+            // Draw film holes
+            const holeSize = 10;
+            const holeSpacing = 20;
+            
+            ctx.fillStyle = '#000000';
+            for (let y = holeSpacing; y < canvas.height; y += holeSpacing * 2) {
+              // Left side
+              ctx.beginPath();
+              ctx.arc(frameSize, y, holeSize/2, 0, Math.PI * 2);
+              ctx.fill();
+              
+              // Right side
+              ctx.beginPath();
+              ctx.arc(canvas.width - frameSize, y, holeSize/2, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            break;
+        }
+      }
+      
+      // Download image
+      function downloadImage() {
+        if (!canvas.width || !canvas.height) return;
+        
+        const quality = qualityRange.value / 100;
+        
+        canvas.toBlob(function(blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'edited-image.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          
+          showToast('Image downloaded successfully!');
+        }, 'image/png', quality);
+      }
+      
+      // Reset all
+      function resetAll() {
+        // Reset controls
+        sizeRange.value = 100;
+        sizeVal.textContent = '100';
+        qualityRange.value = 92;
+        qualityVal.textContent = '92';
+        modeSelect.value = 'resize';
+        
+        // Reset all range inputs
+        const rangeInputs = document.querySelectorAll('input[type="range"]');
+        rangeInputs.forEach(input => {
+          if (input.id !== 'sizeRange' && input.id !== 'qualityRange') {
+            input.value = input.defaultValue;
+            const valueDisplay = document.getElementById(`${input.id}Value`);
+            if (valueDisplay) {
+              valueDisplay.textContent = input.defaultValue;
+            }
+          }
+        });
+        
+        // Reset color inputs
+        const colorInputs = document.querySelectorAll('input[type="color"]');
+        colorInputs.forEach(input => {
+          input.value = input.defaultValue;
+        });
+        
+        // Reset selects
+        const selects = document.querySelectorAll('select');
+        selects.forEach(select => {
+          if (select.id !== 'mode') {
+            select.selectedIndex = 0;
+          }
+        });
+        
+        // Reset frame options
+        const frameOptions = document.querySelectorAll('.frame-option');
+        frameOptions.forEach(option => {
+          option.classList.remove('active');
+        });
+        document.querySelector('.frame-option[data-frame="none"]').classList.add('active');
+        
+        // Reset text style options
+        const textStyleOptions = document.querySelectorAll('.text-style-option');
+        textStyleOptions.forEach(option => {
+          option.classList.remove('active');
+        });
+        document.querySelector('.text-style-option[data-style="normal"]').classList.add('active');
+        
+        // Reset tabs
+        tabs.forEach(tab => {
+          tab.classList.remove('active');
+        });
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+        });
+        document.querySelector('.tab[data-tab="basic"]').classList.add('active');
+        document.getElementById('basic-tab').classList.add('active');
+        
+        // Reset filter controls
+        filterControls.forEach(control => {
+          control.classList.remove('active');
+        });
+        
+        // Reset image
+        if (originalImage) {
+          applyEffects();
+          updatePreviewWithQuality();
+        }
+        
+        // Reset info
+        outMode.textContent = 'Resize Biasa';
+        
+        showToast('All settings reset!');
+      }
+      
+      // Show toast notification
+      function showToast(message, type = 'success') {
+        toast.textContent = message;
+        toast.className = 'toast';
+        
+        if (type === 'error') {
+          toast.classList.add('error');
+        }
+        
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
+      
+      // Format file size
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+      
+      // Estimate file size
+      function estimateFileSize() {
+        // Rough estimate based on canvas dimensions and quality
+        const pixels = canvas.width * canvas.height;
+        const quality = qualityRange.value / 100;
+        
+        // Base estimate: 3 bytes per pixel (RGB) * quality factor
+        return pixels * 3 * quality;
+      }
+      
+      // Convert hex to RGB
+      function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : { r: 0, g: 0, b: 0 };
+      }
+    });
+  </script>
+</body>
+</html>
